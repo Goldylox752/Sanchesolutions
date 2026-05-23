@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Byron Sanche | Full Stack Developer & AI Automation</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#050816;
+  --card:#0f172a;
+  --card2:#111827;
+  --line:rgba(255,255,255,.08);
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --blue:#3b82f6;
+  --purple:#8b5cf6;
+  --green:#10b981;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:linear-gradient(to bottom,#050816,#0b1120);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+.container{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:0 24px;
+}
+
+/* NAV */
+
+nav{
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(14px);
+  background:rgba(5,8,22,.75);
+  border-bottom:1px solid var(--line);
+}
+
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 0;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+
+.logo span{
+  color:var(--blue);
+}
+
+.nav-links{
+  display:flex;
+  gap:28px;
+}
+
+.nav-links a{
+  color:var(--muted);
+  font-size:15px;
+  transition:.2s;
+}
+
+.nav-links a:hover{
+  color:white;
+}
+
+/* HERO */
+
+.hero{
+  padding:120px 0 90px;
+  position:relative;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:60px;
+  align-items:center;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:rgba(59,130,246,.1);
+  border:1px solid rgba(59,130,246,.2);
+  color:#93c5fd;
+  font-size:14px;
+  margin-bottom:24px;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 16px var(--green);
+}
+
+.hero h1{
+  font-size:clamp(48px,7vw,88px);
+  line-height:.95;
+  letter-spacing:-4px;
+  margin-bottom:22px;
+}
+
+.hero h1 span{
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:19px;
+  line-height:1.8;
+  max-width:680px;
+}
+
+.hero-actions{
+  margin-top:36px;
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:16px 28px;
+  border-radius:14px;
+  font-weight:600;
+  transition:.25s;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+
+.btn-primary{
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  color:white;
+  box-shadow:0 10px 40px rgba(59,130,246,.25);
+}
+
+.btn-primary:hover{
+  transform:translateY(-3px);
+}
+
+.btn-secondary{
+  border:1px solid var(--line);
+  color:white;
+}
+
+.btn-secondary:hover{
+  background:rgba(255,255,255,.05);
+}
+
+/* HERO CARD */
+
+.hero-card{
+  background:linear-gradient(180deg,#0f172a,#111827);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:30px;
+  box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+
+.metric{
+  padding:22px;
+  border-radius:18px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.04);
+  margin-bottom:18px;
+}
+
+.metric h3{
+  font-size:38px;
+  margin-bottom:6px;
+}
+
+.metric p{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.stack{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:20px;
+}
+
+.stack span{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:13px;
+  color:#cbd5e1;
+}
+
+/* SECTION */
+
+section{
+  padding:100px 0;
+}
+
+.section-title{
+  font-size:48px;
+  margin-bottom:16px;
+  letter-spacing:-2px;
+}
+
+.section-sub{
+  color:var(--muted);
+  font-size:18px;
+  max-width:700px;
+  line-height:1.8;
+}
+
+/* PROJECTS */
+
+.projects-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:26px;
+  margin-top:50px;
+}
+
+.project{
+  background:linear-gradient(180deg,#111827,#0f172a);
+  border:1px solid var(--line);
+  border-radius:24px;
+  overflow:hidden;
+  transition:.3s;
+}
+
+.project:hover{
+  transform:translateY(-6px);
+  border-color:rgba(59,130,246,.4);
+}
+
+.project-top{
+  padding:26px;
+  border-bottom:1px solid var(--line);
+}
+
+.project-tag{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(59,130,246,.1);
+  color:#93c5fd;
+  font-size:12px;
+  margin-bottom:18px;
+}
+
+.project h3{
+  font-size:28px;
+  margin-bottom:12px;
+}
+
+.project p{
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.project-bottom{
+  padding:24px 26px;
+}
+
+.project-links{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.project-links a{
+  padding:12px 18px;
+  border-radius:12px;
+  background:rgba(255,255,255,.05);
+  color:white;
+  font-size:14px;
+  transition:.2s;
+}
+
+.project-links a:hover{
+  background:rgba(59,130,246,.18);
+}
+
+/* SKILLS */
+
+.skills-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+  margin-top:50px;
+}
+
+.skill{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:28px;
+}
+
+.skill h3{
+  margin-bottom:14px;
+  font-size:22px;
+}
+
+.skill ul{
+  list-style:none;
+}
+
+.skill li{
+  margin-bottom:10px;
+  color:var(--muted);
+}
+
+/* CTA */
+
+.cta{
+  text-align:center;
+  background:linear-gradient(180deg,#111827,#0f172a);
+  border:1px solid var(--line);
+  border-radius:30px;
+  padding:70px 30px;
+}
+
+.cta h2{
+  font-size:54px;
+  margin-bottom:16px;
+  letter-spacing:-2px;
+}
+
+.cta p{
+  max-width:700px;
+  margin:auto;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:18px;
+}
+
+/* FOOTER */
+
+footer{
+  padding:50px 0;
+  text-align:center;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+  margin-top:80px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+  .hero-grid{
+    grid-template-columns:1fr;
+  }
+
+  .nav-links{
+    display:none;
+  }
+
+  .hero h1{
+    font-size:60px;
+  }
+
+  .section-title{
+    font-size:38px;
+  }
+
+  .cta h2{
+    font-size:42px;
+  }
+
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <div class="logo">
+      Byron<span>.</span>
+    </div>
+
+    <div class="nav-links">
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+
+  <div class="container hero-grid">
+
+    <div>
+
+      <div class="badge">
+        <div class="dot"></div>
+        Full Stack Developer • AI Automation • Network Systems
+      </div>
+
+      <h1>
+        Building modern <span>AI systems</span>, websites, and automation platforms.
+      </h1>
+
+      <p>
+        I build high-performance websites, AI lead systems, CRM automations,
+        APIs, cloud deployments, and networking infrastructure for modern businesses.
+      </p>
+
+      <div class="hero-actions">
+
+        <a href="#projects" class="btn btn-primary">
+          View My Work →
+        </a>
+
+        <a href="mailto:youremail@example.com" class="btn btn-secondary">
+          Contact Me
+        </a>
+
+      </div>
+
+    </div>
+
+    <div class="hero-card">
+
+      <div class="metric">
+        <h3>10+</h3>
+        <p>Live deployments & automation systems</p>
+      </div>
+
+      <div class="metric">
+        <h3>24/7</h3>
+        <p>Cloud hosted infrastructure & monitoring</p>
+      </div>
+
+      <div class="metric">
+        <h3>Full Stack</h3>
+        <p>Frontend, backend, APIs, AI & deployment</p>
+      </div>
+
+      <div class="stack">
+        <span>Node.js</span>
+        <span>JavaScript</span>
+        <span>Vercel</span>
+        <span>Render</span>
+        <span>Stripe</span>
+        <span>Twilio</span>
+        <span>Telegram Bots</span>
+        <span>SEO</span>
+        <span>Cloudflare</span>
+        <span>Cisco</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="projects">
+
+  <div class="container">
+
+    <h2 class="section-title">
+      Featured Projects
+    </h2>
+
+    <p class="section-sub">
+      Production-ready websites, AI automation systems, backend infrastructure,
+      CRM integrations, and lead-generation platforms.
+    </p>
+
+    <div class="projects-grid">
+
+      <div class="project">
+
+        <div class="project-top">
+
+          <div class="project-tag">
+            AI Roofing Platform
+          </div>
+
+          <h3>NorthSky</h3>
+
+          <p>
+            AI-powered roofing lead intelligence platform with storm tracking,
+            lead scoring, CRM automation, and live sales dashboards.
+          </p>
+
+        </div>
+
+        <div class="project-bottom">
+
+          <div class="project-links">
+            <a href="https://north-sky-products-os.vercel.app" target="_blank">
+              Frontend
+            </a>
+
+            <a href="https://northsky-roofflow.onrender.com" target="_blank">
+              Backend
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="project">
+
+        <div class="project-top">
+
+          <div class="project-tag">
+            AI Automation
+          </div>
+
+          <h3>RoofFlow CRM</h3>
+
+          <p>
+            Lead dispatching, Twilio integrations, WhatsApp messaging,
+            Telegram bots, and automated CRM workflows.
+          </p>
+
+        </div>
+
+        <div class="project-bottom">
+
+          <div class="project-links">
+            <a href="https://northsky-roofflow.onrender.com" target="_blank">
+              Live API
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="project">
+
+        <div class="project-top">
+
+          <div class="project-tag">
+            Cloud Deployment
+          </div>
+
+          <h3>AI Lead Systems</h3>
+
+          <p>
+            Full backend architecture with APIs, Stripe billing,
+            server deployments, authentication, and scalable infrastructure.
+          </p>
+
+        </div>
+
+        <div class="project-bottom">
+
+          <div class="project-links">
+            <a href="https://skyscan-ccjt.onrender.com" target="_blank">
+              Open Project
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="skills">
+
+  <div class="container">
+
+    <h2 class="section-title">
+      Technical Skills
+    </h2>
+
+    <p class="section-sub">
+      Modern development, networking, cloud infrastructure,
+      marketing systems, and automation engineering.
+    </p>
+
+    <div class="skills-grid">
+
+      <div class="skill">
+        <h3>Frontend</h3>
+
+        <ul>
+          <li>HTML5 / CSS3</li>
+          <li>JavaScript</li>
+          <li>Responsive Design</li>
+          <li>UI/UX Systems</li>
+          <li>SEO Optimization</li>
+        </ul>
+      </div>
+
+      <div class="skill">
+        <h3>Backend</h3>
+
+        <ul>
+          <li>Node.js</li>
+          <li>REST APIs</li>
+          <li>Authentication</li>
+          <li>Stripe Integrations</li>
+          <li>Database Architecture</li>
+        </ul>
+      </div>
+
+      <div class="skill">
+        <h3>Automation</h3>
+
+        <ul>
+          <li>Twilio APIs</li>
+          <li>Telegram Bots</li>
+          <li>CRM Workflows</li>
+          <li>AI Routing</li>
+          <li>Lead Dispatch Systems</li>
+        </ul>
+      </div>
+
+      <div class="skill">
+        <h3>Infrastructure</h3>
+
+        <ul>
+          <li>Vercel Deployments</li>
+          <li>Render Hosting</li>
+          <li>Linux Servers</li>
+          <li>Cloudflare</li>
+          <li>Cisco Networking</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="contact">
+
+  <div class="container">
+
+    <div class="cta">
+
+      <h2>
+        Let’s build something powerful.
+      </h2>
+
+      <p>
+        Available for freelance development, AI automation systems,
+        infrastructure deployment, lead-generation platforms, and networking projects.
+      </p>
+
+      <div class="hero-actions" style="justify-content:center;margin-top:34px">
+
+        <a href="mailto:youremail@example.com" class="btn btn-primary">
+          Contact Me →
+        </a>
+
+        <a href="https://github.com/" target="_blank" class="btn btn-secondary">
+          GitHub
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer>
+  © 2026 Byron Sanche — Full Stack Developer & AI Systems
+</footer>
+
+</body>
+</html>
