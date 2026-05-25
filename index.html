@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Sanche AI | AI Systems That Generate Leads & Close Sales</title>
+<title>Sanche AI | AI Systems That Close Sales Automatically</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -23,13 +23,13 @@
 
 body{
   font-family:"DM Sans",sans-serif;
-  background: radial-gradient(circle at 20% 10%, rgba(79,140,255,0.18), transparent 40%),
-              radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
-              var(--bg);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(79,140,255,0.18), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
+    var(--bg);
   color:var(--text);
 }
 
-/* NAV */
 nav{
   position:fixed;
   top:0;
@@ -56,7 +56,6 @@ nav{
   cursor:pointer;
 }
 
-/* HERO */
 .hero{
   min-height:100vh;
   display:flex;
@@ -143,6 +142,7 @@ p{
   border-radius:12px;
   margin-bottom:10px;
   font-size:14px;
+  white-space:pre-wrap;
 }
 
 .user{
@@ -194,10 +194,8 @@ button.send{
   <p>AI automation that generates leads, qualifies prospects, and closes deals 24/7.</p>
 </section>
 
-<!-- CHAT BUTTON -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
-<!-- CHAT PANEL -->
 <div class="panel" id="panel">
   <div class="header">AI Assistant</div>
 
@@ -210,13 +208,13 @@ button.send{
 </div>
 
 <script>
-const API = "https://YOUR-RENDER-URL.onrender.com/chat";
+
+const API = "https://sanchesolutions.onrender.com/chat";
 
 const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 
-/* OPEN CHAT */
 function toggleChat(){
   panel.classList.toggle("open");
 
@@ -225,8 +223,7 @@ function toggleChat(){
   }
 }
 
-/* ADD MESSAGE */
-function addMessage(text, type, returnEl=false){
+function addMessage(text, type){
   const el = document.createElement("div");
   el.className = `msg ${type}`;
   el.textContent = text;
@@ -234,26 +231,23 @@ function addMessage(text, type, returnEl=false){
   messages.appendChild(el);
   messages.scrollTop = messages.scrollHeight;
 
-  if(returnEl) return el;
+  return el;
 }
 
-/* SCROLL */
 function scroll(){
   messages.scrollTop = messages.scrollHeight;
 }
 
-/* SEND MESSAGE (STREAMING) */
+/* STREAMING CHAT */
 async function handleSend(){
   const text = input.value.trim();
   if(!text) return;
 
   input.value = "";
 
-  // user message
   addMessage(text, "user");
 
-  // bot bubble (stream target)
-  const botBubble = addMessage("", "bot", true);
+  const botBubble = addMessage("", "bot");
 
   try {
     const res = await fetch(API, {
@@ -263,34 +257,34 @@ async function handleSend(){
     });
 
     if(!res.body){
-      botBubble.textContent = "No response";
+      botBubble.textContent = "No response from server";
       return;
     }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
 
-    let full = "";
+    let fullText = "";
 
     while(true){
       const { value, done } = await reader.read();
       if(done) break;
 
-      full += decoder.decode(value, { stream:true });
-      botBubble.textContent = full;
+      fullText += decoder.decode(value, { stream:true });
 
+      botBubble.textContent = fullText;
       scroll();
     }
 
   } catch(err){
-    botBubble.textContent = "Connection error";
+    botBubble.textContent = "Connection error. Try again.";
   }
 }
 
-/* ENTER KEY */
 input.addEventListener("keydown", e => {
   if(e.key === "Enter") handleSend();
 });
+
 </script>
 
 </body>
