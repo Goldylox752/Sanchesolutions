@@ -7,35 +7,46 @@ app.use(cors());
 app.use(express.json());
 
 /* ===============================
-   SIMPLE "AI" RESPONSE ENGINE
-   (no external APIs)
+   FREE AI (HUGGING FACE)
 =============================== */
 
-function generateReply(message = "") {
-  const msg = message.toLowerCase();
+const HF_API_TOKEN = process.env.HF_API_TOKEN; // optional but recommended
 
-  // basic intent detection
-  if (msg.includes("price") || msg.includes("cost")) {
-    return "Our AI systems start from $500 setup and scale based on automation needs.";
+async function generateReply(message = "") {
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": HF_API_TOKEN ? `Bearer ${HF_API_TOKEN}` : "",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          inputs: `You are a helpful business AI assistant.\nUser: ${message}\nAssistant:`,
+          parameters: {
+            max_new_tokens: 200,
+            return_full_text: false
+          }
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    return (
+      data?.[0]?.generated_text ||
+      "I can help you with AI automation, SEO, and business systems."
+    );
+
+  } catch (err) {
+    console.error("HF error:", err);
+    return "AI service temporarily unavailable.";
   }
-
-  if (msg.includes("seo")) {
-    return "We improve SEO using structured content, keyword mapping, and automation-driven optimization.";
-  }
-
-  if (msg.includes("ai") || msg.includes("automation")) {
-    return "We build AI systems that automate leads, follow-ups, and sales processes 24/7.";
-  }
-
-  if (msg.includes("hello") || msg.includes("hi")) {
-    return "Hey 👋 How can I help you scale your business today?";
-  }
-
-  return "I can help you with AI automation, lead generation, SEO, and sales systems. What are you trying to build?";
 }
 
 /* ===============================
-   CHAT ENDPOINT (STREAM STYLE SIM)
+   CHAT ROUTE (STREAM STYLE)
 =============================== */
 
 app.post("/chat", async (req, res) => {
@@ -43,28 +54,24 @@ app.post("/chat", async (req, res) => {
     const { message } = req.body;
 
     if (!message) {
-      return res.status(400).json({
-        success: false,
-        reply: "No message provided"
-      });
+      return res.status(400).json({ success: false, reply: "No message" });
     }
 
-    const reply = generateReply(message);
+    const reply = await generateReply(message);
 
-    // optional fake streaming (keeps frontend working like ChatGPT)
+    // streaming effect (fake ChatGPT typing)
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
 
     for (let i = 0; i < reply.length; i++) {
       res.write(reply[i]);
-      await new Promise(r => setTimeout(r, 10)); // typing effect
+      await new Promise(r => setTimeout(r, 8));
     }
 
     res.end();
 
   } catch (err) {
-    console.error("Server error:", err);
-
+    console.error(err);
     res.status(500).end("Server error");
   }
 });
@@ -76,16 +83,16 @@ app.post("/chat", async (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
-    ai: "local-engine"
+    ai: "huggingface-mistral"
   });
 });
 
 /* ===============================
-   START SERVER
+   START
 =============================== */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("🚀 Server running on port", PORT);
 });
