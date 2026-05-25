@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sanche AI | Build Systems That Sell</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sanche Solutions | AI Systems That Convert</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -11,47 +11,69 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg:#0a0a0a;
-  --card:#121212;
+  --bg1:#050505;
+  --bg2:#0b0f1a;
+  --card:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.10);
   --text:#ffffff;
-  --muted:#a1a1a1;
-  --border:#262626;
+  --muted:rgba(255,255,255,0.65);
   --accent:#ffffff;
-  --soft:#1a1a1a;
 }
 
+/* ===== PREMIUM BACKGROUND ===== */
 body {
   font-family: Geist, sans-serif;
-  background: radial-gradient(circle at top, #1a1a1a, #000);
   color: var(--text);
-  overflow-x: hidden;
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 20% 20%, #1a2a6c33, transparent 40%),
+    radial-gradient(circle at 80% 30%, #b21f1f22, transparent 40%),
+    radial-gradient(circle at 50% 80%, #0f202733, transparent 40%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 
-/* NAV */
+/* soft animated glow */
+body::before {
+  content:"";
+  position:fixed;
+  inset:-200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
+  filter: blur(60px);
+  animation: floatGlow 10s ease-in-out infinite alternate;
+  z-index:-1;
+}
+
+@keyframes floatGlow {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(20px); }
+}
+
+/* ===== NAV ===== */
 nav {
   display:flex;
   justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid var(--border);
+  padding:22px 40px;
   position:sticky;
   top:0;
-  background:rgba(0,0,0,0.7);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
+  background: rgba(0,0,0,0.4);
+  border-bottom:1px solid var(--border);
 }
 
 .logo {
   font-family:"Instrument Serif";
-  font-size:20px;
+  font-size:22px;
 }
 
 .nav-links {
   display:flex;
-  gap:20px;
+  gap:24px;
   color:var(--muted);
   font-size:14px;
 }
 
-/* HERO */
+/* ===== HERO ===== */
 .hero {
   text-align:center;
   padding:140px 20px 80px;
@@ -60,9 +82,9 @@ nav {
 }
 
 .hero h1 {
-  font-size:64px;
   font-family:"Instrument Serif";
-  font-weight:400;
+  font-size:72px;
+  line-height:1.05;
   letter-spacing:-1px;
 }
 
@@ -71,20 +93,27 @@ nav {
   font-size:18px;
   color:var(--muted);
   line-height:1.6;
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 .cta {
   margin-top:30px;
   display:inline-block;
-  padding:12px 22px;
+  padding:14px 26px;
+  border-radius:14px;
   border:1px solid var(--border);
-  border-radius:12px;
+  background:var(--card);
+  backdrop-filter: blur(20px);
   cursor:pointer;
+  transition:.2s;
 }
+.cta:hover { transform: scale(1.03); }
 
-/* SECTIONS */
+/* ===== SECTIONS ===== */
 .section {
-  padding:80px 40px;
+  padding:90px 40px;
   max-width:1100px;
   margin:auto;
 }
@@ -92,58 +121,48 @@ nav {
 .section h2 {
   font-size:34px;
   font-family:"Instrument Serif";
-  margin-bottom:20px;
+  margin-bottom:24px;
 }
 
 .grid {
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:20px;
 }
 
 .card {
   background:var(--card);
   border:1px solid var(--border);
-  padding:20px;
-  border-radius:16px;
+  padding:22px;
+  border-radius:18px;
+  backdrop-filter: blur(20px);
+  transition:.2s;
 }
 
-.card h3 {
-  margin-bottom:10px;
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.25);
 }
 
 .card p {
   color:var(--muted);
+  margin-top:8px;
   font-size:14px;
-  line-height:1.5;
 }
 
-/* PRICING */
-.pricing {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-}
-
-.price-card {
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:25px;
-  border-radius:16px;
-}
-
+/* ===== PRICING ===== */
 .price {
-  font-size:32px;
-  margin:10px 0;
+  font-size:34px;
+  margin:12px 0;
 }
 
-/* CHAT WIDGET */
+/* ===== CHAT ===== */
 .fab {
   position:fixed;
   bottom:24px;
   right:24px;
-  width:56px;
-  height:56px;
+  width:58px;
+  height:58px;
   border-radius:50%;
   background:white;
   color:black;
@@ -157,17 +176,18 @@ nav {
   position:fixed;
   bottom:90px;
   right:24px;
-  width:360px;
+  width:380px;
   height:520px;
-  background:#111;
+  background:rgba(10,10,10,0.9);
   border:1px solid var(--border);
-  border-radius:16px;
+  border-radius:18px;
   display:flex;
   flex-direction:column;
   opacity:0;
   transform:translateY(10px);
   pointer-events:none;
-  transition:.2s;
+  transition:.25s;
+  backdrop-filter: blur(20px);
 }
 
 .panel.open {
@@ -193,16 +213,24 @@ nav {
 }
 
 .msg {
-  max-width:80%;
-  padding:10px;
+  max-width:85%;
+  padding:10px 12px;
   border-radius:12px;
   font-size:13px;
+  line-height:1.4;
 }
 
-.user { background:white; color:black; margin-left:auto; }
-.bot { background:#1c1c1c; }
+.user {
+  background:white;
+  color:black;
+  margin-left:auto;
+}
 
-/* QUICK */
+.bot {
+  background:rgba(255,255,255,0.08);
+  color:white;
+}
+
 .quick {
   display:flex;
   flex-wrap:wrap;
@@ -211,7 +239,7 @@ nav {
 
 .quick button {
   font-size:12px;
-  padding:5px 10px;
+  padding:6px 10px;
   border-radius:20px;
   border:1px solid var(--border);
   background:transparent;
@@ -219,9 +247,9 @@ nav {
   cursor:pointer;
 }
 
-/* FOOTER */
+/* ===== FOOTER ===== */
 footer {
-  padding:40px;
+  padding:50px;
   text-align:center;
   color:var(--muted);
   border-top:1px solid var(--border);
@@ -232,7 +260,7 @@ footer {
 <body>
 
 <nav>
-  <div class="logo">Sanche AI</div>
+  <div class="logo">Sanche Solutions</div>
   <div class="nav-links">
     <div>Features</div>
     <div>Pricing</div>
@@ -241,86 +269,58 @@ footer {
 </nav>
 
 <section class="hero">
-  <h1>Turn Visitors Into Paying Customers</h1>
-  <p>We build AI systems, automation tools, and high-converting websites that help businesses grow without ads or guesswork.</p>
-  <div class="cta">Start Building</div>
-</section>
-
-<section class="section">
-  <h2>What You Get</h2>
-  <div class="grid">
-
-    <div class="card">
-      <h3>AI Sales Systems</h3>
-      <p>Chatbots and automation tools that convert leads automatically 24/7.</p>
-    </div>
-
-    <div class="card">
-      <h3>High-Converting Websites</h3>
-      <p>Modern, fast websites designed to turn traffic into revenue.</p>
-    </div>
-
-    <div class="card">
-      <h3>SEO Growth</h3>
-      <p>Rank higher on Google and get consistent organic traffic.</p>
-    </div>
-
+  <h1>Build AI Systems That Sell While You Sleep</h1>
+  <p>We design conversion-driven websites, AI chat systems, and automation pipelines that turn traffic into paying clients.</p>
+  <div class="cta" onclick="document.getElementById('panel').classList.add('open')">
+    Start Your System
   </div>
 </section>
 
 <section class="section">
-  <h2>Pricing</h2>
-  <div class="pricing">
-
-    <div class="price-card">
-      <h3>Starter</h3>
-      <div class="price">$299</div>
-      <p>Basic website + setup</p>
+  <h2>What We Build</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>AI Sales Bots</h3>
+      <p>Convert visitors into leads automatically 24/7.</p>
     </div>
-
-    <div class="price-card">
-      <h3>Growth</h3>
-      <div class="price">$599</div>
-      <p>Website + SEO + automation</p>
+    <div class="card">
+      <h3>High-Converting Sites</h3>
+      <p>Fast, modern websites built for revenue.</p>
     </div>
-
-    <div class="price-card">
-      <h3>Scale</h3>
-      <div class="price">$999+</div>
-      <p>Full AI system + CRM + funnels</p>
+    <div class="card">
+      <h3>Automation Systems</h3>
+      <p>Email, CRM, and workflow automation.</p>
     </div>
-
   </div>
 </section>
 
 <footer>
-  © 2026 Sanche AI — Built to convert, not just exist.
+  © 2026 Sanche Solutions — Systems > Websites
 </footer>
 
 <!-- CHAT -->
-<button class="fab" id="fab">💬</button>
+<button class="fab" onclick="toggleChat()">💬</button>
 
 <div class="panel" id="panel">
-
   <div class="header">
     <div>Sanche AI</div>
-    <button id="close">✕</button>
+    <button onclick="toggleChat()">✕</button>
   </div>
 
   <div class="messages" id="messages"></div>
-
 </div>
 
 <script>
 const API_URL = "https://sanchesolutions.onrender.com/api/bot";
-
-const fab = document.getElementById("fab");
 const panel = document.getElementById("panel");
-const closeBtn = document.getElementById("close");
 const messages = document.getElementById("messages");
 
-fab.onclick = () => panel.classList.toggle("open");
-closeBtn.onclick = () => panel.classList.remove("open");
+function toggleChat() {
+  panel.classList.toggle("open");
+  if (messages.children.length === 0) {
+    add("Hey 👋 What are you trying to build?", "bot");
+  }
+}
 
 function add(text, type) {
   const div = document.createElement("div");
@@ -328,35 +328,6 @@ function add(text, type) {
   div.textContent = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
-}
-
-function quickReplies() {
-  const div = document.createElement("div");
-  div.className = "quick";
-
-  ["Get Quote", "Pricing", "Book Call"].forEach(t => {
-    const b = document.createElement("button");
-    b.textContent = t;
-    b.onclick = () => send(t);
-    div.appendChild(b);
-  });
-
-  messages.appendChild(div);
-}
-
-async function send(text) {
-  add(text, "user");
-
-  const res = await fetch(API_URL, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ message:text })
-  });
-
-  const data = await res.json();
-  add(data.reply || "No response", "bot");
-
-  quickReplies();
 }
 </script>
 
