@@ -79,6 +79,7 @@ body{
   padding:10px 12px;
   border-radius:10px;
   white-space:pre-wrap;
+  max-width:85%;
 }
 
 .ai-user{background:rgba(255,255,255,.05);margin-left:auto;}
@@ -103,6 +104,11 @@ body{
   border:none;
   padding:0 16px;
   cursor:pointer;
+}
+
+.loading{
+  opacity:0.6;
+  font-style:italic;
 }
 </style>
 </head>
@@ -138,9 +144,6 @@ const input = document.getElementById("ai-input");
 const sendBtn = document.getElementById("ai-send");
 const messages = document.getElementById("ai-messages");
 
-// ✅ VERCEL SAFE (NO ENV NEEDED)
-const API_URL = "";
-
 function addMsg(text, type){
   const div = document.createElement("div");
   div.className = "ai-msg " + type;
@@ -175,23 +178,34 @@ async function send(){
   addMsg(text,"ai-user");
   input.value="";
 
+  // loading message
+  const loadingId = "loading-" + Date.now();
+  addMsg("Thinking...", "ai-bot");
+
   try{
     const res = await fetch("/api/bot", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ message:text })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
     });
-
-    if(!res.ok) throw new Error("API failed");
 
     const data = await res.json();
 
-    addMsg(data.reply || "No response.","ai-bot");
+    // remove last loading message
+    messages.lastChild.remove();
 
-  }catch(err){
+    if(!res.ok) throw new Error(data.error || "API failed");
+
+    addMsg(data.reply || "No response.", "ai-bot");
+
+  } catch(err){
     console.error(err);
 
-    addMsg("AI offline — opening WhatsApp...", "ai-bot");
+    if(messages.lastChild){
+      messages.lastChild.remove();
+    }
+
+    addMsg("AI offline — redirecting to WhatsApp...", "ai-bot");
 
     window.open(
       "https://wa.me/17802679673?text=" + encodeURIComponent(text),
