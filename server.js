@@ -6,57 +6,99 @@ const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Smart Sales Bot (Upgraded)
+/* =========================
+   SMART INTENT BOT ENGINE
+========================= */
+
+const INTENTS = [
+  {
+    id: "website",
+    keywords: ["website", "web", "build", "site", "landing page"],
+    reply:
+      "We build high-converting websites designed to bring you leads, not just look good. What type of business do you run?"
+  },
+  {
+    id: "seo",
+    keywords: ["seo", "google", "rank", "traffic", "search"],
+    reply:
+      "We help businesses rank higher on Google and generate consistent organic leads without ads."
+  },
+  {
+    id: "pricing",
+    keywords: ["price", "cost", "pricing", "how much", "$", "budget"],
+    reply:
+      "Most projects range from $300–$800 depending on features. If you tell me your goals, I can give an exact quote."
+  },
+  {
+    id: "automation",
+    keywords: ["automation", "ai", "bot", "crm", "system", "workflow"],
+    reply:
+      "We build automation systems that capture, follow up, and convert leads automatically for your business."
+  },
+  {
+    id: "contact",
+    keywords: ["contact", "whatsapp", "call", "talk", "human"],
+    reply:
+      "You can reach us directly on WhatsApp at +1 780-267-9673 and we’ll respond quickly."
+  },
+  {
+    id: "stripe",
+    keywords: ["pay", "checkout", "buy", "start", "purchase"],
+    reply:
+      "You can start your project securely through our checkout system. Want me to send you the payment link?"
+  }
+];
+
+/* =========================
+   BOT ENDPOINT
+========================= */
+
 app.post("/api/bot", (req, res) => {
-  const msg = (req.body.message || "").toLowerCase();
+  try {
+    const msg = (req.body.message || "").toLowerCase().trim();
 
-  // intent scoring system
-  const rules = [
-    {
-      keywords: ["website", "web", "build", "site"],
-      reply:
-        "We build high-converting websites designed to bring you leads, not just look good. What type of business do you run?"
-    },
-    {
-      keywords: ["seo", "google", "rank", "traffic"],
-      reply:
-        "We help businesses rank higher on Google and get consistent organic leads without ads."
-    },
-    {
-      keywords: ["price", "cost", "pricing", "how much"],
-      reply:
-        "Pricing depends on your project, but most business websites start between $300–$800 depending on features."
-    },
-    {
-      keywords: ["automation", "ai", "bot", "system"],
-      reply:
-        "We build automation systems that save time and handle leads automatically for your business."
-    },
-    {
-      keywords: ["contact", "whatsapp", "call", "talk"],
-      reply:
-        "You can reach us directly on WhatsApp at +1 780-267-9673 and we’ll respond quickly."
-    }
-  ];
+    // find best matching intent
+    const match = INTENTS.find(intent =>
+      intent.keywords.some(keyword => msg.includes(keyword))
+    );
 
-  // find best match
-  const match = rules.find(r =>
-    r.keywords.some(k => msg.includes(k))
-  );
+    // fallback responses (more natural)
+    const fallback = [
+      "Got it — what kind of business are you running?",
+      "I can help you with websites, SEO, or automation. What are you trying to achieve?",
+      "Tell me a bit more so I can recommend the right solution."
+    ];
 
-  // smarter fallback (NOT dumb anymore)
-  const fallbackMessages = [
-    "Got it — can you tell me a bit more about your business so I can recommend the right solution?",
-    "I can help you build a website, improve SEO, or automate your leads. What are you focused on right now?",
-    "Are you trying to get more customers online or improve your current website?"
-  ];
+    const reply = match
+      ? match.reply
+      : fallback[Math.floor(Math.random() * fallback.length)];
 
-  const reply = match
-    ? match.reply
-    : fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+    res.json({
+      reply,
+      intent: match?.id || "fallback"
+    });
 
-  res.json({ reply });
+  } catch (err) {
+    console.error("BOT ERROR:", err);
+    res.status(500).json({
+      reply: "Server error — please try WhatsApp instead."
+    });
+  }
 });
 
+/* =========================
+   HEALTH CHECK
+========================= */
+
+app.get("/", (req, res) => {
+  res.send("Sanche Smart Bot API Running 🚀");
+});
+
+/* =========================
+   START SERVER
+========================= */
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on", port));
+app.listen(port, () => {
+  console.log("Server running on port", port);
+});
