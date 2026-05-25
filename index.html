@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>Sanche AI | AI Systems That Generate Leads & Close Sales</title>
-
-<meta name="description" content="We build AI automation systems that generate leads, qualify prospects, and close sales automatically for service businesses."/>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -26,10 +23,9 @@
 
 body{
   font-family:"DM Sans",sans-serif;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(79,140,255,0.18), transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
-    var(--bg);
+  background: radial-gradient(circle at 20% 10%, rgba(79,140,255,0.18), transparent 40%),
+              radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
+              var(--bg);
   color:var(--text);
 }
 
@@ -68,22 +64,13 @@ nav{
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding:120px 20px 60px;
-}
-
-.badge{
-  padding:6px 12px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  color:var(--blue2);
-  font-size:12px;
+  padding:120px 20px;
 }
 
 h1{
-  font-size:58px;
+  font-size:52px;
   max-width:900px;
   line-height:1.05;
-  margin-top:20px;
 }
 
 h1 span{
@@ -100,76 +87,6 @@ p{
   line-height:1.6;
 }
 
-/* STATS */
-.strip{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:40px;
-  max-width:900px;
-}
-
-.strip div{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--border);
-  padding:18px;
-  border-radius:16px;
-}
-
-.strip h3{color:var(--blue);}
-
-/* SECTIONS */
-.section{
-  max-width:1100px;
-  margin:auto;
-  padding:80px 20px;
-}
-
-.title{font-size:44px;}
-.sub{color:var(--muted);margin-top:10px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:16px;
-  margin-top:40px;
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:24px;
-  border-radius:18px;
-}
-
-/* PRICING */
-.pricing{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:16px;
-  margin-top:40px;
-}
-
-.price{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--border);
-  padding:26px;
-  border-radius:18px;
-}
-
-.price h2{color:var(--blue);}
-
-/* CTA */
-.cta{
-  text-align:center;
-  padding:70px 20px;
-  background:linear-gradient(135deg,rgba(79,140,255,0.12),rgba(122,168,255,0.06));
-  border:1px solid var(--border);
-  border-radius:28px;
-  max-width:900px;
-  margin:80px auto;
-}
-
 /* CHAT */
 .fab{
   position:fixed;
@@ -182,6 +99,7 @@ p{
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
   cursor:pointer;
+  font-size:20px;
 }
 
 .panel{
@@ -189,7 +107,7 @@ p{
   bottom:90px;
   right:20px;
   width:360px;
-  height:540px;
+  height:520px;
   background:rgba(10,14,30,0.95);
   border:1px solid var(--border);
   border-radius:18px;
@@ -215,4 +133,165 @@ p{
 }
 
 .messages{
-  flex
+  flex:1;
+  padding:14px;
+  overflow-y:auto;
+}
+
+.msg{
+  padding:10px 12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.user{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  margin-left:auto;
+  max-width:80%;
+}
+
+.bot{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  max-width:80%;
+}
+
+.input{
+  display:flex;
+  border-top:1px solid var(--border);
+}
+
+input{
+  flex:1;
+  padding:12px;
+  background:transparent;
+  border:none;
+  color:white;
+  outline:none;
+}
+
+button.send{
+  width:50px;
+  background:var(--blue);
+  border:none;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">Sanche<span>AI</span></div>
+  <button class="btn">Book Call</button>
+</nav>
+
+<section class="hero">
+  <h1>We Build AI Systems That <span>Close Sales Automatically</span></h1>
+  <p>AI automation that generates leads, qualifies prospects, and closes deals 24/7.</p>
+</section>
+
+<!-- CHAT BUTTON -->
+<button class="fab" onclick="toggleChat()">💬</button>
+
+<!-- CHAT PANEL -->
+<div class="panel" id="panel">
+  <div class="header">AI Assistant</div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input">
+    <input id="input" placeholder="Ask anything..." />
+    <button class="send" onclick="handleSend()">→</button>
+  </div>
+</div>
+
+<script>
+const API = "https://YOUR-RENDER-URL.onrender.com/chat";
+
+const panel = document.getElementById("panel");
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+/* OPEN CHAT */
+function toggleChat(){
+  panel.classList.toggle("open");
+
+  if(messages.children.length === 0){
+    addMessage("Hi 👋 How can I help you scale your business?", "bot");
+  }
+}
+
+/* ADD MESSAGE */
+function addMessage(text, type, returnEl=false){
+  const el = document.createElement("div");
+  el.className = `msg ${type}`;
+  el.textContent = text;
+
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+
+  if(returnEl) return el;
+}
+
+/* SCROLL */
+function scroll(){
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* SEND MESSAGE (STREAMING) */
+async function handleSend(){
+  const text = input.value.trim();
+  if(!text) return;
+
+  input.value = "";
+
+  // user message
+  addMessage(text, "user");
+
+  // bot bubble (stream target)
+  const botBubble = addMessage("", "bot", true);
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    if(!res.body){
+      botBubble.textContent = "No response";
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    let full = "";
+
+    while(true){
+      const { value, done } = await reader.read();
+      if(done) break;
+
+      full += decoder.decode(value, { stream:true });
+      botBubble.textContent = full;
+
+      scroll();
+    }
+
+  } catch(err){
+    botBubble.textContent = "Connection error";
+  }
+}
+
+/* ENTER KEY */
+input.addEventListener("keydown", e => {
+  if(e.key === "Enter") handleSend();
+});
+</script>
+
+</body>
+</html>
