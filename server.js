@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch";
 
 const app = express();
 
@@ -17,39 +16,68 @@ app.post("/api/bot", async (req, res) => {
   try {
     const { message } = req.body;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `
+    if (!message) {
+      return res.status(400).json({
+        reply: "Please enter a message."
+      });
+    }
+
+    const response = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `
 You are a sales assistant for Sanche Solutions.
-Your job is to convert visitors into leads.
-Be short, helpful, and push WhatsApp if they are serious.
-            `
-          },
-          { role: "user", content: message }
-        ]
-      })
-    });
+
+Your goals:
+- Convert visitors into leads
+- Be short, confident, and professional
+- Encourage users to contact via WhatsApp for serious projects
+- Help with websites, SEO, AI chatbots, branding, and automation
+
+Never make responses overly long.
+              `
+            },
+            {
+              role: "user",
+              content: message
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 200
+        })
+      }
+    );
 
     const data = await response.json();
 
-    res.json({
-      reply: data.choices?.[0]?.message?.content || "Tell me more about your project."
-    });
+    console.log(data);
 
+    res.json({
+      reply:
+        data?.choices?.[0]?.message?.content ||
+        "Tell me more about your project."
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "Server error. Please try WhatsApp." });
+    console.error("BOT ERROR:", err);
+
+    res.status(500).json({
+      reply: "Server error. Please contact us on WhatsApp."
+    });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on", port));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
