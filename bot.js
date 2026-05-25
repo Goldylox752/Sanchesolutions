@@ -4,28 +4,64 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+/* ─────────────────────────────
+   AGENTS
+───────────────────────────── */
+
 const agents = {
-  router: `...`,
-  sales: `...`,
-  technical: `...`,
-  seo: `...`,
-  automation: `...`,
-  closer: `...`,
-  support: `...`
+  router: `You are a routing system.
+
+Return ONLY one word:
+sales, technical, seo, automation, closer, support
+
+Choose based on intent, not keywords.`,
+
+  sales: `You are a sales assistant. Focus on value, benefits, and conversion.`,
+
+  technical: `You are a technical support assistant. Be clear and practical.`,
+
+  seo: `You are an SEO expert. Focus on rankings, keywords, and optimization.`,
+
+  automation: `You are an automation expert. Focus on workflows and systems.`,
+
+  closer: `You are a high-conversion sales closer. Be confident and persuasive.`,
+
+  support: `You are a customer support agent. Be helpful and calm.`
 };
+
+/* ─────────────────────────────
+   STAGE DETECTION (metadata only)
+───────────────────────────── */
 
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  const decisionKeywords = ["price", "pricing", "cost", "quote", "how much", "$"];
-  const purchaseKeywords = ["book", "pay", "buy", "start", "ready", "let's do it"];
-  const interestKeywords = ["seo", "website", "automation", "chatbot", "ai", "leads"];
+  const decisionKeywords = [
+    "price",
+    "pricing",
+    "cost",
+    "quote",
+    "how much",
+    "$"
+  ];
 
-  if (decisionKeywords.some(w => msg.includes(w))) return "decision";
+  const purchaseKeywords = [
+    "buy",
+    "book",
+    "pay",
+    "start now",
+    "let's do it"
+  ];
+
   if (purchaseKeywords.some(w => msg.includes(w))) return "purchase";
-  if (interestKeywords.some(w => msg.includes(w))) return "interest";
+  if (decisionKeywords.some(w => msg.includes(w))) return "decision";
+
   return "awareness";
 }
+
+/* ─────────────────────────────
+   ROUTER (AI DECIDES AGENT)
+───────────────────────────── */
 
 async function routeAgent(message) {
   try {
@@ -39,7 +75,8 @@ async function routeAgent(message) {
       ]
     });
 
-    const result = res.choices?.[0]?.message?.content?.trim()?.toLowerCase();
+    const result =
+      res.choices?.[0]?.message?.content?.trim()?.toLowerCase();
 
     const valid = new Set([
       "sales",
@@ -51,18 +88,23 @@ async function routeAgent(message) {
     ]);
 
     return valid.has(result) ? result : "sales";
-
   } catch (err) {
     console.error("Router error:", err);
     return "sales";
   }
 }
 
+/* ─────────────────────────────
+   AGENT EXECUTION
+───────────────────────────── */
+
 async function runAgent({ agentName, session, message }) {
   try {
     const systemPrompt = agents[agentName] || agents.sales;
 
-    const messages = [{ role: "system", content: systemPrompt }];
+    const messages = [
+      { role: "system", content: systemPrompt }
+    ];
 
     if (Array.isArray(session?.messages)) {
       messages.push(...session.messages.slice(-8));
@@ -72,25 +114,37 @@ async function runAgent({ agentName, session, message }) {
 
     const res = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: agentName === "closer" ? 0.5 : 0.7,
+      temperature:
+        agentName === "closer"
+          ? 0.4
+          : agentName === "support"
+          ? 0.3
+          : 0.6,
       max_tokens: 300,
       messages
     });
 
     return res.choices?.[0]?.message?.content || "Need more details.";
-
   } catch (err) {
     console.error("Agent error:", err);
-    return "Something went wrong.";
+    return "Something went wrong. Please try again.";
   }
 }
 
-export async function generateMultiAgentReply({ session = {}, message = "" }) {
+/* ─────────────────────────────
+   MAIN ORCHESTRATOR
+───────────────────────────── */
+
+export async function generateMultiAgentReply({
+  session = {},
+  message = ""
+}) {
   const stage = detectStage(message);
 
   let agent = await routeAgent(message);
 
-  if (stage === "decision" || stage === "purchase") {
+  // Only upgrade to closer on strong purchase intent
+  if (stage === "purchase") {
     agent = "closer";
   }
 
@@ -105,6 +159,6 @@ export async function generateMultiAgentReply({ session = {}, message = "" }) {
     reply,
     agent,
     stage,
-    priority: stage === "decision" || stage === "purchase" ? "hot" : "normal"
+    priority: stage === "purchase" ? "hot" : "normal"
   };
 }
