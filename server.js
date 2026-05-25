@@ -9,10 +9,27 @@ app.use(express.json());
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 /* =========================================
-   STREAM GROQ (ROBUST SSE PARSER)
+   HEALTH CHECK
+========================================= */
+
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "groq-stream-ai",
+    model: "llama3-8b-8192",
+  });
+});
+
+/* =========================================
+   GROQ STREAMING ENGINE (FIXED)
 ========================================= */
 
 async function streamGroq(message, res) {
+  if (!GROQ_API_KEY) {
+    res.write("Server missing GROQ_API_KEY");
+    return res.end();
+  }
+
   try {
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -29,7 +46,7 @@ async function streamGroq(message, res) {
             {
               role: "system",
               content:
-                "You are a high-performance AI assistant for a SaaS automation company. Be concise, sales-driven, and practical.",
+                "You are an AI assistant for a SaaS automation company. Be concise, persuasive, and helpful.",
             },
             { role: "user", content: message },
           ],
@@ -40,8 +57,9 @@ async function streamGroq(message, res) {
     );
 
     if (!response.ok || !response.body) {
-      console.error("Groq error:", await response.text());
-      res.write("AI temporarily unavailable.");
+      const errText = await response.text();
+      console.error("Groq error:", errText);
+      res.write("AI error. Try again later.");
       return res.end();
     }
 
@@ -56,11 +74,77 @@ async function streamGroq(message, res) {
 
       buffer += decoder.decode(value, { stream: true });
 
-      // split SSE safely
       const lines = buffer.split("\n");
-      buffer = lines.pop();
+      buffer = lines.pop(); // keep incomplete line
 
       for (const line of lines) {
-        if (!line.startsWith("data:")) continue;
+        const trimmed = line.trim();
 
-        const data = line.replace("data:
+        if (!trimmed.startsWith("data:")) continue;
+
+        const jsonStr = trimmed.replace("data:", "").trim();
+
+        if (jsonStr === "[DONE]") continue;
+
+        try {
+          const json = JSON.parse(jsonStr);
+          const token = json?.choices?.[0]?.delta?.content;
+
+          if (token) {
+            res.write(token);
+          }
+        } catch (err) {
+          // ignore malformed chunks safely
+        }
+      }
+    }
+
+    res.end();
+  } catch (err) {
+    console.error("Stream crash:", err);
+    res.write("AI stream failed.");
+    res.end();
+  }
+}
+
+/* =========================================
+   CHAT ROUTE
+========================================= */
+
+app.post("/chat", async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: "No message provided" });
+  }
+
+  // streaming headers (IMPORTANT for Render/Vercel)
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+
+  await streamGroq(message, res);
+});
+
+/* =========================================
+   SAFETY HANDLERS
+========================================= */
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err);
+});
+
+/* =========================================
+   START SERVER
+========================================= */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Groq AI server running on port ${PORT}`);
+});
