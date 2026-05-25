@@ -1,53 +1,991 @@
-<script>
-/* =========================
-   CHATBOT FRONTEND
-========================= */
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-const panel = document.getElementById("panel");
-const messagesEl = document.getElementById("messages");
-const chatInput = document.getElementById("chatInput");
+<!-- =========================
+SEO + META + ANALYTICS
+========================= -->
+
+<title>Sanche AI | AI Systems That Close Deals</title>
+
+<meta charset="UTF-8" />
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<meta
+  name="description"
+  content="Sanche AI builds AI sales systems, automation workflows, and high-converting websites for founders, agencies, SaaS brands, and e-commerce businesses."
+/>
+
+<meta
+  name="keywords"
+  content="AI automation Alberta, AI chatbot agency Canada, lead generation systems, AI sales agents, automation workflows, high-converting websites, CRM automation"
+/>
+
+<meta
+  name="robots"
+  content="index, follow"
+/>
+
+<meta
+  name="author"
+  content="Sanche AI"
+/>
+
+<meta
+  name="theme-color"
+  content="#050d1f"
+/>
+
+<!-- OPEN GRAPH -->
+<meta
+  property="og:title"
+  content="Sanche AI | AI Systems That Close Deals"
+/>
+
+<meta
+  property="og:description"
+  content="AI sales systems, automation workflows, and high-converting websites designed to generate leads automatically."
+/>
+
+<meta
+  property="og:type"
+  content="website"
+/>
+
+<meta
+  property="og:url"
+  content="https://sancheai.com"
+/>
+
+<meta
+  property="og:image"
+  content="https://sancheai.com/og-image.jpg"
+/>
+
+<!-- TWITTER -->
+<meta
+  name="twitter:card"
+  content="summary_large_image"
+/>
+
+<meta
+  name="twitter:title"
+  content="Sanche AI"
+/>
+
+<meta
+  name="twitter:description"
+  content="AI systems that close deals while you sleep."
+/>
+
+<!-- CANONICAL -->
+<link
+  rel="canonical"
+  href="https://sancheai.com"
+/>
+
+<!-- GOOGLE FONTS -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+
+<!-- GOOGLE ANALYTICS -->
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=G-A4-528699336"
+></script>
+
+<script>
+window.dataLayer = window.dataLayer || [];
+
+function gtag(){
+  dataLayer.push(arguments);
+}
+
+gtag("js", new Date());
+
+gtag("config", "G-A4-528699336");
+</script>
+
+<!-- STRUCTURED DATA -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"ProfessionalService",
+  "name":"Sanche AI",
+  "url":"https://sancheai.com",
+  "email":"hello@sancheai.com",
+  "description":"AI systems, automation workflows, and conversion-focused websites.",
+  "areaServed":"Canada",
+  "sameAs":[
+    "https://wa.me/17802679673"
+  ]
+}
+</script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#050d1f;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(74,142,255,0.2);
+  --blue:#1a6bff;
+  --blueBright:#4d8eff;
+  --text:#f0f4ff;
+  --muted:rgba(180,200,255,0.7);
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* NAV */
+
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+
+  padding:18px 28px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:rgba(5,13,31,0.88);
+
+  backdrop-filter:blur(20px);
+
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  font-size:24px;
+  font-family:'Instrument Serif',serif;
+}
+
+.logo span{
+  color:var(--blueBright);
+}
+
+.nav-btn{
+  padding:12px 20px;
+  border-radius:12px;
+  border:none;
+
+  background:var(--blue);
+  color:white;
+
+  font-weight:700;
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.nav-btn:hover{
+  transform:translateY(-2px);
+}
+
+/* HERO */
+
+.hero{
+  min-height:100vh;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  text-align:center;
+
+  padding:120px 20px 80px;
+}
+
+.badge{
+  padding:8px 16px;
+
+  border-radius:100px;
+
+  background:rgba(26,107,255,0.1);
+
+  border:1px solid var(--border);
+
+  color:var(--blueBright);
+
+  font-size:13px;
+
+  margin-bottom:24px;
+}
+
+.hero h1{
+  font-size:72px;
+  line-height:1.02;
+
+  max-width:900px;
+
+  font-family:'Instrument Serif',serif;
+
+  letter-spacing:-2px;
+}
+
+.hero h1 span{
+  color:var(--blueBright);
+}
+
+.hero p{
+  margin-top:26px;
+
+  font-size:20px;
+  line-height:1.7;
+
+  color:var(--muted);
+
+  max-width:760px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+
+  margin-top:40px;
+}
+
+.btn-primary{
+  padding:16px 28px;
+
+  border:none;
+  border-radius:14px;
+
+  background:var(--blue);
+  color:white;
+
+  font-size:15px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+}
+
+.btn-secondary{
+  padding:16px 28px;
+
+  border-radius:14px;
+
+  border:1px solid var(--border);
+
+  background:transparent;
+
+  color:var(--text);
+
+  cursor:pointer;
+}
+
+/* STATS */
+
+.stats{
+  max-width:1000px;
+
+  margin:0 auto 100px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+
+  gap:18px;
+
+  padding:0 20px;
+}
+
+.stat{
+  background:var(--card);
+
+  border:1px solid var(--border);
+
+  border-radius:20px;
+
+  padding:34px;
+
+  text-align:center;
+}
+
+.stat h2{
+  font-size:52px;
+  color:var(--blueBright);
+
+  font-family:'Instrument Serif',serif;
+}
+
+.stat p{
+  margin-top:8px;
+  color:var(--muted);
+}
+
+/* SECTION */
+
+.section{
+  max-width:1100px;
+  margin:auto;
+
+  padding:100px 20px;
+}
+
+.section-tag{
+  color:var(--blueBright);
+
+  text-transform:uppercase;
+
+  letter-spacing:1px;
+
+  font-size:13px;
+  font-weight:700;
+
+  margin-bottom:14px;
+}
+
+.section-title{
+  font-size:54px;
+
+  line-height:1.05;
+
+  font-family:'Instrument Serif',serif;
+
+  margin-bottom:18px;
+}
+
+.section-sub{
+  max-width:640px;
+
+  color:var(--muted);
+
+  line-height:1.7;
+
+  margin-bottom:50px;
+}
+
+/* GRID */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+
+  gap:18px;
+}
+
+.card{
+  background:var(--card);
+
+  border:1px solid var(--border);
+
+  border-radius:22px;
+
+  padding:30px;
+
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(74,142,255,0.45);
+}
+
+.card h3{
+  margin:18px 0 10px;
+}
+
+.card p{
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* FOOTER */
+
+footer{
+  border-top:1px solid var(--border);
+
+  padding:50px 20px;
+
+  text-align:center;
+
+  color:var(--muted);
+}
+
+/* CHAT */
+
+.fab{
+  position:fixed;
+
+  bottom:24px;
+  right:24px;
+
+  width:62px;
+  height:62px;
+
+  border-radius:50%;
+
+  border:none;
+
+  background:var(--blue);
+
+  color:white;
+
+  font-size:24px;
+
+  cursor:pointer;
+
+  z-index:9999;
+}
+
+.panel{
+  position:fixed;
+
+  bottom:100px;
+  right:24px;
+
+  width:390px;
+  height:580px;
+
+  background:#071530;
+
+  border:1px solid var(--border);
+
+  border-radius:22px;
+
+  display:flex;
+  flex-direction:column;
+
+  overflow:hidden;
+
+  opacity:0;
+  pointer-events:none;
+
+  transform:translateY(20px);
+
+  transition:.25s;
+
+  z-index:9998;
+}
+
+.panel.open{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0);
+}
+
+.panel-header{
+  padding:18px;
+
+  border-bottom:1px solid var(--border);
+
+  font-weight:700;
+}
+
+.messages{
+  flex:1;
+
+  overflow-y:auto;
+
+  padding:16px;
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.msg{
+  padding:12px 14px;
+
+  border-radius:14px;
+
+  max-width:85%;
+
+  line-height:1.6;
+
+  font-size:14px;
+}
+
+.user{
+  background:var(--blue);
+  color:white;
+  margin-left:auto;
+}
+
+.bot{
+  background:rgba(255,255,255,0.06);
+}
+
+.panel-input{
+  display:flex;
+
+  gap:8px;
+
+  padding:14px;
+
+  border-top:1px solid var(--border);
+}
+
+.panel-input input{
+  flex:1;
+
+  background:rgba(255,255,255,0.06);
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  padding:12px;
+
+  color:white;
+}
+
+.send-btn{
+  width:48px;
+  height:48px;
+
+  border:none;
+
+  border-radius:12px;
+
+  background:var(--blue);
+
+  color:white;
+
+  cursor:pointer;
+}
+
+/* MOBILE CTA */
+
+.mobile-cta{
+  position:fixed;
+
+  bottom:18px;
+  left:16px;
+  right:16px;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:15px 20px;
+
+  background:#25D366;
+
+  color:white;
+
+  text-decoration:none;
+
+  border-radius:14px;
+
+  font-weight:700;
+
+  z-index:9997;
+}
+
+@media(max-width:768px){
+
+  .hero h1{
+    font-size:46px;
+  }
+
+  .hero p{
+    font-size:17px;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .section-title{
+    font-size:38px;
+  }
+
+  .panel{
+    width:calc(100vw - 30px);
+    right:15px;
+  }
+
+  .mobile-cta{
+    display:flex;
+  }
+
+  .fab{
+    bottom:84px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- NAV -->
+
+<nav>
+
+  <div class="logo">
+    Sanche<span>AI</span>
+  </div>
+
+  <button
+    class="nav-btn"
+    onclick="toggleChat()"
+  >
+    Talk to AI →
+  </button>
+
+</nav>
+
+<!-- HERO -->
+
+<section class="hero">
+
+  <div class="badge">
+    AI Systems • Automation • Websites
+  </div>
+
+  <h1>
+    AI Systems That
+    <span>Close Deals</span>
+    While You Sleep
+  </h1>
+
+  <p>
+    We build AI sales agents, automation workflows, and high-converting websites that turn visitors into qualified leads automatically.
+  </p>
+
+  <div class="hero-actions">
+
+    <button
+      class="btn-primary"
+      onclick="toggleChat()"
+    >
+      Get Free Strategy Call →
+    </button>
+
+    <button
+      class="btn-secondary"
+      onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})"
+    >
+      Explore Services
+    </button>
+
+  </div>
+
+</section>
+
+<!-- STATS -->
+
+<section class="stats">
+
+  <div class="stat">
+    <h2>3×</h2>
+    <p>Average Conversion Lift</p>
+  </div>
+
+  <div class="stat">
+    <h2>24/7</h2>
+    <p>Lead Qualification</p>
+  </div>
+
+  <div class="stat">
+    <h2>14d</h2>
+    <p>Average Delivery Time</p>
+  </div>
+
+</section>
+
+<!-- SERVICES -->
+
+<section
+  class="section"
+  id="services"
+>
+
+  <div class="section-tag">
+    SERVICES
+  </div>
+
+  <h2 class="section-title">
+    Built to Generate Revenue
+  </h2>
+
+  <p class="section-sub">
+    We create modern AI systems and conversion infrastructure for businesses that want more leads and better automation.
+  </p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>🤖 AI Sales Agents</h3>
+      <p>
+        Custom AI assistants trained on your offers that qualify leads and book calls automatically.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Automation Systems</h3>
+      <p>
+        CRM flows, follow-ups, lead nurturing, and backend automations that save hours every week.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🌐 High-Converting Websites</h3>
+      <p>
+        Modern websites optimized for conversion, speed, mobile UX, and search visibility.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- CTA -->
+
+<section class="section">
+
+  <div
+    style="
+      background:rgba(26,107,255,0.12);
+      border:1px solid rgba(74,142,255,0.3);
+      border-radius:28px;
+      padding:70px 30px;
+      text-align:center;
+    "
+  >
+
+    <h2 class="section-title">
+      Ready to Scale Faster?
+    </h2>
+
+    <p
+      class="section-sub"
+      style="margin:auto auto 34px"
+    >
+      Get a free strategy session and see how AI automation can increase your conversions and save time.
+    </p>
+
+    <button
+      class="btn-primary"
+      onclick="toggleChat()"
+    >
+      Start Free Consultation →
+    </button>
+
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+
+  <div style="margin-bottom:12px">
+    © 2026 Sanche AI · AI Systems & Automation
+  </div>
+
+  <div
+    style="
+      display:flex;
+      gap:18px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    "
+  >
+
+    <a
+      href="#services"
+      style="
+        color:var(--muted);
+        text-decoration:none;
+      "
+    >
+      Services
+    </a>
+
+    <a
+      href="mailto:hello@sancheai.com"
+      style="
+        color:var(--muted);
+        text-decoration:none;
+      "
+    >
+      Email
+    </a>
+
+    <a
+      href="https://wa.me/17802679673?text=Hi%20Sanche%20AI%2C%20I%27d%20like%20a%20quote."
+      target="_blank"
+      rel="noopener"
+      style="
+        color:#25D366;
+        text-decoration:none;
+        font-weight:700;
+      "
+    >
+      WhatsApp Quotes
+    </a>
+
+  </div>
+
+  <div
+    style="
+      color:rgba(180,200,255,0.45);
+      font-size:12px;
+    "
+  >
+    Built for founders, agencies, SaaS & e-commerce brands.
+  </div>
+
+</footer>
+
+<!-- CHAT BUTTON -->
+
+<button
+  class="fab"
+  onclick="toggleChat()"
+>
+  💬
+</button>
+
+<!-- CHAT PANEL -->
+
+<div
+  class="panel"
+  id="panel"
+>
+
+  <div class="panel-header">
+    Sanche AI Assistant
+  </div>
+
+  <div
+    class="messages"
+    id="messages"
+  ></div>
+
+  <div class="panel-input">
+
+    <input
+      id="chatInput"
+      placeholder="Ask about pricing, automation, websites..."
+    />
+
+    <button
+      class="send-btn"
+      onclick="sendMessage()"
+    >
+      →
+    </button>
+
+  </div>
+
+</div>
+
+<!-- MOBILE CTA -->
+
+<a
+  href="https://wa.me/17802679673?text=Hi%20Sanche%20AI%2C%20I%27d%20like%20a%20quote."
+  class="mobile-cta"
+  target="_blank"
+  rel="noopener"
+>
+  💬 WhatsApp for Fast Quotes
+</a>
+
+<script>
+
+/* CHATBOT */
+
+const panel =
+  document.getElementById("panel");
+
+const messagesEl =
+  document.getElementById("messages");
+
+const chatInput =
+  document.getElementById("chatInput");
 
 let isOpen = false;
 
-/* SESSION MEMORY */
-if (!localStorage.getItem("sanche_session")) {
+/* SESSION */
+
+if(
+  !localStorage.getItem(
+    "sanche_session"
+  )
+){
   localStorage.setItem(
     "sanche_session",
     crypto.randomUUID()
   );
 }
 
-/* =========================
-   TOGGLE CHAT
-========================= */
-function toggleChat() {
+/* TOGGLE */
+
+function toggleChat(){
+
   isOpen = !isOpen;
 
-  panel.classList.toggle("open", isOpen);
+  panel.classList.toggle(
+    "open",
+    isOpen
+  );
 
-  if (isOpen && messagesEl.children.length === 0) {
+  if(
+    isOpen &&
+    messagesEl.children.length === 0
+  ){
+
     addMessage(
-      "Hey! 👋 I'm the Sanche AI assistant. What are you trying to build or improve right now?",
+      "Hey 👋 I'm the Sanche AI assistant. Looking for more leads, automation, or a better website? Tell me what you're trying to grow.",
       "bot"
     );
 
-    addQuickReplies();
   }
 
-  if (isOpen) {
-    setTimeout(() => {
-      chatInput.focus();
-    }, 250);
-  }
 }
 
-/* =========================
-   ADD MESSAGE
-========================= */
-function addMessage(text, type) {
-  const div = document.createElement("div");
+/* ADD MESSAGE */
 
-  div.className = `msg ${type}`;
+function addMessage(
+  text,
+  type
+){
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    `msg ${type}`;
 
   div.textContent = text;
 
@@ -55,179 +993,89 @@ function addMessage(text, type) {
 
   messagesEl.scrollTop =
     messagesEl.scrollHeight;
+
 }
 
-/* =========================
-   QUICK REPLIES
-========================= */
-function addQuickReplies() {
-  const wrap = document.createElement("div");
+/* SEND */
 
-  wrap.className = "quick";
+async function sendMessage(){
 
-  const options = [
-    [
-      "💰 Get Pricing",
-      "I'd like pricing for an AI system"
-    ],
-
-    [
-      "🤖 AI Chatbot",
-      "Tell me about your AI chatbot services"
-    ],
-
-    [
-      "🌐 Website",
-      "I need a high-converting website"
-    ],
-
-    [
-      "⚡ Automation",
-      "I want to automate lead follow-up"
-    ]
-  ];
-
-  options.forEach(([label, msg]) => {
-    const btn =
-      document.createElement("button");
-
-    btn.textContent = label;
-
-    btn.onclick = () => sendMessage(msg);
-
-    wrap.appendChild(btn);
-  });
-
-  messagesEl.appendChild(wrap);
-
-  messagesEl.scrollTop =
-    messagesEl.scrollHeight;
-}
-
-/* =========================
-   TYPING INDICATOR
-========================= */
-function showTyping() {
-  removeTyping();
-
-  const div = document.createElement("div");
-
-  div.className = "typing-bubble";
-
-  div.id = "typing";
-
-  div.innerHTML = `
-    <span></span>
-    <span></span>
-    <span></span>
-  `;
-
-  messagesEl.appendChild(div);
-
-  messagesEl.scrollTop =
-    messagesEl.scrollHeight;
-}
-
-function removeTyping() {
-  document
-    .getElementById("typing")
-    ?.remove();
-}
-
-/* =========================
-   SEND MESSAGE
-========================= */
-async function sendMessage(
-  overrideText = ""
-) {
   const text =
-    (overrideText || chatInput.value).trim();
+    chatInput.value.trim();
 
-  if (!text) return;
+  if(!text) return;
 
-  /* USER MESSAGE */
-  addMessage(text, "user");
+  addMessage(
+    text,
+    "user"
+  );
 
   chatInput.value = "";
 
-  showTyping();
+  try{
 
-  try {
-    const response = await fetch(
-      "/api/bot",
-      {
-        method: "POST",
+    const response =
+      await fetch(
+        "/api/bot",
+        {
+          method:"POST",
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-        body: JSON.stringify({
-          message: text,
+          body:JSON.stringify({
+            message:text,
 
-          sessionId:
-            localStorage.getItem(
-              "sanche_session"
-            )
-        })
-      }
-    );
+            sessionId:
+              localStorage.getItem(
+                "sanche_session"
+              )
+          })
+        }
+      );
 
     const data =
       await response.json();
 
-    removeTyping();
-
-    /* FAILED RESPONSE */
-    if (!data.success) {
-      addMessage(
-        "Something went wrong. Please try again.",
-        "bot"
-      );
-
-      return;
-    }
-
-    /* BOT REPLY */
-    addMessage(data.reply, "bot");
-
-    /* HOT LEAD FOLLOW-UP */
-    if (data.priority === "hot") {
-      setTimeout(() => {
-        addMessage(
-          "You seem like a strong fit for this. Want a free strategy call to map everything out properly?",
-          "bot"
-        );
-      }, 1200);
-    }
-
-  } catch (error) {
-    console.error(error);
-
-    removeTyping();
-
     addMessage(
-      "Connection issue. Please refresh the page or email hello@sancheai.com",
+      data.reply ||
+      "Thanks — we'll follow up shortly.",
       "bot"
     );
+
+  }catch(error){
+
+    addMessage(
+      "Connection issue — please refresh the page or contact us through WhatsApp for a faster response.",
+      "bot"
+    );
+
   }
+
 }
 
-/* =========================
-   ENTER KEY SUPPORT
-========================= */
+/* ENTER KEY */
+
 chatInput.addEventListener(
   "keydown",
   e => {
-    if (
-      e.key === "Enter" &&
-      !e.shiftKey
-    ) {
+
+    if(
+      e.key === "Enter"
+    ){
+
       e.preventDefault();
 
       sendMessage();
+
     }
+
   }
 );
+
 </script>
+
+</body>
+</html>
