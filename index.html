@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sanche Solutions | AI Systems That Convert</title>
+<title>Sanche AI | Build Systems That Sell</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -40,7 +40,7 @@ body{
 }
 .hero h1{
   font-family:"Instrument Serif";
-  font-size:72px;
+  font-size:74px;
   line-height:1.05;
 }
 .hero p{
@@ -48,7 +48,11 @@ body{
   margin-top:18px;
   font-size:18px;
   line-height:1.6;
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
 }
+
 .cta{
   margin-top:30px;
   display:inline-block;
@@ -59,12 +63,12 @@ body{
   cursor:pointer;
   transition:.2s;
 }
-.cta:hover{transform:scale(1.04)}
+.cta:hover{transform:scale(1.05)}
 
 /* FEATURES */
 .section{
-  padding:70px 20px;
-  max-width:1000px;
+  padding:80px 20px;
+  max-width:1100px;
   margin:auto;
 }
 .grid{
@@ -73,7 +77,7 @@ body{
   gap:18px;
 }
 .card{
-  padding:18px;
+  padding:20px;
   border-radius:16px;
   background:var(--card);
   border:1px solid var(--border);
@@ -92,6 +96,7 @@ body{
   border:none;
   cursor:pointer;
   z-index:9999;
+  font-size:20px;
 }
 
 /* PANEL */
@@ -100,8 +105,8 @@ body{
   bottom:90px;
   right:24px;
   width:380px;
-  height:540px;
-  background:rgba(10,10,10,0.95);
+  height:560px;
+  background:rgba(10,10,10,0.96);
   border:1px solid var(--border);
   border-radius:18px;
   display:flex;
@@ -112,7 +117,6 @@ body{
   transition:.25s;
   backdrop-filter:blur(20px);
 }
-
 .panel.open{
   opacity:1;
   transform:translateY(0);
@@ -121,10 +125,11 @@ body{
 
 /* HEADER */
 .header{
-  padding:12px;
+  padding:14px;
   border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
+  font-weight:500;
 }
 
 /* MESSAGES */
@@ -142,6 +147,7 @@ body{
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
+  line-height:1.4;
 }
 
 .user{
@@ -149,12 +155,11 @@ body{
   color:black;
   margin-left:auto;
 }
-
 .bot{
   background:rgba(255,255,255,0.08);
 }
 
-/* INPUT AREA (FIXED) */
+/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -180,12 +185,11 @@ button.send{
   cursor:pointer;
 }
 
-/* QUICK */
+/* QUICK BUTTONS */
 .quick{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  margin-top:6px;
 }
 
 .quick button{
@@ -198,7 +202,7 @@ button.send{
   cursor:pointer;
 }
 
-/* typing */
+/* TYPING */
 .typing{
   font-size:12px;
   opacity:0.7;
@@ -210,18 +214,25 @@ button.send{
 
 <section class="hero">
   <h1>AI Systems That Close Leads For You</h1>
-  <p>Automation, websites, and AI chat systems that turn visitors into customers.</p>
-  <div class="cta" onclick="toggleChat()">Start Chat</div>
+  <p>
+    We build automation systems, AI chat agents, and high-converting websites
+    that turn traffic into paying customers — on autopilot.
+  </p>
+
+  <div class="cta" onclick="toggleChat()">
+    Start Building
+  </div>
 </section>
 
 <section class="section">
   <div class="grid">
-    <div class="card">AI Sales Bots</div>
-    <div class="card">Automation Systems</div>
-    <div class="card">High-Converting Websites</div>
+    <div class="card">AI Sales Bots That Convert 24/7</div>
+    <div class="card">Automation Systems & CRM Flows</div>
+    <div class="card">High-Converting SaaS Websites</div>
   </div>
 </section>
 
+<!-- CHAT -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
 <div class="panel" id="panel">
@@ -233,9 +244,8 @@ button.send{
 
   <div class="messages" id="messages"></div>
 
-  <!-- FIXED INPUT (this was missing / broken before) -->
   <div class="input">
-    <input id="input" placeholder="Type your message..." />
+    <input id="input" placeholder="Ask about pricing, websites, SEO..." />
     <button class="send" onclick="send()">➤</button>
   </div>
 
@@ -243,7 +253,7 @@ button.send{
 
 <script>
 const API_URL = "https://sanchesolutions.onrender.com/api/bot";
-const SESSION_ID = "user_" + Math.random().toString(36).slice(2,9);
+const SESSION_ID = "user_" + Math.random().toString(36).slice(2,10);
 
 const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
@@ -253,7 +263,7 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    add("Hey 👋 What are you building?", "bot");
+    add("Hey 👋 What are you trying to build?", "bot");
     addQuick();
   }
 }
@@ -272,9 +282,9 @@ function addQuick(){
 
   [
     ["Get Quote","quote"],
-    ["Pricing","price"],
-    ["Build Website","website"],
-    ["WhatsApp","contact"]
+    ["Pricing","pricing"],
+    ["Website Build","website"],
+    ["Automation","automation"]
   ].forEach(i=>{
     const b=document.createElement("button");
     b.textContent=i[0];
@@ -291,7 +301,6 @@ function typing(){
   div.id="typing";
   div.textContent="Sanche AI is thinking...";
   messages.appendChild(div);
-  messages.scrollTop=messages.scrollHeight;
 }
 
 async function send(text){
@@ -314,13 +323,13 @@ async function send(text){
     });
 
     const data=await res.json();
-    document.getElementById("typing")?.remove();
 
+    document.getElementById("typing")?.remove();
     add(data.reply || "No response","bot");
 
   }catch(e){
     document.getElementById("typing")?.remove();
-    add("Server error. Try again.","bot");
+    add("Server offline — try again later.","bot");
   }
 }
 
