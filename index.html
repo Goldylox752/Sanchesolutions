@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions | AI SaaS Developer</title>
+<title>SancheSolutions | Full Stack AI SaaS Developer</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -23,7 +23,6 @@ body{
   font-family:"DM Sans",sans-serif;
   background:var(--bg);
   color:var(--text);
-  line-height:1.6;
 }
 
 /* NAV */
@@ -40,9 +39,7 @@ nav{
   z-index:10;
 }
 
-.logo{
-  font-weight:700;
-}
+.logo{font-weight:700;}
 .logo span{color:var(--blue);}
 
 /* HERO */
@@ -71,18 +68,16 @@ p{
   font-size:18px;
 }
 
-/* SECTION */
+/* SECTIONS */
 .section{
   max-width:1000px;
   margin:auto;
   padding:80px 20px;
 }
 
-h2{
-  margin-bottom:12px;
-  font-size:22px;
-}
+h2{margin-bottom:12px;}
 
+/* CARD */
 .card{
   border:1px solid var(--border);
   background:rgba(255,255,255,0.03);
@@ -108,25 +103,7 @@ h2{
   color:var(--blue);
 }
 
-/* CTA */
-.cta{
-  text-align:center;
-  padding:90px 20px;
-  border-top:1px solid var(--border);
-}
-
-.btn{
-  display:inline-block;
-  margin-top:20px;
-  padding:12px 18px;
-  border-radius:12px;
-  background:var(--blue);
-  color:white;
-  text-decoration:none;
-  font-weight:600;
-}
-
-/* CHAT */
+/* CHAT BUTTON */
 .fab{
   position:fixed;
   bottom:20px;
@@ -137,11 +114,11 @@ h2{
   border:none;
   background:var(--blue);
   color:white;
+  font-size:20px;
   cursor:pointer;
-  font-size:22px;
-  z-index:20;
 }
 
+/* CHAT PANEL */
 .panel{
   position:fixed;
   bottom:90px;
@@ -157,7 +134,7 @@ h2{
   opacity:0;
   transform:translateY(20px);
   pointer-events:none;
-  transition:0.25s;
+  transition:.25s;
   z-index:20;
 }
 
@@ -183,13 +160,11 @@ h2{
   padding:10px 12px;
   border-radius:12px;
   margin-bottom:10px;
-  font-size:14px;
   white-space:pre-wrap;
 }
 
 .user{
-  background:var(--blue);
-  color:white;
+  background:linear-gradient(135deg,var(--blue),#7aa8ff);
   margin-left:auto;
   max-width:80%;
 }
@@ -200,6 +175,7 @@ h2{
   max-width:80%;
 }
 
+/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -228,64 +204,47 @@ button.send{
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <div>AI SaaS Developer</div>
+  <div>Full Stack AI Developer</div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <h1>AI SaaS Funnel Systems & <span>Full Stack Automation Engineering</span></h1>
+  <h1>AI SaaS Funnel System & <span>Full Stack Engineering Case Study</span></h1>
   <p>
-    SanchezSolutions builds AI-powered systems that automate lead generation,
-    qualify customers, and increase conversions using real-time AI chat.
+    I build AI automation systems that generate leads, qualify prospects,
+    and convert users into customers using real-time AI streaming.
   </p>
 </section>
 
-<!-- ABOUT -->
-<section class="section">
-  <h2>Overview</h2>
-  <div class="card">
-    SanchezSolutions is a full-stack AI engineering project showcasing SaaS funnel automation,
-    AI chat systems, and conversion-focused business logic.
-  </div>
-</section>
-
-<!-- TECH -->
 <section class="section">
   <h2>Tech Stack</h2>
-
   <div class="grid">
-    <div class="tag">HTML / CSS / JS</div>
-    <div class="tag">Node.js</div>
-    <div class="tag">Express API</div>
-    <div class="tag">Groq LLaMA 3</div>
-    <div class="tag">Streaming AI</div>
-    <div class="tag">Render Hosting</div>
+    <div class="tag">Frontend (HTML/CSS/JS)</div>
+    <div class="tag">Node.js + Express</div>
+    <div class="tag">Groq LLaMA 3 AI</div>
+    <div class="tag">Streaming API</div>
+    <div class="tag">Stripe Payments</div>
+    <div class="tag">Render + Vercel</div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta">
-  <h2>Need an AI system like this?</h2>
-  <p style="color:var(--muted)">
-    SanchezSolutions builds AI automation, SaaS tools, and sales systems.
-  </p>
-
-  <a class="btn" href="mailto:contact@sanchesolutions.com">
-    Contact SanchezSolutions
-  </a>
+<section class="section">
+  <h2>Architecture</h2>
+  <div class="card">
+    User → Chat UI → API (Express) → Groq AI → Streaming Response → Funnel Logic → Conversion System
+  </div>
 </section>
 
 <!-- CHAT BUTTON -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
-<!-- CHAT PANEL -->
+<!-- CHAT -->
 <div class="panel" id="panel">
   <div class="header">SancheSolutions AI Assistant</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask about AI systems..." />
+    <input id="input" placeholder="Ask about automation, SEO, or AI systems..." />
     <button class="send" onclick="send()">→</button>
   </div>
 </div>
@@ -302,11 +261,11 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    addMsg("Hi 👋 I'm the SanchezSolutions AI assistant. Ask me anything about automation or SaaS systems.", "bot");
+    add("Hi 👋 I’m the SancheSolutions AI assistant.", "bot");
   }
 }
 
-function addMsg(text, type){
+function add(text, type){
   const el = document.createElement("div");
   el.className = `msg ${type}`;
   el.textContent = text;
@@ -315,46 +274,40 @@ function addMsg(text, type){
   return el;
 }
 
-/* STREAMING CHAT */
+/* STREAM CHAT (GROQ BACKEND) */
 async function send(){
   const text = input.value.trim();
   if(!text) return;
 
   input.value = "";
 
-  addMsg(text, "user");
-  const bot = addMsg("", "bot");
+  add(text, "user");
+  const bot = add("", "bot");
 
   try {
     const res = await fetch(API, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ message:text })
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ message: text })
     });
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
 
-    let full = "";
+    let out = "";
 
     while(true){
-      const { value, done } = await reader.read();
+      const {value, done} = await reader.read();
       if(done) break;
 
-      full += decoder.decode(value, { stream:true });
-      bot.textContent = full;
-
-      messages.scrollTop = messages.scrollHeight;
+      out += decoder.decode(value, {stream:true});
+      bot.textContent = out;
     }
 
-  } catch(e){
-    bot.textContent = "Connection error";
+  } catch(err){
+    bot.textContent = "AI temporarily unavailable.";
   }
 }
-
-input.addEventListener("keydown",(e)=>{
-  if(e.key==="Enter") send();
-});
 
 </script>
 
