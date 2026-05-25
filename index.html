@@ -4,11 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Sanche Solutions | Byron Sanche — Full Stack Developer & AI Automation</title>
-
-<meta name="description" content="Byron Sanche builds high-performance websites, AI lead systems, CRM automations, REST APIs, cloud deployments, and networking infrastructure for modern businesses. Based in Edmonton, Alberta, Canada." />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://sanchesolutions.com/" />
+<title>Sanche Solutions | AI Assistant</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -30,7 +26,6 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'DM Sans',sans-serif;
-  overflow-x:hidden;
 }
 
 /* BOT */
@@ -86,14 +81,8 @@ body{
   white-space:pre-wrap;
 }
 
-.ai-user{
-  background:rgba(255,255,255,.05);
-  margin-left:auto;
-}
-
-.ai-bot{
-  background:rgba(99,179,237,.08);
-}
+.ai-user{background:rgba(255,255,255,.05);margin-left:auto;}
+.ai-bot{background:rgba(99,179,237,.08);}
 
 .ai-input{
   display:flex;
@@ -120,15 +109,14 @@ body{
 
 <body>
 
-<!-- BOT -->
 <div class="ai-fab" id="ai-fab">💬</div>
 
 <div class="ai-panel" id="ai-panel">
 
   <div class="ai-header">
     <div>
-      <div><b>Sanche AI</b></div>
-      <div style="font-size:11px;color:#94a3b8;">Lead Assistant</div>
+      <b>Sanche AI</b><br>
+      <span style="font-size:11px;color:#94a3b8;">Lead Assistant</span>
     </div>
     <div id="ai-close">✕</div>
   </div>
@@ -150,6 +138,9 @@ const input = document.getElementById("ai-input");
 const sendBtn = document.getElementById("ai-send");
 const messages = document.getElementById("ai-messages");
 
+// 🔥 VERCEL ENV FIX
+const API_URL = window.NEXT_PUBLIC_API_URL || "https://sanchesolutions.onrender.com";
+
 function addMsg(text, type){
   const div = document.createElement("div");
   div.className = "ai-msg " + type;
@@ -165,7 +156,7 @@ fab.onclick = () => {
     addMsg(
 `Hey 👋 I’m your AI assistant.
 
-I can help you with:
+I help with:
 • Websites
 • AI automation
 • CRM systems
@@ -185,25 +176,22 @@ async function send(){
   input.value="";
 
   try{
-    const res = await fetch("https://sanchesolutions.onrender.com/api/bot",{
+    const res = await fetch(`${API_URL}/api/bot`, {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({ message:text })
     });
 
-    if(!res.ok) throw new Error("API error");
+    if(!res.ok) throw new Error("API failed");
 
     const data = await res.json();
 
-    addMsg(data.reply || "No response from server.","ai-bot");
+    addMsg(data.reply || "No response.","ai-bot");
 
   }catch(err){
     console.error(err);
 
-    addMsg(
-      "AI offline — redirecting to WhatsApp...",
-      "ai-bot"
-    );
+    addMsg("AI offline — opening WhatsApp...", "ai-bot");
 
     window.open(
       "https://wa.me/17802679673?text=" + encodeURIComponent(text),
