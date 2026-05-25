@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import OpenAI from "openai";
 
 const app = express();
 
@@ -8,15 +7,35 @@ app.use(cors());
 app.use(express.json());
 
 /* ===============================
-   OPENAI
+   SIMPLE "AI" RESPONSE ENGINE
+   (no external APIs)
 =============================== */
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+function generateReply(message = "") {
+  const msg = message.toLowerCase();
+
+  // basic intent detection
+  if (msg.includes("price") || msg.includes("cost")) {
+    return "Our AI systems start from $500 setup and scale based on automation needs.";
+  }
+
+  if (msg.includes("seo")) {
+    return "We improve SEO using structured content, keyword mapping, and automation-driven optimization.";
+  }
+
+  if (msg.includes("ai") || msg.includes("automation")) {
+    return "We build AI systems that automate leads, follow-ups, and sales processes 24/7.";
+  }
+
+  if (msg.includes("hello") || msg.includes("hi")) {
+    return "Hey 👋 How can I help you scale your business today?";
+  }
+
+  return "I can help you with AI automation, lead generation, SEO, and sales systems. What are you trying to build?";
+}
 
 /* ===============================
-   STREAMING CHAT ROUTE
+   CHAT ENDPOINT (STREAM STYLE SIM)
 =============================== */
 
 app.post("/chat", async (req, res) => {
@@ -24,42 +43,29 @@ app.post("/chat", async (req, res) => {
     const { message } = req.body;
 
     if (!message) {
-      return res.status(400).json({ error: "No message provided" });
+      return res.status(400).json({
+        success: false,
+        reply: "No message provided"
+      });
     }
 
-    // IMPORTANT: streaming headers
+    const reply = generateReply(message);
+
+    // optional fake streaming (keeps frontend working like ChatGPT)
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
 
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      stream: true,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful AI assistant for a sales automation company."
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ]
-    });
-
-    // Send tokens as they arrive
-    for await (const chunk of stream) {
-      const token = chunk.choices?.[0]?.delta?.content;
-
-      if (token) {
-        res.write(token);
-      }
+    for (let i = 0; i < reply.length; i++) {
+      res.write(reply[i]);
+      await new Promise(r => setTimeout(r, 10)); // typing effect
     }
 
     res.end();
+
   } catch (err) {
-    console.error("Streaming error:", err);
-    res.status(500).end("AI stream failed");
+    console.error("Server error:", err);
+
+    res.status(500).end("Server error");
   }
 });
 
@@ -68,7 +74,10 @@ app.post("/chat", async (req, res) => {
 =============================== */
 
 app.get("/", (req, res) => {
-  res.json({ status: "ok", streaming: true });
+  res.json({
+    status: "ok",
+    ai: "local-engine"
+  });
 });
 
 /* ===============================
@@ -78,5 +87,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Streaming server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
