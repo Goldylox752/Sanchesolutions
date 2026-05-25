@@ -28,7 +28,7 @@ body{
   font-family:'DM Sans',sans-serif;
 }
 
-/* FLOAT BUTTON */
+/* BUTTON */
 .ai-fab{
   position:fixed;
   bottom:24px;
@@ -43,10 +43,9 @@ body{
   cursor:pointer;
   font-size:22px;
   z-index:9999;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
-/* CHAT PANEL */
+/* PANEL */
 .ai-panel{
   position:fixed;
   bottom:92px;
@@ -118,10 +117,8 @@ body{
 
 <body>
 
-<!-- BUTTON -->
 <div class="ai-fab" id="fab">💬</div>
 
-<!-- CHAT -->
 <div class="ai-panel" id="panel">
 
   <div class="ai-header">
@@ -149,7 +146,7 @@ const input = document.getElementById("input");
 const sendBtn = document.getElementById("send");
 const messages = document.getElementById("messages");
 
-// VERCEL SERVERLESS API
+// IMPORTANT: Vercel serverless route
 const API_URL = "/api/bot";
 
 function addMsg(text, type){
@@ -190,12 +187,11 @@ async function send(){
   loading.className = "ai-msg ai-bot";
   loading.innerText = "Thinking...";
   messages.appendChild(loading);
-  messages.scrollTop = messages.scrollHeight;
 
   try{
     const res = await fetch(API_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text })
     });
 
@@ -203,14 +199,13 @@ async function send(){
 
     loading.remove();
 
-    if(!res.ok){
-      addMsg(data.error || "Server error", "ai-bot");
-      return;
+    if(!res.ok || !data.reply){
+      throw new Error(data.error || "API failed");
     }
 
-    addMsg(data.reply || "No response", "ai-bot");
+    addMsg(data.reply, "ai-bot");
 
-  }catch(err){
+  } catch(err){
     console.error(err);
 
     loading.remove();
