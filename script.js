@@ -1,1 +1,0 @@
-const API_URL = "https://sanchesolutions.onrender.com/api/bot";
