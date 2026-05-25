@@ -3,81 +3,60 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// HEALTH CHECK
-app.get("/", (req, res) => {
-  res.send("Sanche Bot API Running");
-});
+// Smart Sales Bot (Upgraded)
+app.post("/api/bot", (req, res) => {
+  const msg = (req.body.message || "").toLowerCase();
 
-// BOT ENDPOINT
-app.post("/api/bot", async (req, res) => {
-  try {
-    const { message } = req.body;
-
-    if (!message) {
-      return res.status(400).json({
-        reply: "Please enter a message."
-      });
-    }
-
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: `
-You are a sales assistant for Sanche Solutions.
-
-Your goals:
-- Convert visitors into leads
-- Be short, confident, and professional
-- Encourage users to contact via WhatsApp for serious projects
-- Help with websites, SEO, AI chatbots, branding, and automation
-
-Never make responses overly long.
-              `
-            },
-            {
-              role: "user",
-              content: message
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 200
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    console.log(data);
-
-    res.json({
+  // intent scoring system
+  const rules = [
+    {
+      keywords: ["website", "web", "build", "site"],
       reply:
-        data?.choices?.[0]?.message?.content ||
-        "Tell me more about your project."
-    });
-  } catch (err) {
-    console.error("BOT ERROR:", err);
+        "We build high-converting websites designed to bring you leads, not just look good. What type of business do you run?"
+    },
+    {
+      keywords: ["seo", "google", "rank", "traffic"],
+      reply:
+        "We help businesses rank higher on Google and get consistent organic leads without ads."
+    },
+    {
+      keywords: ["price", "cost", "pricing", "how much"],
+      reply:
+        "Pricing depends on your project, but most business websites start between $300–$800 depending on features."
+    },
+    {
+      keywords: ["automation", "ai", "bot", "system"],
+      reply:
+        "We build automation systems that save time and handle leads automatically for your business."
+    },
+    {
+      keywords: ["contact", "whatsapp", "call", "talk"],
+      reply:
+        "You can reach us directly on WhatsApp at +1 780-267-9673 and we’ll respond quickly."
+    }
+  ];
 
-    res.status(500).json({
-      reply: "Server error. Please contact us on WhatsApp."
-    });
-  }
+  // find best match
+  const match = rules.find(r =>
+    r.keywords.some(k => msg.includes(k))
+  );
+
+  // smarter fallback (NOT dumb anymore)
+  const fallbackMessages = [
+    "Got it — can you tell me a bit more about your business so I can recommend the right solution?",
+    "I can help you build a website, improve SEO, or automate your leads. What are you focused on right now?",
+    "Are you trying to get more customers online or improve your current website?"
+  ];
+
+  const reply = match
+    ? match.reply
+    : fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+
+  res.json({ reply });
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log("Server running on", port));
