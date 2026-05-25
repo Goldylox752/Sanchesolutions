@@ -17,9 +17,9 @@
   --surface2:#0c1422;
   --border:rgba(255,255,255,.06);
   --text:#eef2ff;
-  --muted:#94a3b8;
   --accent:#63b3ed;
   --accent2:#7c6af7;
+  --muted:#94a3b8;
 }
 
 body{
@@ -28,7 +28,7 @@ body{
   font-family:'DM Sans',sans-serif;
 }
 
-/* BOT */
+/* FAB */
 .ai-fab{
   position:fixed;
   bottom:24px;
@@ -40,11 +40,12 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
   cursor:pointer;
-  z-index:99999;
+  font-size:22px;
+  z-index:9999;
 }
 
+/* PANEL */
 .ai-panel{
   position:fixed;
   bottom:92px;
@@ -56,8 +57,8 @@ body{
   border-radius:18px;
   display:none;
   flex-direction:column;
-  z-index:99999;
   overflow:hidden;
+  z-index:9999;
 }
 
 .ai-header{
@@ -82,8 +83,14 @@ body{
   max-width:85%;
 }
 
-.ai-user{background:rgba(255,255,255,.05);margin-left:auto;}
-.ai-bot{background:rgba(99,179,237,.08);}
+.ai-user{
+  background:rgba(255,255,255,.05);
+  margin-left:auto;
+}
+
+.ai-bot{
+  background:rgba(99,179,237,.08);
+}
 
 .ai-input{
   display:flex;
@@ -95,8 +102,8 @@ body{
   padding:12px;
   background:transparent;
   border:none;
-  color:white;
   outline:none;
+  color:white;
 }
 
 .ai-input button{
@@ -105,18 +112,15 @@ body{
   padding:0 16px;
   cursor:pointer;
 }
-
-.loading{
-  opacity:0.6;
-  font-style:italic;
-}
 </style>
 </head>
 
 <body>
 
+<!-- BUTTON -->
 <div class="ai-fab" id="ai-fab">💬</div>
 
+<!-- CHAT -->
 <div class="ai-panel" id="ai-panel">
 
   <div class="ai-header">
@@ -143,6 +147,9 @@ const closeBtn = document.getElementById("ai-close");
 const input = document.getElementById("ai-input");
 const sendBtn = document.getElementById("ai-send");
 const messages = document.getElementById("ai-messages");
+
+// VERCEL API (IMPORTANT)
+const API_URL = "/api/bot";
 
 function addMsg(text, type){
   const div = document.createElement("div");
@@ -175,15 +182,13 @@ async function send(){
   const text = input.value.trim();
   if(!text) return;
 
-  addMsg(text,"ai-user");
-  input.value="";
+  addMsg(text, "ai-user");
+  input.value = "";
 
-  // loading message
-  const loadingId = "loading-" + Date.now();
   addMsg("Thinking...", "ai-bot");
 
   try{
-    const res = await fetch("/api/bot", {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text })
@@ -191,12 +196,9 @@ async function send(){
 
     const data = await res.json();
 
-    // remove last loading message
     messages.lastChild.remove();
 
-    if(!res.ok) throw new Error(data.error || "API failed");
-
-    addMsg(data.reply || "No response.", "ai-bot");
+    addMsg(data.reply || "No response from server.", "ai-bot");
 
   } catch(err){
     console.error(err);
@@ -205,7 +207,7 @@ async function send(){
       messages.lastChild.remove();
     }
 
-    addMsg("AI offline — redirecting to WhatsApp...", "ai-bot");
+    addMsg("AI offline — opening WhatsApp...", "ai-bot");
 
     window.open(
       "https://wa.me/17802679673?text=" + encodeURIComponent(text),
@@ -216,8 +218,8 @@ async function send(){
 
 sendBtn.onclick = send;
 
-input.addEventListener("keydown",(e)=>{
-  if(e.key==="Enter") send();
+input.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") send();
 });
 </script>
 
