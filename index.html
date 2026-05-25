@@ -273,7 +273,7 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    add("Hi 👋 I’m your AI assistant. Ask me anything about automating your business or booking a demo.", "bot");
+    add("Hi 👋 I’m your AI assistant. Ask me anything about automation, pricing, or booking a demo.", "bot");
   }
 }
 
@@ -287,7 +287,7 @@ function add(text, type){
 }
 
 /* ============================
-   FIXED STREAMING CHAT
+   FIXED RELIABLE CHAT (NO STREAM BUGS)
 ============================ */
 async function send(){
   const text = input.value.trim();
@@ -296,7 +296,7 @@ async function send(){
   input.value = "";
 
   add(text, "user");
-  const bot = add("...", "bot");
+  const bot = add("Thinking...", "bot");
 
   try {
     const res = await fetch(API, {
@@ -310,33 +310,17 @@ async function send(){
       return;
     }
 
-    const reader = res.body?.getReader();
+    const reply = await res.text();
 
-    if (!reader) {
-      bot.textContent = await res.text();
-      return;
-    }
-
-    const decoder = new TextDecoder();
-    let output = "";
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      output += decoder.decode(value, { stream: true });
-      bot.textContent = output;
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    bot.textContent = output || "No response received.";
+    bot.textContent = reply || "No response received.";
 
   } catch (err) {
+    console.error(err);
     bot.textContent = "AI temporarily unavailable.";
   }
 }
 
-/* ENTER TO SEND */
+/* ENTER KEY SUPPORT */
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
