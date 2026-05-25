@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Sanche Solutions | AI Assistant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#04060f;
+  --surface:#080d1a;
+  --surface2:#0c1422;
+  --text:#eef2ff;
+  --muted:#94a3b8;
+  --accent:#63b3ed;
+  --accent2:#7c6af7;
+  --border:rgba(255,255,255,.08);
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+}
+
+/* BUTTON */
+.ai-fab{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:22px;
+  z-index:9999;
+}
+
+/* PANEL */
+.ai-panel{
+  position:fixed;
+  bottom:92px;
+  right:24px;
+  width:360px;
+  height:480px;
+  background:linear-gradient(160deg,var(--surface),var(--surface2));
+  border:1px solid var(--border);
+  border-radius:18px;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+  z-index:9999;
+}
+
+.ai-header{
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+
+.ai-messages{
+  flex:1;
+  padding:14px;
+  overflow-y:auto;
+  font-size:13px;
+}
+
+.ai-msg{
+  margin-bottom:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  max-width:85%;
+  white-space:pre-wrap;
+}
+
+.ai-user{
+  background:rgba(255,255,255,.06);
+  margin-left:auto;
+}
+
+.ai-bot{
+  background:rgba(99,179,237,.10);
+}
+
+.ai-input{
+  display:flex;
+  border-top:1px solid var(--border);
+}
+
+.ai-input input{
+  flex:1;
+  padding:12px;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:white;
+}
+
+.ai-input button{
+  padding:0 16px;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+}
+</style>
+</head>
+
+<body>
+
+<div class="ai-fab" id="fab">💬</div>
+
+<div class="ai-panel" id="panel">
+
+  <div class="ai-header">
+    <div>
+      <b>Sanche AI</b><br>
+      <span style="font-size:11px;color:#94a3b8;">Lead Assistant</span>
+    </div>
+    <div id="close" style="cursor:pointer;">✕</div>
+  </div>
+
+  <div class="ai-messages" id="messages"></div>
+
+  <div class="ai-input">
+    <input id="input" placeholder="Tell me about your project..." />
+    <button id="send">Send</button>
+  </div>
+
+</div>
+
+<script>
+const fab = document.getElementById("fab");
+const panel = document.getElementById("panel");
+const closeBtn = document.getElementById("close");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
+const messages = document.getElementById("messages");
+
+// IMPORTANT: Vercel serverless route
+const API_URL = "/api/bot";
+
+function addMsg(text, type){
+  const div = document.createElement("div");
+  div.className = "ai-msg " + type;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+fab.onclick = () => {
+  panel.style.display = "flex";
+
+  if(messages.childElementCount === 0){
+    addMsg(
+`Hey 👋 I’m your AI assistant.
+
+I help with:
+• Websites
+• Automation
+• CRM systems
+• Lead generation`,
+    "ai-bot"
+    );
+  }
+};
+
+closeBtn.onclick = () => panel.style.display = "none";
+
+async function send(){
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMsg(text, "ai-user");
+  input.value = "";
+
+  const loading = document.createElement("div");
+  loading.className = "ai-msg ai-bot";
+  loading.innerText = "Thinking...";
+  messages.appendChild(loading);
+
+  try{
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+
+    loading.remove();
+
+    if(!res.ok || !data.reply){
+      throw new Error(data.error || "API failed");
+    }
+
+    addMsg(data.reply, "ai-bot");
+
+  } catch(err){
+    console.error(err);
+
+    loading.remove();
+
+    addMsg("AI offline — opening WhatsApp...", "ai-bot");
+
+    window.open(
+      "https://wa.me/17802679673?text=" + encodeURIComponent(text),
+      "_blank"
+    );
+  }
+}
+
+sendBtn.onclick = send;
+
+input.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") send();
+});
+</script>
+
+</body>
+</html>
