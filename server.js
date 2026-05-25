@@ -4,68 +4,89 @@ import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 
+/* ───── MIDDLEWARE ───── */
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Supabase setup
+/* ───── SUPABASE ───── */
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// memory (optional fallback)
+/* ───── SIMPLE MEMORY STORE (fallback) ───── */
 const sessions = {};
 
-// intents
+/* ───── INTENTS ENGINE (upgraded logic) ───── */
 const intents = [
   {
     name: "website",
-    keywords: ["website", "web", "site"],
-    reply: "We build high-converting websites that turn visitors into leads. What kind of business do you run?"
+    keywords: ["website", "web", "site", "landing page"],
+    reply:
+      "We build high-converting websites designed to turn visitors into paying customers. What type of business do you run?"
   },
   {
     name: "seo",
-    keywords: ["seo", "google", "rank"],
-    reply: "We help you rank on Google and get organic leads without ads."
+    keywords: ["seo", "google", "rank", "traffic"],
+    reply:
+      "We help businesses rank on Google and generate consistent organic leads without ads."
   },
   {
     name: "pricing",
-    keywords: ["price", "cost", "how much"],
-    reply: "Most websites range from $300–$1500 depending on features. What are you looking for?"
+    keywords: ["price", "cost", "how much", "pricing"],
+    reply:
+      "Most projects start between $300–$1500 depending on complexity. What are you trying to build?"
+  },
+  {
+    name: "automation",
+    keywords: ["automation", "ai", "bot", "crm", "system"],
+    reply:
+      "We build automation systems that handle leads, follow-ups, and customer conversion automatically."
   },
   {
     name: "whatsapp",
-    keywords: ["whatsapp", "call", "contact"],
-    reply: "You can reach us on WhatsApp at +1 780-267-9673 for fastest response."
+    keywords: ["whatsapp", "call", "contact", "talk"],
+    reply:
+      "You can reach us directly on WhatsApp at +1 780-267-9673 for fastest response."
   }
 ];
 
-// intent matcher
-function getIntent(msg) {
-  msg = msg.toLowerCase();
+/* ───── INTENT MATCHER ───── */
+function detectIntent(message = "") {
+  const msg = message.toLowerCase();
 
-  return intents.find(i =>
-    i.keywords.some(k => msg.includes(k))
+  return (
+    intents.find((i) =>
+      i.keywords.some((k) => msg.includes(k))
+    ) || null
   );
 }
 
-// BOT ENDPOINT
+/* ───── BOT ENDPOINT ───── */
 app.post("/api/bot", async (req, res) => {
   try {
     const { message, sessionId = "default" } = req.body;
 
-    if (!sessions[sessionId]) {
-      sessions[sessionId] = { step: 0 };
+    if (!message) {
+      return res.status(400).json({ reply: "No message provided" });
     }
 
-    const intent = getIntent(message);
+    /* session tracking */
+    if (!sessions[sessionId]) {
+      sessions[sessionId] = {
+        step: 0,
+        createdAt: Date.now()
+      };
+    }
 
-    let reply =
-      intent?.reply ||
-      "What type of business are you trying to grow?";
+    const intent = detectIntent(message);
 
-    // save to Supabase
-    await supabase.from("leads").insert([
+    const reply = intent
+      ? intent.reply
+      : "Got it — what kind of business are you trying to grow? I can help with websites, SEO, or automation.";
+
+    /* ───── SAVE TO SUPABASE (LEAD LOGGING) ───── */
+    const { error } = await supabase.from("leads").insert([
       {
         session_id: sessionId,
         message,
@@ -74,21 +95,31 @@ app.post("/api/bot", async (req, res) => {
       }
     ]);
 
+    if (error) {
+      console.error("Supabase error:", error.message);
+    }
+
+    /* ───── RESPONSE ───── */
     res.json({
       reply,
       intent: intent?.name || "unknown"
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "Server error" });
+    console.error("Server error:", err);
+    res.status(500).json({
+      reply: "Server error — please try again or contact support."
+    });
   }
 });
 
-// health
+/* ───── HEALTH CHECK ───── */
 app.get("/", (req, res) => {
   res.send("Sanche Bot + Supabase Running 🚀");
 });
 
+/* ───── START SERVER ───── */
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on", port));
+app.listen(port, () => {
+  console.log("Server running on port", port);
+});
