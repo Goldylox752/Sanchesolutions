@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Byron Sanche | Full Stack AI SaaS Developer</title>
+<title>SancheSolutions | AI SaaS Developer</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -37,6 +37,7 @@ nav{
   background:rgba(5,8,20,0.7);
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
+  z-index:10;
 }
 
 .logo{
@@ -61,9 +62,7 @@ h1{
   line-height:1.1;
 }
 
-h1 span{
-  color:var(--blue);
-}
+h1 span{color:var(--blue);}
 
 p{
   margin-top:18px;
@@ -84,7 +83,6 @@ h2{
   font-size:22px;
 }
 
-/* CARD */
 .card{
   border:1px solid var(--border);
   background:rgba(255,255,255,0.03);
@@ -110,26 +108,6 @@ h2{
   color:var(--blue);
 }
 
-/* METRICS */
-.metrics{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:12px;
-  margin-top:20px;
-}
-
-.metric{
-  border:1px solid var(--border);
-  padding:18px;
-  border-radius:14px;
-  text-align:center;
-}
-
-.metric h3{
-  color:var(--blue);
-  font-size:24px;
-}
-
 /* CTA */
 .cta{
   text-align:center;
@@ -147,22 +125,118 @@ h2{
   text-decoration:none;
   font-weight:600;
 }
+
+/* CHAT */
+.fab{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  border:none;
+  background:var(--blue);
+  color:white;
+  cursor:pointer;
+  font-size:22px;
+  z-index:20;
+}
+
+.panel{
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  width:360px;
+  height:520px;
+  background:rgba(10,14,30,0.95);
+  border:1px solid var(--border);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(20px);
+  pointer-events:none;
+  transition:0.25s;
+  z-index:20;
+}
+
+.panel.open{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+
+.header{
+  padding:14px;
+  border-bottom:1px solid var(--border);
+  font-weight:600;
+}
+
+.messages{
+  flex:1;
+  padding:14px;
+  overflow-y:auto;
+}
+
+.msg{
+  padding:10px 12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  font-size:14px;
+  white-space:pre-wrap;
+}
+
+.user{
+  background:var(--blue);
+  color:white;
+  margin-left:auto;
+  max-width:80%;
+}
+
+.bot{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  max-width:80%;
+}
+
+.input{
+  display:flex;
+  border-top:1px solid var(--border);
+}
+
+input{
+  flex:1;
+  padding:12px;
+  background:transparent;
+  border:none;
+  color:white;
+  outline:none;
+}
+
+button.send{
+  width:50px;
+  background:var(--blue);
+  border:none;
+  color:white;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <nav>
-  <div class="logo">Byron<span>Sanche</span></div>
-  <div>Full Stack AI Developer</div>
+  <div class="logo">Sanche<span>Solutions</span></div>
+  <div>AI SaaS Developer</div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <h1>AI SaaS Funnel System & <span>Full Stack Engineering Case Study</span></h1>
+  <h1>AI SaaS Funnel Systems & <span>Full Stack Automation Engineering</span></h1>
   <p>
-    I design and build AI-powered SaaS systems that automate lead generation,
-    qualify prospects, and increase conversions using real-time AI streaming.
+    SanchezSolutions builds AI-powered systems that automate lead generation,
+    qualify customers, and increase conversions using real-time AI chat.
   </p>
 </section>
 
@@ -170,95 +244,119 @@ h2{
 <section class="section">
   <h2>Overview</h2>
   <div class="card">
-    This project is a full AI sales funnel system combining frontend UX,
-    backend API architecture, and AI-driven conversational automation.
-    It simulates a real SaaS product designed for service-based businesses.
+    SanchezSolutions is a full-stack AI engineering project showcasing SaaS funnel automation,
+    AI chat systems, and conversion-focused business logic.
   </div>
 </section>
 
-<!-- ROLE -->
-<section class="section">
-  <h2>My Role</h2>
-  <div class="card">
-    Full Stack Developer — Built UI, API backend, AI integration (Groq LLaMA 3),
-    streaming chat system, and conversion funnel logic.
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section class="section">
-  <h2>Problem</h2>
-  <div class="card">
-    Businesses lose leads due to slow response times, lack of automation,
-    and no structured qualification system for incoming prospects.
-  </div>
-</section>
-
-<!-- SOLUTION -->
-<section class="section">
-  <h2>Solution</h2>
-  <div class="card">
-    Built an AI-powered SaaS funnel that responds instantly, qualifies users,
-    and guides them toward conversion using automated sales logic.
-  </div>
-</section>
-
-<!-- IMPACT -->
-<section class="section">
-  <h2>Impact</h2>
-
-  <div class="metrics">
-    <div class="metric">
-      <h3>24/7</h3>
-      <p>Automated Sales System</p>
-    </div>
-
-    <div class="metric">
-      <h3>Real-Time</h3>
-      <p>AI Streaming Responses</p>
-    </div>
-
-    <div class="metric">
-      <h3>Scalable</h3>
-      <p>Multi-Agent Architecture</p>
-    </div>
-  </div>
-</section>
-
-<!-- TECH STACK -->
+<!-- TECH -->
 <section class="section">
   <h2>Tech Stack</h2>
 
   <div class="grid">
     <div class="tag">HTML / CSS / JS</div>
-    <div class="tag">Node.js / Express</div>
+    <div class="tag">Node.js</div>
+    <div class="tag">Express API</div>
     <div class="tag">Groq LLaMA 3</div>
-    <div class="tag">Streaming API</div>
-    <div class="tag">Stripe Integration</div>
-    <div class="tag">Render Deployment</div>
-  </div>
-</section>
-
-<!-- ARCHITECTURE -->
-<section class="section">
-  <h2>Architecture</h2>
-  <div class="card">
-    Frontend UI → Express API → AI Engine (Groq) → Streaming Response →
-    Funnel Logic → Conversion System
+    <div class="tag">Streaming AI</div>
+    <div class="tag">Render Hosting</div>
   </div>
 </section>
 
 <!-- CTA -->
 <section class="cta">
-  <h2>Want a system like this built for your business?</h2>
+  <h2>Need an AI system like this?</h2>
   <p style="color:var(--muted)">
-    I build AI SaaS systems, automation funnels, and full-stack applications.
+    SanchezSolutions builds AI automation, SaaS tools, and sales systems.
   </p>
 
-  <a class="btn" href="mailto:youremail@email.com">
-    Contact Me
+  <a class="btn" href="mailto:contact@sanchesolutions.com">
+    Contact SanchezSolutions
   </a>
 </section>
+
+<!-- CHAT BUTTON -->
+<button class="fab" onclick="toggleChat()">💬</button>
+
+<!-- CHAT PANEL -->
+<div class="panel" id="panel">
+  <div class="header">SancheSolutions AI Assistant</div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input">
+    <input id="input" placeholder="Ask about AI systems..." />
+    <button class="send" onclick="send()">→</button>
+  </div>
+</div>
+
+<script>
+
+const API = "https://sanchesolutions.onrender.com/chat";
+
+const panel = document.getElementById("panel");
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+function toggleChat(){
+  panel.classList.toggle("open");
+
+  if(messages.children.length === 0){
+    addMsg("Hi 👋 I'm the SanchezSolutions AI assistant. Ask me anything about automation or SaaS systems.", "bot");
+  }
+}
+
+function addMsg(text, type){
+  const el = document.createElement("div");
+  el.className = `msg ${type}`;
+  el.textContent = text;
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+  return el;
+}
+
+/* STREAMING CHAT */
+async function send(){
+  const text = input.value.trim();
+  if(!text) return;
+
+  input.value = "";
+
+  addMsg(text, "user");
+  const bot = addMsg("", "bot");
+
+  try {
+    const res = await fetch(API, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ message:text })
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    let full = "";
+
+    while(true){
+      const { value, done } = await reader.read();
+      if(done) break;
+
+      full += decoder.decode(value, { stream:true });
+      bot.textContent = full;
+
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+  } catch(e){
+    bot.textContent = "Connection error";
+  }
+}
+
+input.addEventListener("keydown",(e)=>{
+  if(e.key==="Enter") send();
+});
+
+</script>
 
 </body>
 </html>
