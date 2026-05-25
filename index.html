@@ -15,11 +15,11 @@
   --bg:#04060f;
   --surface:#080d1a;
   --surface2:#0c1422;
-  --border:rgba(255,255,255,.06);
   --text:#eef2ff;
+  --muted:#94a3b8;
   --accent:#63b3ed;
   --accent2:#7c6af7;
-  --muted:#94a3b8;
+  --border:rgba(255,255,255,.08);
 }
 
 body{
@@ -28,7 +28,7 @@ body{
   font-family:'DM Sans',sans-serif;
 }
 
-/* FAB */
+/* FLOAT BUTTON */
 .ai-fab{
   position:fixed;
   bottom:24px;
@@ -43,9 +43,10 @@ body{
   cursor:pointer;
   font-size:22px;
   z-index:9999;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
-/* PANEL */
+/* CHAT PANEL */
 .ai-panel{
   position:fixed;
   bottom:92px;
@@ -79,17 +80,17 @@ body{
   margin-bottom:10px;
   padding:10px 12px;
   border-radius:10px;
-  white-space:pre-wrap;
   max-width:85%;
+  white-space:pre-wrap;
 }
 
 .ai-user{
-  background:rgba(255,255,255,.05);
+  background:rgba(255,255,255,.06);
   margin-left:auto;
 }
 
 .ai-bot{
-  background:rgba(99,179,237,.08);
+  background:rgba(99,179,237,.10);
 }
 
 .ai-input{
@@ -100,52 +101,55 @@ body{
 .ai-input input{
   flex:1;
   padding:12px;
-  background:transparent;
   border:none;
   outline:none;
+  background:transparent;
   color:white;
 }
 
 .ai-input button{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border:none;
   padding:0 16px;
+  border:none;
   cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
 }
 </style>
 </head>
 
 <body>
 
-<div class="ai-fab" id="ai-fab">💬</div>
+<!-- BUTTON -->
+<div class="ai-fab" id="fab">💬</div>
 
-<div class="ai-panel" id="ai-panel">
+<!-- CHAT -->
+<div class="ai-panel" id="panel">
 
   <div class="ai-header">
     <div>
       <b>Sanche AI</b><br>
       <span style="font-size:11px;color:#94a3b8;">Lead Assistant</span>
     </div>
-    <div id="ai-close" style="cursor:pointer;">✕</div>
+    <div id="close" style="cursor:pointer;">✕</div>
   </div>
 
-  <div class="ai-messages" id="ai-messages"></div>
+  <div class="ai-messages" id="messages"></div>
 
   <div class="ai-input">
-    <input id="ai-input" placeholder="Tell me about your project..." />
-    <button id="ai-send">Send</button>
+    <input id="input" placeholder="Tell me about your project..." />
+    <button id="send">Send</button>
   </div>
 
 </div>
 
 <script>
-const fab = document.getElementById("ai-fab");
-const panel = document.getElementById("ai-panel");
-const closeBtn = document.getElementById("ai-close");
-const input = document.getElementById("ai-input");
-const sendBtn = document.getElementById("ai-send");
-const messages = document.getElementById("ai-messages");
+const fab = document.getElementById("fab");
+const panel = document.getElementById("panel");
+const closeBtn = document.getElementById("close");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
+const messages = document.getElementById("messages");
 
+// VERCEL SERVERLESS API
 const API_URL = "/api/bot";
 
 function addMsg(text, type){
@@ -165,7 +169,7 @@ fab.onclick = () => {
 
 I help with:
 • Websites
-• AI automation
+• Automation
 • CRM systems
 • Lead generation`,
     "ai-bot"
@@ -182,7 +186,6 @@ async function send(){
   addMsg(text, "ai-user");
   input.value = "";
 
-  // create loading message
   const loading = document.createElement("div");
   loading.className = "ai-msg ai-bot";
   loading.innerText = "Thinking...";
@@ -191,24 +194,23 @@ async function send(){
 
   try{
     const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
 
-    // remove loading safely
     loading.remove();
 
-    if(!res.ok) {
+    if(!res.ok){
       addMsg(data.error || "Server error", "ai-bot");
       return;
     }
 
-    addMsg(data.reply || "No response from server.", "ai-bot");
+    addMsg(data.reply || "No response", "ai-bot");
 
-  } catch(err){
+  }catch(err){
     console.error(err);
 
     loading.remove();
