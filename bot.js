@@ -30,28 +30,14 @@ Choose based on intent, not keywords.`,
 };
 
 /* ─────────────────────────────
-   STAGE DETECTION (metadata only)
+   STAGE DETECTION
 ───────────────────────────── */
 
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  const decisionKeywords = [
-    "price",
-    "pricing",
-    "cost",
-    "quote",
-    "how much",
-    "$"
-  ];
-
-  const purchaseKeywords = [
-    "buy",
-    "book",
-    "pay",
-    "start now",
-    "let's do it"
-  ];
+  const decisionKeywords = ["price", "pricing", "cost", "quote", "how much", "$"];
+  const purchaseKeywords = ["buy", "book", "pay", "start now", "let's do it"];
 
   if (purchaseKeywords.some(w => msg.includes(w))) return "purchase";
   if (decisionKeywords.some(w => msg.includes(w))) return "decision";
@@ -60,7 +46,7 @@ function detectStage(message = "") {
 }
 
 /* ─────────────────────────────
-   ROUTER (AI DECIDES AGENT)
+   ROUTER
 ───────────────────────────── */
 
 async function routeAgent(message) {
@@ -75,8 +61,7 @@ async function routeAgent(message) {
       ]
     });
 
-    const result =
-      res.choices?.[0]?.message?.content?.trim()?.toLowerCase();
+    const result = res.choices?.[0]?.message?.content?.trim()?.toLowerCase();
 
     const valid = new Set([
       "sales",
@@ -95,16 +80,14 @@ async function routeAgent(message) {
 }
 
 /* ─────────────────────────────
-   AGENT EXECUTION
+   STREAMING AGENT EXECUTION
 ───────────────────────────── */
 
-async function runAgent({ agentName, session, message }) {
+async function runAgentStream({ agentName, session, message, res }) {
   try {
     const systemPrompt = agents[agentName] || agents.sales;
 
-    const messages = [
-      { role: "system", content: systemPrompt }
-    ];
+    const messages = [{ role: "system", content: systemPrompt }];
 
     if (Array.isArray(session?.messages)) {
       messages.push(...session.messages.slice(-8));
@@ -112,7 +95,7 @@ async function runAgent({ agentName, session, message }) {
 
     messages.push({ role: "user", content: message });
 
-    const res = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature:
         agentName === "closer"
@@ -121,44 +104,58 @@ async function runAgent({ agentName, session, message }) {
           ? 0.3
           : 0.6,
       max_tokens: 300,
-      messages
+      messages,
+      stream: true
     });
 
-    return res.choices?.[0]?.message?.content || "Need more details.";
+    let fullText = "";
+
+    for await (const chunk of stream) {
+      const token = chunk.choices?.[0]?.delta?.content;
+
+      if (token) {
+        fullText += token;
+
+        // Send token immediately to frontend
+        res.write(token);
+      }
+    }
+
+    res.end();
+
+    return fullText;
   } catch (err) {
-    console.error("Agent error:", err);
-    return "Something went wrong. Please try again.";
+    console.error("Stream error:", err);
+    res.write("Something went wrong.");
+    res.end();
   }
 }
 
 /* ─────────────────────────────
-   MAIN ORCHESTRATOR
+   MAIN ORCHESTRATOR (STREAM)
 ───────────────────────────── */
 
-export async function generateMultiAgentReply({
-  session = {},
-  message = ""
+export async function generateMultiAgentStream({
+  req,
+  res
 }) {
-  const stage = detectStage(message);
+  const { message = "", session = {} } = req.body;
 
+  const stage = detectStage(message);
   let agent = await routeAgent(message);
 
-  // Only upgrade to closer on strong purchase intent
   if (stage === "purchase") {
     agent = "closer";
   }
 
-  const reply = await runAgent({
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  await runAgentStream({
     agentName: agent,
     session,
-    message
+    message,
+    res
   });
-
-  return {
-    success: true,
-    reply,
-    agent,
-    stage,
-    priority: stage === "purchase" ? "hot" : "normal"
-  };
 }
