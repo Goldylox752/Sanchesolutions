@@ -10,67 +10,76 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
-:root {
+:root{
   --bg1:#050505;
   --bg2:#0b0f1a;
   --card:rgba(255,255,255,0.06);
-  --border:rgba(255,255,255,0.10);
-  --text:#ffffff;
+  --border:rgba(255,255,255,0.12);
+  --text:#fff;
   --muted:rgba(255,255,255,0.65);
 }
 
-/* background */
-body {
-  font-family: Geist, sans-serif;
-  color: var(--text);
+/* BACKGROUND */
+body{
+  font-family:Geist,sans-serif;
+  color:var(--text);
   min-height:100vh;
+  overflow-x:hidden;
   background:
     radial-gradient(circle at 20% 20%, #1a2a6c33, transparent 40%),
     radial-gradient(circle at 80% 30%, #b21f1f22, transparent 40%),
     radial-gradient(circle at 50% 80%, #0f202733, transparent 40%),
-    linear-gradient(180deg, var(--bg1), var(--bg2));
-}
-
-/* NAV */
-nav {
-  display:flex;
-  justify-content:space-between;
-  padding:22px 40px;
-  backdrop-filter: blur(20px);
-  background: rgba(0,0,0,0.4);
-  border-bottom:1px solid var(--border);
+    linear-gradient(180deg,var(--bg1),var(--bg2));
 }
 
 /* HERO */
-.hero {
+.hero{
   text-align:center;
   padding:140px 20px 80px;
+  max-width:900px;
+  margin:auto;
 }
-
-.hero h1 {
+.hero h1{
   font-family:"Instrument Serif";
-  font-size:64px;
+  font-size:68px;
+  line-height:1.05;
 }
-
-.hero p {
+.hero p{
+  margin-top:18px;
   color:var(--muted);
-  margin-top:20px;
   font-size:18px;
+  line-height:1.6;
 }
-
-/* CTA */
-.cta {
-  margin-top:30px;
+.cta{
+  margin-top:28px;
   display:inline-block;
-  padding:14px 26px;
+  padding:14px 24px;
   border-radius:14px;
   border:1px solid var(--border);
   background:var(--card);
   cursor:pointer;
 }
 
-/* CHAT */
-.fab {
+/* SECTIONS */
+.section{
+  padding:80px 40px;
+  max-width:1100px;
+  margin:auto;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.card{
+  padding:20px;
+  border-radius:16px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+
+/* CHAT BUTTON */
+.fab{
   position:fixed;
   bottom:24px;
   right:24px;
@@ -81,11 +90,11 @@ nav {
   color:black;
   border:none;
   cursor:pointer;
-  font-size:20px;
   z-index:9999;
 }
 
-.panel {
+/* CHAT PANEL */
+.panel{
   position:fixed;
   bottom:90px;
   right:24px;
@@ -100,24 +109,22 @@ nav {
   transform:translateY(10px);
   pointer-events:none;
   transition:.25s;
+  backdrop-filter:blur(20px);
 }
-
-.panel.open {
+.panel.open{
   opacity:1;
   transform:translateY(0);
   pointer-events:auto;
 }
 
-/* HEADER */
-.header {
+.header{
   padding:12px;
   border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
 }
 
-/* MESSAGES */
-.messages {
+.messages{
   flex:1;
   padding:12px;
   overflow:auto;
@@ -126,45 +133,59 @@ nav {
   gap:10px;
 }
 
-.msg {
+.msg{
   max-width:85%;
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
 }
 
-.user {
+.user{
   background:white;
   color:black;
   margin-left:auto;
 }
-
-.bot {
+.bot{
   background:rgba(255,255,255,0.08);
-  color:white;
 }
 
-/* INPUT */
-.input {
+.input{
   display:flex;
   border-top:1px solid var(--border);
   padding:10px;
   gap:8px;
 }
-
-input {
+textarea{
   flex:1;
-  padding:10px;
-  border-radius:10px;
+  resize:none;
   border:none;
   outline:none;
+  border-radius:10px;
+  padding:10px;
+  background:rgba(255,255,255,0.08);
+  color:white;
 }
-
-button.send {
+button.send{
   width:42px;
   background:white;
   border:none;
   border-radius:10px;
+  cursor:pointer;
+}
+
+.quick{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:6px;
+}
+.quick button{
+  font-size:12px;
+  padding:5px 10px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:white;
   cursor:pointer;
 }
 </style>
@@ -172,20 +193,28 @@ button.send {
 
 <body>
 
-<nav>
-  <div>Sanche Solutions</div>
-</nav>
-
 <section class="hero">
-  <h1>AI Systems That Sell While You Sleep</h1>
-  <p>High converting websites + automation + AI chat systems.</p>
-  <div class="cta" onclick="toggleChat()">Start Chat</div>
+  <h1>AI Systems That Close Leads For You</h1>
+  <p>We build automation, AI chat systems, and high-converting websites for modern businesses.</p>
+
+  <div class="cta" onclick="toggleChat()">
+    Start Chat
+  </div>
+</section>
+
+<section class="section">
+  <div class="grid">
+    <div class="card"><h3>AI Sales Bot</h3><p>Converts visitors into leads 24/7.</p></div>
+    <div class="card"><h3>Automation</h3><p>Email + CRM workflows.</p></div>
+    <div class="card"><h3>Web Design</h3><p>High-conversion SaaS landing pages.</p></div>
+  </div>
 </section>
 
 <!-- CHAT -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
 <div class="panel" id="panel">
+
   <div class="header">
     <div>Sanche AI</div>
     <button onclick="toggleChat()">✕</button>
@@ -194,9 +223,10 @@ button.send {
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Type your message..." />
+    <textarea id="input" placeholder="Ask something..."></textarea>
     <button class="send" onclick="send()">➤</button>
   </div>
+
 </div>
 
 <script>
@@ -206,47 +236,65 @@ const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 
-function toggleChat() {
+function toggleChat(){
   panel.classList.toggle("open");
 
-  if (messages.children.length === 0) {
-    add("Hey 👋 How can I help you today?", "bot");
+  if(messages.children.length === 0){
+    add("Hey 👋 What are you building?", "bot");
+    addQuick();
   }
 }
 
-function add(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.textContent = text;
+function add(text,type){
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.textContent=text;
   messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+  messages.scrollTop=messages.scrollHeight;
 }
 
-async function send() {
-  const text = input.value.trim();
-  if (!text) return;
+function addQuick(){
+  const div=document.createElement("div");
+  div.className="quick";
 
-  add(text, "user");
-  input.value = "";
+  const items=[
+    {t:"Get Quote",v:"I want a quote"},
+    {t:"Start ($299)",v:"I want to start a project"},
+    {t:"Stripe Payment",v:"show me payment options"},
+    {t:"WhatsApp",v:"contact me"}
+  ];
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+  items.forEach(i=>{
+    const b=document.createElement("button");
+    b.textContent=i.t;
+    b.onclick=()=>send(i.v);
+    div.appendChild(b);
+  });
+
+  messages.appendChild(div);
+}
+
+async function send(text){
+  const msg=(text||input.value).trim();
+  if(!msg) return;
+
+  add(msg,"user");
+  input.value="";
+
+  try{
+    const res=await fetch(API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ message:msg })
     });
 
-    const data = await res.json();
-    add(data.reply || "No response", "bot");
+    const data=await res.json();
+    add(data.reply || "No response","bot");
 
-  } catch (err) {
-    add("Server not responding. Check backend.", "bot");
+  }catch(e){
+    add("Server offline. Try WhatsApp.","bot");
   }
 }
-
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") send();
-});
 </script>
 
 </body>
