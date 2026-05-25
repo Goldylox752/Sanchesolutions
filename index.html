@@ -5,11 +5,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Sanche AI | AI Systems That Close Deals</title>
+<title>Sanche AI | AI Systems That Generate Leads & Close Sales</title>
 
-<meta name="description" content="Sanche AI builds AI sales systems, automation workflows, and high-converting websites for modern businesses."/>
+<meta name="description" content="We install AI systems that generate leads, automate follow-ups, and close sales for service businesses and agencies."/>
 <meta name="robots" content="index, follow"/>
-<meta name="theme-color" content="#050814"/>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -23,14 +22,9 @@
   --muted:rgba(210,220,255,0.65);
   --blue:#4f8cff;
   --blue2:#7aa8ff;
-  --radius:18px;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
   font-family:"DM Sans",sans-serif;
@@ -39,7 +33,6 @@ body{
     radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
     var(--bg);
   color:var(--text);
-  overflow-x:hidden;
 }
 
 /* NAV */
@@ -57,25 +50,8 @@ nav{
   z-index:1000;
 }
 
-.logo{
-  font-weight:600;
-  letter-spacing:-0.5px;
-}
-
-.logo span{
-  color:var(--blue);
-}
-
-.nav-links a{
-  color:var(--muted);
-  text-decoration:none;
-  margin:0 10px;
-  font-size:14px;
-}
-
-.nav-links a:hover{
-  color:white;
-}
+.logo{font-weight:600;}
+.logo span{color:var(--blue);}
 
 .btn{
   background:linear-gradient(135deg,var(--blue),var(--blue2));
@@ -83,8 +59,8 @@ nav{
   padding:12px 18px;
   border-radius:12px;
   color:white;
-  cursor:pointer;
   font-weight:600;
+  cursor:pointer;
 }
 
 /* HERO */
@@ -99,19 +75,19 @@ nav{
 }
 
 .badge{
-  font-size:12px;
   padding:6px 12px;
   border:1px solid var(--border);
   border-radius:999px;
   color:var(--blue2);
+  font-size:12px;
   background:rgba(255,255,255,0.03);
 }
 
 h1{
-  font-size:64px;
-  margin-top:20px;
+  font-size:66px;
   line-height:1.05;
   max-width:900px;
+  margin-top:20px;
 }
 
 h1 span{
@@ -122,20 +98,35 @@ h1 span{
 
 .hero p{
   margin-top:18px;
+  max-width:720px;
   color:var(--muted);
-  max-width:700px;
   font-size:18px;
   line-height:1.6;
 }
 
-.actions{
-  margin-top:30px;
-  display:flex;
+/* VALUE STRIP */
+.strip{
+  max-width:900px;
+  margin:40px auto 0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
   gap:12px;
-  flex-wrap:wrap;
 }
 
-/* SECTIONS */
+.strip div{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  padding:18px;
+  border-radius:16px;
+  text-align:center;
+}
+
+.strip h3{
+  color:var(--blue);
+  font-size:26px;
+}
+
+/* SECTION */
 .section{
   max-width:1100px;
   margin:auto;
@@ -144,11 +135,11 @@ h1 span{
 
 .title{
   font-size:44px;
-  margin-bottom:10px;
 }
 
 .sub{
   color:var(--muted);
+  margin-top:10px;
   max-width:700px;
   line-height:1.6;
 }
@@ -164,45 +155,36 @@ h1 span{
 .card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:20px;
   padding:24px;
-  transition:.25s;
+  border-radius:18px;
 }
 
-.card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(120,160,255,0.4);
-}
-
-/* STATS */
-.stats{
+/* PRICING */
+.pricing{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:16px;
-  max-width:900px;
-  margin:60px auto;
+  margin-top:40px;
 }
 
-.stat{
+.price{
   background:rgba(255,255,255,0.03);
   border:1px solid var(--border);
-  border-radius:20px;
-  padding:28px;
-  text-align:center;
+  padding:26px;
+  border-radius:18px;
 }
 
-.stat h2{
-  font-size:40px;
+.price h2{
   color:var(--blue);
 }
 
 /* CTA */
 .cta{
   text-align:center;
-  padding:80px 20px;
+  padding:70px 20px;
   background:linear-gradient(135deg,rgba(79,140,255,0.12),rgba(122,168,255,0.06));
   border:1px solid var(--border);
-  border-radius:30px;
+  border-radius:28px;
   max-width:900px;
   margin:80px auto;
 }
@@ -218,8 +200,6 @@ h1 span{
   border:none;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
-  cursor:pointer;
-  box-shadow:0 20px 40px rgba(79,140,255,0.3);
 }
 
 .panel{
@@ -230,7 +210,7 @@ h1 span{
   height:540px;
   background:rgba(10,14,30,0.95);
   border:1px solid var(--border);
-  border-radius:20px;
+  border-radius:18px;
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -269,15 +249,14 @@ h1 span{
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   margin-left:auto;
   color:white;
-  max-width:80%;
 }
 
 .bot{
   background:rgba(255,255,255,0.04);
   border:1px solid var(--border);
-  max-width:80%;
 }
 
+/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -293,8 +272,8 @@ input{
 
 button.send{
   width:50px;
-  border:none;
   background:var(--blue);
+  border:none;
   color:white;
 }
 
@@ -306,62 +285,66 @@ button.send{
 
 <nav>
   <div class="logo">Sanche<span>AI</span></div>
-
-  <div class="nav-links">
-    <a href="#services">Services</a>
-    <a href="#results">Results</a>
-    <a href="#contact">Contact</a>
-  </div>
-
-  <button class="btn" onclick="toggleChat()">Talk to AI</button>
+  <button class="btn" onclick="toggleChat()">Book Strategy</button>
 </nav>
 
 <section class="hero">
 
-  <div class="badge">AI Systems • Automation • Growth</div>
+  <div class="badge">AI Systems • Lead Generation • Automation</div>
 
   <h1>
-    AI Systems That
-    <span>Close Deals</span>
-    While You Sleep
+    We Build AI Systems That
+    <span>Generate Leads & Close Sales</span>
   </h1>
 
   <p>
-    We build AI sales systems, automation workflows, and high-converting websites that turn traffic into revenue automatically.
+    We install automated AI sales systems that replace manual lead handling, improve conversion rates, and help businesses scale faster in 14 days.
   </p>
 
-  <div class="actions">
-    <button class="btn" onclick="toggleChat()">Get Strategy</button>
-  </div>
+  <button class="btn" onclick="toggleChat()" style="margin-top:25px;">
+    Get Free Strategy →
+  </button>
 
-  <div class="stats">
-    <div class="stat"><h2>3×</h2><p>Conversion Lift</p></div>
-    <div class="stat"><h2>24/7</h2><p>AI Automation</p></div>
-    <div class="stat"><h2>14d</h2><p>Delivery</p></div>
+  <div class="strip">
+    <div><h3>24/7</h3><p>Lead Capture</p></div>
+    <div><h3>3×</h3><p>More Conversions</p></div>
+    <div><h3>14d</h3><p>Delivery</p></div>
   </div>
 
 </section>
 
-<section class="section" id="services">
+<section class="section">
 
-  <h2 class="title">What We Build</h2>
-  <p class="sub">Systems designed for revenue, not vanity metrics.</p>
+  <h2 class="title">What You Get</h2>
+  <p class="sub">Everything needed to turn your website into a sales system.</p>
 
   <div class="grid">
+    <div class="card">AI Lead Qualification System</div>
+    <div class="card">Automated Follow-up Engine</div>
+    <div class="card">Conversion Optimized Website</div>
+  </div>
 
-    <div class="card">
-      <h3>AI Sales Agents</h3>
-      <p>Automate lead qualification and booking.</p>
+</section>
+
+<section class="section">
+
+  <h2 class="title">Pricing</h2>
+
+  <div class="pricing">
+
+    <div class="price">
+      <h2>$2K</h2>
+      <p>Starter AI Setup</p>
     </div>
 
-    <div class="card">
-      <h3>Automation Systems</h3>
-      <p>CRM + workflows that save hours daily.</p>
+    <div class="price">
+      <h2>$5K</h2>
+      <p>Growth Automation System</p>
     </div>
 
-    <div class="card">
-      <h3>High-Converting Sites</h3>
-      <p>Fast, modern, SEO-ready websites.</p>
+    <div class="price">
+      <h2>$10K</h2>
+      <p>Full AI Sales Engine</p>
     </div>
 
   </div>
@@ -370,16 +353,16 @@ button.send{
 
 <section class="cta">
 
-  <h2 class="title">Ready to Scale?</h2>
-  <p class="sub">Let’s build your AI growth system.</p>
+  <h2 class="title">Want This Built for Your Business?</h2>
+  <p class="sub">Talk to our AI and get a custom strategy plan instantly.</p>
 
-  <div style="margin-top:20px;">
-    <button class="btn" onclick="toggleChat()">Start Now</button>
-  </div>
+  <button class="btn" onclick="toggleChat()" style="margin-top:20px;">
+    Start Now
+  </button>
 
 </section>
 
-<footer id="contact" style="text-align:center;padding:40px;color:var(--muted);">
+<footer style="text-align:center;padding:40px;color:var(--muted);">
   © 2026 Sanche AI · hello@sancheai.com
 </footer>
 
@@ -389,12 +372,12 @@ button.send{
 
 <div class="panel" id="panel">
 
-  <div class="header">Sanche AI Assistant</div>
+  <div class="header">AI Assistant</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="chatInput" placeholder="Ask anything..." />
+    <input id="chatInput" placeholder="Ask about pricing or automation..." />
     <button class="send" onclick="sendMessage()">→</button>
   </div>
 
@@ -402,49 +385,46 @@ button.send{
 
 <script>
 
-const panel = document.getElementById("panel");
-const messages = document.getElementById("messages");
-const input = document.getElementById("chatInput");
+const panel=document.getElementById("panel");
+const messages=document.getElementById("messages");
+const input=document.getElementById("chatInput");
 
 function toggleChat(){
   panel.classList.toggle("open");
-
-  if(messages.children.length === 0){
-    addMsg("Hey 👋 How can I help you build your AI system?", "bot");
+  if(messages.children.length===0){
+    add("Hey 👋 What kind of business are you trying to grow?","bot");
   }
 }
 
-function addMsg(text,type){
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+function add(text,type){
+  const d=document.createElement("div");
+  d.className=`msg ${type}`;
+  d.textContent=text;
+  messages.appendChild(d);
+  messages.scrollTop=messages.scrollHeight;
 }
 
 async function sendMessage(){
 
-  const text = input.value.trim();
-  if(!text) return;
+  const text=input.value.trim();
+  if(!text)return;
 
-  addMsg(text,"user");
+  add(text,"user");
   input.value="";
 
   try{
-
-    const res = await fetch("/api/bot",{
+    const res=await fetch("/api/bot",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({message:text})
     });
 
-    const data = await res.json();
-    addMsg(data.reply || "OK", "bot");
+    const data=await res.json();
+    add(data.reply||"Got it.","bot");
 
   }catch(e){
-    addMsg("Connection issue. Try again.", "bot");
+    add("Connection issue.","bot");
   }
-
 }
 
 </script>
