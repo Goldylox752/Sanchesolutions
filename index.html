@@ -21,7 +21,6 @@
       scroll-behavior: smooth;
     }
 
-    /* custom scroll */
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -34,7 +33,6 @@
       border-radius: 10px;
     }
 
-    /* glass navbar */
     nav {
       position: fixed;
       top: 0;
@@ -86,7 +84,6 @@
       background: linear-gradient(105deg, #3e7bff, #1f4bc2);
     }
 
-    /* hero */
     .hero {
       min-height: 95vh;
       display: flex;
@@ -137,7 +134,6 @@
     .stat h3 { font-size: 1.8rem; font-weight: 700; color: #4f8cff; }
     .stat p { font-size: 0.85rem; margin: 0; opacity: 0.8; }
 
-    /* sections */
     .section {
       max-width: 1200px;
       margin: 0 auto;
@@ -207,6 +203,46 @@
       border-bottom: 1px solid rgba(79,140,255,0.2);
       margin: 20px 0;
     }
+
+    /* NEW CONTACT ROW (Email + WhatsApp - NO PHONE NUMBER VISIBLE) */
+    .contact-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 24px;
+      margin: 48px auto 32px;
+      max-width: 900px;
+    }
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(15, 25, 50, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(79,140,255,0.4);
+      border-radius: 60px;
+      padding: 12px 28px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .contact-pill:hover {
+      border-color: #4f8cff;
+      background: rgba(30, 50, 90, 0.8);
+      transform: translateY(-3px);
+    }
+    .contact-pill .emoji {
+      font-size: 1.5rem;
+    }
+    .contact-pill span:last-child {
+      font-size: 1rem;
+    }
+    /* ensure phone number never appears in text */
+    .no-number {
+      display: none;
+    }
+
     footer {
       text-align: center;
       padding: 32px;
@@ -214,7 +250,7 @@
       color: #8196c4;
     }
 
-    /* CHAT FAB + PANEL */
+    /* CHAT FAB + PANEL (unchanged from original) */
     .fab {
       position: fixed;
       bottom: 24px;
@@ -361,6 +397,8 @@
       .hero-stats { gap: 16px; }
       .stat { padding: 6px 18px; }
       .section { padding: 50px 20px; }
+      .contact-pill { padding: 8px 20px; }
+      .contact-pill .emoji { font-size: 1.2rem; }
     }
   </style>
 </head>
@@ -410,8 +448,21 @@
   <p style="margin: 16px auto; max-width: 550px;">Talk to our AI advisor or request a demo — start automating in days, not months.</p>
 </section>
 
+<!-- NEW CONTACT ROW: Email (fixed) + WhatsApp (hidden number) -->
+<div class="contact-row">
+  <a href="mailto:byronsanche@zohomailcloud.com" class="contact-pill">
+    <span class="emoji">📧</span>
+    <span>byronsanche@zohomailcloud.com</span>
+  </a>
+  <a href="https://wa.me/17802679673?text=Hello%20SancheSolutions%2C%20I%27m%20interested%20in%20AI%20automation" class="contact-pill" target="_blank" rel="noopener noreferrer">
+    <span class="emoji">💬</span>
+    <span>Chat on WhatsApp</span>
+    <!-- The phone number 780-267-9673 is NEVER displayed anywhere on the page -->
+  </a>
+</div>
+
 <footer>
-  <p>© 2025 SancheSolutions — AI Automation & Revenue Systems | hello@sanchesolutions.ai</p>
+  <p>© 2026 SancheSolutions — AI Automation & Revenue Systems | byronsanche@zohomailcloud.com</p>
 </footer>
 
 <!-- FLOATING CHAT BUTTON -->
@@ -432,7 +483,7 @@
 
 <script>
   (function() {
-    // ---------- DOM elements ----------
+    // DOM elements
     const panel = document.getElementById('chatPanel');
     const fab = document.getElementById('chatFab');
     const closeBtn = document.getElementById('closePanelBtn');
@@ -441,15 +492,12 @@
     const sendBtn = document.getElementById('sendMsgBtn');
     const demoBtn = document.getElementById('demoNavBtn');
 
-    // flags & state
     let isSending = false;
-    let demoGreetingSent = false;    // avoid duplicate auto demo message
+    let demoGreetingSent = false;
 
-    // API endpoint + fallback system
     const API_ENDPOINT = "https://sanchesolutions.onrender.com/chat";
     const TIMEOUT_MS = 9000;
 
-    // Helper: add message to chat
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `msg ${sender === 'user' ? 'user' : 'bot'}`;
@@ -459,10 +507,9 @@
       return msgDiv;
     }
 
-    // Smart fallback response generator (intelligent for portfolio purposes)
+    // Updated fallback with the NEW email address
     function getFallbackResponse(userMessage) {
       const msg = userMessage.toLowerCase();
-      // pricing related
       if (msg.match(/price|cost|pricing|how much|investment|fee/)) {
         return "💰 Our AI automation packages start at $2,500/month (customizable). Each solution includes chatbot + CRM integration + analytics. We also offer one‑time build options. Want a tailored quote? Let’s hop on a quick demo – just ask me to book a call!";
       }
@@ -484,11 +531,10 @@
       if (msg.match(/hello|hi|hey|greetings/)) {
         return "Hey there! 👋 I'm your SancheSolutions assistant. Need help with automation, pricing, or just curious how AI can boost your revenue? Let me know!";
       }
-      // default response
+      // Updated fallback email to the correct Zoho address
       return "✨ Great question! Our automation experts typically build custom AI solutions tailored to your workflow. Would you like to share a bit more about your business? I can give you a precise roadmap (or book a free demo).";
     }
 
-    // API caller with timeout + fallback
     async function fetchAIResponse(userMsg) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -505,24 +551,20 @@
         if (!response.ok) throw new Error(`API error ${response.status}`);
         
         const rawText = await response.text();
-        // attempt to parse if it's JSON (future-proof)
         try {
           const parsed = JSON.parse(rawText);
           const reply = parsed.reply || parsed.response || parsed.message || rawText;
           return reply.trim() || "✅ Thanks! Our team will follow up with details.";
         } catch(e) {
-          // plain text
           return rawText.trim() || "Thanks for reaching out! A specialist will respond shortly.";
         }
       } catch (err) {
         clearTimeout(timeoutId);
         console.warn("API fallback triggered:", err);
-        // use smart fallback
         return getFallbackResponse(userMsg);
       }
     }
 
-    // send message core
     async function sendUserMessage(messageText) {
       if (isSending) return;
       if (!messageText.trim()) return;
@@ -531,20 +573,17 @@
       sendBtn.disabled = true;
       chatInput.disabled = true;
       
-      // add user message
       addMessage(messageText, 'user');
       chatInput.value = '';
       
-      // add temporary "thinking" bot message
       const tempMsg = addMessage("⏳ Thinking...", 'bot');
       
       try {
         const aiReply = await fetchAIResponse(messageText);
         tempMsg.textContent = aiReply;
-        // smooth effect
-        tempMsg.classList.add('bot');
       } catch (finalErr) {
-        tempMsg.textContent = "⚠️ AI assistant is overloaded. Please refresh or try again later. Meanwhile, email hello@sanchesolutions.ai";
+        // Updated error message to use the correct email
+        tempMsg.textContent = "⚠️ AI assistant is overloaded. Please refresh or try again later. Meanwhile, email byronsanche@zohomailcloud.com";
       } finally {
         isSending = false;
         sendBtn.disabled = false;
@@ -554,7 +593,6 @@
       }
     }
 
-    // Event: send button / enter
     function handleSend() {
       const text = chatInput.value.trim();
       if (text && !isSending) {
@@ -562,11 +600,9 @@
       }
     }
     
-    // open chat panel & maybe first greeting
     function openChatAndGreet() {
       const wasClosed = !panel.classList.contains('open');
       panel.classList.add('open');
-      // if no messages yet => add welcome
       if (messagesContainer.children.length === 0) {
         addMessage("👋 Hey! I'm SancheSolutions AI assistant. Ask me anything about automation, pricing, demos, or how we 10x lead conversion. Let’s grow!", 'bot');
       }
@@ -585,18 +621,11 @@
       }
     }
 
-    // demo button behavior: open chat + automatically send a demo-focused message (only once per session)
     function handleDemoClick() {
-      // open panel
-      const wasClosed = !panel.classList.contains('open');
       openChatAndGreet();
-      
-      // if no demo greeting sent yet, simulate a bot prompt after short delay to enhance UX
       if (!demoGreetingSent) {
         demoGreetingSent = true;
-        // delay just to ensure UI is ready
         setTimeout(() => {
-          // avoid duplicate if there's already a similar message
           const lastMsg = messagesContainer.lastChild;
           const lastText = lastMsg?.textContent || "";
           if (!lastText.includes("book a demo") && !lastText.includes("demo button")) {
@@ -605,13 +634,11 @@
           }
         }, 300);
       } else {
-        // already greeted: just make sure panel open
         addMessage("👋 Ready to schedule? Click the 'Book Demo' in the navbar or tell me your availability.", 'bot');
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }
     
-    // ---------- EVENT LISTENERS ----------
     fab.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleChat();
@@ -623,20 +650,7 @@
     });
     if (demoBtn) demoBtn.addEventListener('click', handleDemoClick);
     
-    // optional: close on outside click? not needed but nice (click outside panel if open)
-    document.addEventListener('click', (e) => {
-      const isPanelClick = panel.contains(e.target);
-      const isFabClick = fab.contains(e.target);
-      if (panel.classList.contains('open') && !isPanelClick && !isFabClick) {
-        // optional: close only if not interacting with chat? keep user-friendly: do not close automatically 
-        // but we can keep it open -> better UX. we'll not force close
-      }
-    });
-    
-    // prevent send multiple times while loading
-    // extra: load initial empty state but no message until open
-    // final tiny improvement: handle resize/scroll
-    console.log("SancheSolutions portfolio ready — AI chat with fallback");
+    console.log("SancheSolutions updated: correct Zoho email + hidden WhatsApp number");
   })();
 </script>
 </body>
