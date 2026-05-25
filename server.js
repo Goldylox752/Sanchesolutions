@@ -14,77 +14,95 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-/* ───── MEMORY ───── */
+/* ───── MEMORY STORE (session context) ───── */
 const sessions = {};
 
-/* ───── SMART KNOWLEDGE BASE ───── */
+/* ───── KNOWLEDGE BASE ───── */
 const knowledge = {
   website: [
     "We build high-converting websites designed to turn visitors into paying customers.",
-    "A strong website should focus on speed, clarity, and conversion."
+    "A strong website focuses on speed, clarity, and conversion."
   ],
   seo: [
-    "We help businesses rank on Google and get consistent organic traffic.",
-    "SEO is the long-term way to get free leads without ads."
+    "We help businesses rank on Google and generate consistent organic traffic.",
+    "SEO is the long-term strategy for free leads without ads."
   ],
   pricing: [
-    "Most projects range from $300–$1500 depending on complexity.",
-    "Pricing depends on features like automation, SEO, and integrations."
+    "Most projects range between $300–$1500 depending on complexity.",
+    "Pricing depends on features like SEO, automation, and integrations."
   ],
   automation: [
-    "We build AI-like automation systems that handle leads and follow-ups automatically.",
-    "Automation saves time and increases conversion rates."
+    "We build AI-style automation systems that handle leads, follow-ups, and CRM workflows.",
+    "Automation increases conversions while saving time."
   ],
   contact: [
     "You can reach us on WhatsApp at +1 780-267-9673 for fastest response."
   ]
 };
 
-/* ───── KEYWORD ENGINE ───── */
-function detectIntent(msg) {
-  msg = msg.toLowerCase();
+/* ───── INTENT SCORING (UPGRADED) ───── */
+const intentMap = {
+  website: ["website", "web", "site", "landing", "build"],
+  seo: ["seo", "google", "rank", "traffic"],
+  pricing: ["price", "cost", "how much", "pricing", "$"],
+  automation: ["automation", "ai", "bot", "crm", "system"],
+  contact: ["whatsapp", "contact", "call", "talk"]
+};
 
-  const map = {
-    website: ["website", "web", "site", "landing"],
-    seo: ["seo", "google", "rank", "traffic"],
-    pricing: ["price", "cost", "how much"],
-    automation: ["automation", "ai", "bot", "crm"],
-    contact: ["whatsapp", "contact", "call", "talk"]
-  };
+function detectIntent(message = "") {
+  const msg = message.toLowerCase();
 
-  for (const key in map) {
-    if (map[key].some(k => msg.includes(k))) {
-      return key;
+  let best = { intent: null, score: 0 };
+
+  for (const key in intentMap) {
+    let score = 0;
+
+    for (const keyword of intentMap[key]) {
+      if (msg.includes(keyword)) {
+        score += 1;
+      }
+    }
+
+    if (score > best.score) {
+      best = { intent: key, score };
     }
   }
 
-  return null;
+  return best.intent;
 }
 
-/* ───── RESPONSE BUILDER (IMPORTANT) ───── */
-function generateReply(intent, message) {
+/* ───── LLM-STYLE RESPONSE ENGINE ───── */
+function generateReply(intent, message, sessionId) {
+  const session = sessions[sessionId];
+
+  // store last message context
+  session.lastMessage = message;
+
+  const fallback = [
+    "Got it — what are you trying to build exactly?",
+    "I can help you with websites, SEO, or automation. What are you focused on?",
+    "Tell me a bit more about your business so I can guide you properly."
+  ];
+
   if (!intent) {
-    return "Got it — what are you trying to build? I can help you with websites, SEO, or automation systems.";
+    return fallback[Math.floor(Math.random() * fallback.length)];
   }
 
-  const responses = knowledge[intent];
+  const base =
+    knowledge[intent][
+      Math.floor(Math.random() * knowledge[intent].length)
+    ];
 
-  // random “AI-like” variation
-  const base = responses[Math.floor(Math.random() * responses.length)];
+  // contextual expansion (makes it feel “AI-like”)
+  const contextAdditions = {
+    website: "What type of business is this for?",
+    seo: "Are you currently getting traffic?",
+    pricing: "What budget range are you thinking?",
+    automation: "Do you want leads automated or full CRM setup?",
+    contact: "Want me to connect you directly with a rep?"
+  };
 
-  if (intent === "pricing") {
-    return base + " What budget range are you thinking?";
-  }
-
-  if (intent === "website") {
-    return base + " What type of business do you run?";
-  }
-
-  if (intent === "seo") {
-    return base + " Are you currently getting any traffic?";
-  }
-
-  return base;
+  return `${base} ${contextAdditions[intent] || ""}`;
 }
 
 /* ───── BOT ENDPOINT ───── */
@@ -96,15 +114,29 @@ app.post("/api/bot", async (req, res) => {
       return res.status(400).json({ reply: "No message provided" });
     }
 
-    /* session */
+    /* session init */
     if (!sessions[sessionId]) {
-      sessions[sessionId] = { step: 0 };
+      sessions[sessionId] = {
+        createdAt: Date.now(),
+        messages: []
+      };
     }
 
     const intent = detectIntent(message);
-    const reply = generateReply(intent, message);
+    const reply = generateReply(intent, message, sessionId);
 
-    /* save lead */
+    /* save memory */
+    sessions[sessionId].messages.push({
+      role: "user",
+      message
+    });
+
+    sessions[sessionId].messages.push({
+      role: "bot",
+      message: reply
+    });
+
+    /* supabase logging */
     await supabase.from("leads").insert([
       {
         session_id: sessionId,
@@ -122,16 +154,18 @@ app.post("/api/bot", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      reply: "Server error — try again later"
+      reply: "Server error — please try again."
     });
   }
 });
 
 /* ───── HEALTH ───── */
 app.get("/", (req, res) => {
-  res.send("Sanche FREE AI Bot + Supabase 🚀");
+  res.send("Sanche AI Bot (LLaMA-style engine) 🚀");
 });
 
 /* ───── START ───── */
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on", port));
+app.listen(port, () =>
+  console.log("Server running on port", port)
+);
