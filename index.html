@@ -4,39 +4,34 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Sanche AI | AI Sales Funnel System</title>
+<title>Full Stack Developer | AI Funnel System Case Study</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
 <style>
 :root{
   --bg:#050814;
-  --card:rgba(255,255,255,0.04);
-  --border:rgba(120,160,255,0.18);
   --text:#eef3ff;
   --muted:rgba(210,220,255,0.65);
+  --border:rgba(120,160,255,0.18);
   --blue:#4f8cff;
-  --blue2:#7aa8ff;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
   font-family:"DM Sans",sans-serif;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(79,140,255,0.18), transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(122,168,255,0.12), transparent 40%),
-    var(--bg);
+  background:var(--bg);
   color:var(--text);
 }
 
+/* NAV */
 nav{
   position:fixed;
   top:0;
   width:100%;
   display:flex;
   justify-content:space-between;
-  align-items:center;
   padding:16px 28px;
   background:rgba(5,8,20,0.6);
   backdrop-filter:blur(16px);
@@ -46,16 +41,7 @@ nav{
 .logo{font-weight:600;}
 .logo span{color:var(--blue);}
 
-.btn{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  border:none;
-  padding:12px 18px;
-  border-radius:12px;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-}
-
+/* HERO */
 .hero{
   min-height:100vh;
   display:flex;
@@ -67,15 +53,13 @@ nav{
 }
 
 h1{
-  font-size:52px;
+  font-size:48px;
   max-width:900px;
-  line-height:1.05;
+  line-height:1.1;
 }
 
 h1 span{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+  color:var(--blue);
 }
 
 p{
@@ -86,107 +70,60 @@ p{
   line-height:1.6;
 }
 
-/* CHAT */
-.fab{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:58px;
-  height:58px;
-  border-radius:50%;
-  border:none;
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:white;
-  cursor:pointer;
-  font-size:20px;
+/* SECTIONS */
+.section{
+  max-width:1000px;
+  margin:auto;
+  padding:80px 20px;
 }
 
-.panel{
-  position:fixed;
-  bottom:90px;
-  right:20px;
-  width:360px;
-  height:520px;
-  background:rgba(10,14,30,0.95);
+h2{
+  font-size:28px;
+  margin-bottom:12px;
+}
+
+.card{
   border:1px solid var(--border);
-  border-radius:18px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  opacity:0;
-  transform:translateY(20px);
-  pointer-events:none;
-  transition:.25s;
+  padding:18px;
+  border-radius:14px;
+  margin-top:12px;
+  background:rgba(255,255,255,0.03);
+  color:var(--muted);
 }
 
-.panel.open{
-  opacity:1;
-  transform:translateY(0);
-  pointer-events:auto;
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:12px;
+  margin-top:20px;
 }
 
-.header{
-  padding:14px;
-  border-bottom:1px solid var(--border);
-  font-weight:600;
-}
-
-.messages{
-  flex:1;
-  padding:14px;
-  overflow-y:auto;
-}
-
-.msg{
-  padding:10px 12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  font-size:14px;
-  white-space:pre-wrap;
-}
-
-.user{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:white;
-  margin-left:auto;
-  max-width:80%;
-}
-
-.bot{
-  background:rgba(255,255,255,0.04);
+.tag{
   border:1px solid var(--border);
-  max-width:80%;
-}
-
-.cta{
-  margin-top:10px;
   padding:10px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  color:var(--blue2);
-  font-size:13px;
+  border-radius:10px;
+  text-align:center;
+  color:var(--blue);
 }
 
-.input{
-  display:flex;
+/* CTA */
+.cta{
+  text-align:center;
+  padding:60px 20px;
   border-top:1px solid var(--border);
+  margin-top:80px;
 }
 
-input{
-  flex:1;
-  padding:12px;
-  background:transparent;
-  border:none;
-  color:white;
-  outline:none;
-}
-
-button.send{
-  width:50px;
+.btn{
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 18px;
+  border-radius:12px;
   background:var(--blue);
-  border:none;
   color:white;
-  cursor:pointer;
+  text-decoration:none;
+  font-weight:600;
 }
 </style>
 </head>
@@ -194,126 +131,74 @@ button.send{
 <body>
 
 <nav>
-  <div class="logo">Sanche<span>AI</span></div>
-  <button class="btn">Book Call</button>
+  <div class="logo">Byron<span>Sanche</span></div>
+  <div>Full Stack Developer</div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-  <h1>We Build AI Systems That <span>Close Sales Automatically</span></h1>
-  <p>AI automation that generates leads, qualifies prospects, and closes deals 24/7.</p>
+  <h1>AI Funnel System & <span>Full Stack SaaS Build</span></h1>
+  <p>
+    A production-ready AI sales automation system combining frontend UI, backend APIs,
+    streaming AI chat, and conversion funnel logic.
+  </p>
 </section>
 
-<button class="fab" onclick="toggleChat()">💬</button>
-
-<div class="panel" id="panel">
-  <div class="header">AI Sales Assistant</div>
-
-  <div class="messages" id="messages"></div>
-
-  <div class="input">
-    <input id="input" placeholder="Ask about pricing, automation, SEO..." />
-    <button class="send" onclick="handleSend()">→</button>
+<!-- OVERVIEW -->
+<section class="section">
+  <h2>Project Overview</h2>
+  <div class="card">
+    This project is a full-stack AI SaaS funnel system designed to generate leads,
+    qualify prospects, and simulate automated sales conversations using AI.
   </div>
-</div>
+</section>
 
-<script>
+<!-- TECH STACK -->
+<section class="section">
+  <h2>Tech Stack</h2>
 
-const API = "https://sanchesolutions.onrender.com/chat";
+  <div class="grid">
+    <div class="tag">HTML / CSS / JS</div>
+    <div class="tag">Node.js / Express</div>
+    <div class="tag">Groq LLaMA 3 API</div>
+    <div class="tag">Stripe Payments</div>
+    <div class="tag">Streaming Chat API</div>
+    <div class="tag">Render Deployment</div>
+  </div>
+</section>
 
-const panel = document.getElementById("panel");
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
+<!-- FEATURES -->
+<section class="section">
+  <h2>Core Features</h2>
 
-/* INTENT DETECTION (Funnel Engine) */
-function getStage(text){
-  text = text.toLowerCase();
+  <div class="card">• AI-powered sales assistant (real-time chat streaming)</div>
+  <div class="card">• Funnel-based intent detection (awareness → decision → purchase)</div>
+  <div class="card">• Conversion-focused UI with CTA injection</div>
+  <div class="card">• Stripe-ready checkout integration</div>
+  <div class="card">• Backend API architecture for SaaS scaling</div>
+</section>
 
-  if(text.includes("price") || text.includes("cost") || text.includes("how much"))
-    return "decision";
+<!-- SYSTEM ARCHITECTURE -->
+<section class="section">
+  <h2>System Architecture</h2>
 
-  if(text.includes("buy") || text.includes("book") || text.includes("start"))
-    return "purchase";
+  <div class="card">
+    Frontend (Landing + Chat UI) → API Layer (Express Server) → AI Engine (Groq LLaMA 3)
+    → Response Streaming → Conversion Funnel Logic
+  </div>
+</section>
 
-  if(text.includes("ai") || text.includes("automation") || text.includes("seo"))
-    return "interest";
+<!-- CTA -->
+<section class="cta">
+  <h2>Looking for a similar system?</h2>
+  <p style="color:rgba(210,220,255,0.65)">
+    I build AI SaaS systems, automation funnels, and full-stack web applications.
+  </p>
 
-  return "awareness";
-}
-
-/* CHAT OPEN */
-function toggleChat(){
-  panel.classList.toggle("open");
-
-  if(messages.children.length === 0){
-    addMessage("Hi 👋 I can help you build AI systems that generate leads and close sales.", "bot");
-  }
-}
-
-/* MESSAGE UI */
-function addMessage(text, type){
-  const el = document.createElement("div");
-  el.className = `msg ${type}`;
-  el.textContent = text;
-  messages.appendChild(el);
-  messages.scrollTop = messages.scrollHeight;
-  return el;
-}
-
-/* ADD CTA INSIDE CHAT */
-function addCTA(stage){
-  if(stage === "decision" || stage === "purchase"){
-    const cta = document.createElement("div");
-    cta.className = "msg bot cta";
-    cta.textContent = "🔥 Want this built for your business? Book a strategy call today.";
-    messages.appendChild(cta);
-  }
-}
-
-/* SEND */
-async function handleSend(){
-  const text = input.value.trim();
-  if(!text) return;
-
-  input.value = "";
-
-  const stage = getStage(text);
-
-  addMessage(text, "user");
-
-  const botBubble = addMessage("", "bot");
-
-  try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-
-    let full = "";
-
-    while(true){
-      const { value, done } = await reader.read();
-      if(done) break;
-
-      full += decoder.decode(value, { stream:true });
-      botBubble.textContent = full;
-    }
-
-    addCTA(stage);
-
-  } catch(err){
-    botBubble.textContent = "Connection error. Try again.";
-  }
-}
-
-input.addEventListener("keydown", e => {
-  if(e.key === "Enter") handleSend();
-});
-
-</script>
+  <a class="btn" href="mailto:youremail@email.com">
+    Contact Developer
+  </a>
+</section>
 
 </body>
 </html>
