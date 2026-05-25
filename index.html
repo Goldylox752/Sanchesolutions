@@ -117,10 +117,8 @@ body{
 
 <body>
 
-<!-- BUTTON -->
 <div class="ai-fab" id="ai-fab">💬</div>
 
-<!-- CHAT -->
 <div class="ai-panel" id="ai-panel">
 
   <div class="ai-header">
@@ -148,7 +146,6 @@ const input = document.getElementById("ai-input");
 const sendBtn = document.getElementById("ai-send");
 const messages = document.getElementById("ai-messages");
 
-// VERCEL API (IMPORTANT)
 const API_URL = "/api/bot";
 
 function addMsg(text, type){
@@ -185,7 +182,12 @@ async function send(){
   addMsg(text, "ai-user");
   input.value = "";
 
-  addMsg("Thinking...", "ai-bot");
+  // create loading message
+  const loading = document.createElement("div");
+  loading.className = "ai-msg ai-bot";
+  loading.innerText = "Thinking...";
+  messages.appendChild(loading);
+  messages.scrollTop = messages.scrollHeight;
 
   try{
     const res = await fetch(API_URL, {
@@ -196,16 +198,20 @@ async function send(){
 
     const data = await res.json();
 
-    messages.lastChild.remove();
+    // remove loading safely
+    loading.remove();
+
+    if(!res.ok) {
+      addMsg(data.error || "Server error", "ai-bot");
+      return;
+    }
 
     addMsg(data.reply || "No response from server.", "ai-bot");
 
   } catch(err){
     console.error(err);
 
-    if(messages.lastChild){
-      messages.lastChild.remove();
-    }
+    loading.remove();
 
     addMsg("AI offline — opening WhatsApp...", "ai-bot");
 
