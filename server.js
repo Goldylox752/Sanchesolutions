@@ -17,16 +17,17 @@ app.get("/", (req, res) => {
     status: "ok",
     service: "groq-stream-ai",
     model: "llama3-8b-8192",
+    streaming: true,
   });
 });
 
 /* =========================================
-   GROQ STREAMING ENGINE (FIXED)
+   GROQ STREAM ENGINE (ROBUST PRODUCTION)
 ========================================= */
 
 async function streamGroq(message, res) {
   if (!GROQ_API_KEY) {
-    res.write("Server missing GROQ_API_KEY");
+    res.write("Missing GROQ_API_KEY");
     return res.end();
   }
 
@@ -42,24 +43,24 @@ async function streamGroq(message, res) {
         body: JSON.stringify({
           model: "llama3-8b-8192",
           stream: true,
+          temperature: 0.7,
+          max_tokens: 500,
           messages: [
             {
               role: "system",
               content:
-                "You are an AI assistant for a SaaS automation company. Be concise, persuasive, and helpful.",
+                "You are a high-performance AI assistant for a SaaS automation and sales company. Be concise, practical, and conversion-focused.",
             },
             { role: "user", content: message },
           ],
-          temperature: 0.7,
-          max_tokens: 400,
         }),
       }
     );
 
     if (!response.ok || !response.body) {
-      const errText = await response.text();
-      console.error("Groq error:", errText);
-      res.write("AI error. Try again later.");
+      const err = await response.text();
+      console.error("Groq API error:", err);
+      res.write("AI temporarily unavailable.");
       return res.end();
     }
 
@@ -75,7 +76,7 @@ async function streamGroq(message, res) {
       buffer += decoder.decode(value, { stream: true });
 
       const lines = buffer.split("\n");
-      buffer = lines.pop(); // keep incomplete line
+      buffer = lines.pop(); // keep incomplete chunk
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -84,7 +85,7 @@ async function streamGroq(message, res) {
 
         const jsonStr = trimmed.replace("data:", "").trim();
 
-        if (jsonStr === "[DONE]") continue;
+        if (!jsonStr || jsonStr === "[DONE]") continue;
 
         try {
           const json = JSON.parse(jsonStr);
@@ -93,8 +94,8 @@ async function streamGroq(message, res) {
           if (token) {
             res.write(token);
           }
-        } catch (err) {
-          // ignore malformed chunks safely
+        } catch (e) {
+          // ignore malformed JSON chunks (Groq SSE noise)
         }
       }
     }
@@ -102,7 +103,7 @@ async function streamGroq(message, res) {
     res.end();
   } catch (err) {
     console.error("Stream crash:", err);
-    res.write("AI stream failed.");
+    res.write("Stream error occurred.");
     res.end();
   }
 }
@@ -114,11 +115,11 @@ async function streamGroq(message, res) {
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: "No message provided" });
+  if (!message || typeof message !== "string") {
+    return res.status(400).json({ error: "Invalid message" });
   }
 
-  // streaming headers (IMPORTANT for Render/Vercel)
+  // IMPORTANT: streaming headers (Render + proxies)
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
@@ -128,7 +129,7 @@ app.post("/chat", async (req, res) => {
 });
 
 /* =========================================
-   SAFETY HANDLERS
+   GLOBAL ERROR SAFETY
 ========================================= */
 
 process.on("uncaughtException", (err) => {
