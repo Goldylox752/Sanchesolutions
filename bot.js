@@ -1,4 +1,15 @@
+import express from "express";
+import cors from "cors";
 import OpenAI from "openai";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+/* ─────────────────────────────
+   AI CLIENT
+───────────────────────────── */
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -9,24 +20,20 @@ const openai = new OpenAI({
 ───────────────────────────── */
 
 const agents = {
-  router: `You are a routing system.
+  router: `Return ONLY one word:
+sales, technical, seo, automation, closer, support`,
 
-Return ONLY one word:
-sales, technical, seo, automation, closer, support
+  sales: `You are a sales assistant focused on value and conversion.`,
 
-Choose based on intent, not keywords.`,
+  technical: `You are a technical support assistant.`,
 
-  sales: `You are a sales assistant. Focus on value, benefits, and conversion.`,
+  seo: `You are an SEO expert.`,
 
-  technical: `You are a technical support assistant. Be clear and practical.`,
+  automation: `You are an automation expert.`,
 
-  seo: `You are an SEO expert. Focus on rankings, keywords, and optimization.`,
+  closer: `You are a high-conversion sales closer.`,
 
-  automation: `You are an automation expert. Focus on workflows and systems.`,
-
-  closer: `You are a high-conversion sales closer. Be confident and persuasive.`,
-
-  support: `You are a customer support agent. Be helpful and calm.`
+  support: `You are a helpful support agent.`
 };
 
 /* ─────────────────────────────
@@ -36,11 +43,13 @@ Choose based on intent, not keywords.`,
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  const decisionKeywords = ["price", "pricing", "cost", "quote", "how much", "$"];
-  const purchaseKeywords = ["buy", "book", "pay", "start now", "let's do it"];
+  if (msg.includes("buy") || msg.includes("pay") || msg.includes("start")) {
+    return "purchase";
+  }
 
-  if (purchaseKeywords.some(w => msg.includes(w))) return "purchase";
-  if (decisionKeywords.some(w => msg.includes(w))) return "decision";
+  if (msg.includes("price") || msg.includes("cost")) {
+    return "decision";
+  }
 
   return "awareness";
 }
@@ -61,7 +70,7 @@ async function routeAgent(message) {
       ]
     });
 
-    const result = res.choices?.[0]?.message?.content?.trim()?.toLowerCase();
+    const result = res.choices?.[0]?.message?.content?.trim().toLowerCase();
 
     const valid = new Set([
       "sales",
@@ -73,6 +82,7 @@ async function routeAgent(message) {
     ]);
 
     return valid.has(result) ? result : "sales";
+
   } catch (err) {
     console.error("Router error:", err);
     return "sales";
@@ -80,66 +90,46 @@ async function routeAgent(message) {
 }
 
 /* ─────────────────────────────
-   STREAMING AGENT EXECUTION
+   STREAM FUNCTION
 ───────────────────────────── */
 
-async function runAgentStream({ agentName, session, message, res }) {
+async function streamResponse({ agent, message, res }) {
   try {
-    const systemPrompt = agents[agentName] || agents.sales;
-
-    const messages = [{ role: "system", content: systemPrompt }];
-
-    if (Array.isArray(session?.messages)) {
-      messages.push(...session.messages.slice(-8));
-    }
-
-    messages.push({ role: "user", content: message });
-
-    const stream = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature:
-        agentName === "closer"
-          ? 0.4
-          : agentName === "support"
-          ? 0.3
-          : 0.6,
+      stream: true,
+      temperature: 0.6,
       max_tokens: 300,
-      messages,
-      stream: true
+      messages: [
+        { role: "system", content: agents[agent] || agents.sales },
+        { role: "user", content: message }
+      ]
     });
 
-    let fullText = "";
-
-    for await (const chunk of stream) {
+    for await (const chunk of completion) {
       const token = chunk.choices?.[0]?.delta?.content;
-
-      if (token) {
-        fullText += token;
-
-        // Send token immediately to frontend
-        res.write(token);
-      }
+      if (token) res.write(token);
     }
 
     res.end();
 
-    return fullText;
   } catch (err) {
     console.error("Stream error:", err);
-    res.write("Something went wrong.");
+    res.write("AI error occurred.");
     res.end();
   }
 }
 
 /* ─────────────────────────────
-   MAIN ORCHESTRATOR (STREAM)
+   MAIN CHAT ROUTE
 ───────────────────────────── */
 
-export async function generateMultiAgentStream({
-  req,
-  res
-}) {
-  const { message = "", session = {} } = req.body;
+app.post("/chat", async (req, res) => {
+  const { message = "" } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: "No message provided" });
+  }
 
   const stage = detectStage(message);
   let agent = await routeAgent(message);
@@ -152,10 +142,30 @@ export async function generateMultiAgentStream({
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
-  await runAgentStream({
-    agentName: agent,
-    session,
+  await streamResponse({
+    agent,
     message,
     res
   });
-}
+});
+
+/* ─────────────────────────────
+   HEALTH CHECK
+───────────────────────────── */
+
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    streaming: true
+  });
+});
+
+/* ─────────────────────────────
+   START SERVER
+───────────────────────────── */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("🚀 Server running on port", PORT);
+});
