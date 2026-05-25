@@ -185,7 +185,6 @@ button.send {
 </div>
 
 <script>
-/* BACKEND */
 const API_URL = "https://sanchesolutions.onrender.com/api/bot";
 
 /* ELEMENTS */
@@ -204,21 +203,11 @@ fab.onclick = () => {
 
 closeBtn.onclick = () => panel.classList.remove("open");
 
-/* WELCOME MESSAGE */
+/* WELCOME */
 function welcome() {
   addBot("Hey 👋 I can help with websites, SEO, automation, and lead generation.");
 
-  const quick = document.createElement("div");
-  quick.className = "quick";
-
-  ["Website", "SEO", "Automation", "Pricing"].forEach(t => {
-    const b = document.createElement("button");
-    b.textContent = t;
-    b.onclick = () => send(t);
-    quick.appendChild(b);
-  });
-
-  messages.appendChild(quick);
+  addQuickReplies();
 }
 
 /* ADD MESSAGE */
@@ -232,6 +221,21 @@ function add(text, type) {
 
 function addBot(text) {
   add(text, "bot");
+}
+
+/* QUICK REPLIES (YOUR REQUEST) */
+function addQuickReplies() {
+  const div = document.createElement("div");
+  div.className = "quick";
+
+  ["Get Quote", "See Pricing", "Talk on WhatsApp"].forEach(t => {
+    const b = document.createElement("button");
+    b.textContent = t;
+    b.onclick = () => send(t);
+    div.appendChild(b);
+  });
+
+  messages.appendChild(div);
 }
 
 /* SEND */
@@ -250,10 +254,13 @@ async function send(text) {
     });
 
     const data = await res.json();
-    add(data.reply || "No response", "bot");
+    addBot(data.reply || "No response");
+
+    /* NEW: show quick replies after bot response */
+    addQuickReplies();
 
   } catch (e) {
-    add("Server error. Please try again or contact us directly.", "bot");
+    addBot("Server error. Please try again or contact us directly.");
   }
 }
 
