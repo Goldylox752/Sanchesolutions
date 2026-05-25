@@ -17,15 +17,13 @@
   --border:rgba(255,255,255,0.10);
   --text:#ffffff;
   --muted:rgba(255,255,255,0.65);
-  --accent:#ffffff;
 }
 
-/* ===== PREMIUM BACKGROUND ===== */
+/* background */
 body {
   font-family: Geist, sans-serif;
   color: var(--text);
   min-height:100vh;
-  overflow-x:hidden;
   background:
     radial-gradient(circle at 20% 20%, #1a2a6c33, transparent 40%),
     radial-gradient(circle at 80% 30%, #b21f1f22, transparent 40%),
@@ -33,71 +31,34 @@ body {
     linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 
-/* soft animated glow */
-body::before {
-  content:"";
-  position:fixed;
-  inset:-200px;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
-  filter: blur(60px);
-  animation: floatGlow 10s ease-in-out infinite alternate;
-  z-index:-1;
-}
-
-@keyframes floatGlow {
-  from { transform: translateY(-20px); }
-  to { transform: translateY(20px); }
-}
-
-/* ===== NAV ===== */
+/* NAV */
 nav {
   display:flex;
   justify-content:space-between;
   padding:22px 40px;
-  position:sticky;
-  top:0;
   backdrop-filter: blur(20px);
   background: rgba(0,0,0,0.4);
   border-bottom:1px solid var(--border);
 }
 
-.logo {
-  font-family:"Instrument Serif";
-  font-size:22px;
-}
-
-.nav-links {
-  display:flex;
-  gap:24px;
-  color:var(--muted);
-  font-size:14px;
-}
-
-/* ===== HERO ===== */
+/* HERO */
 .hero {
   text-align:center;
   padding:140px 20px 80px;
-  max-width:900px;
-  margin:auto;
 }
 
 .hero h1 {
   font-family:"Instrument Serif";
-  font-size:72px;
-  line-height:1.05;
-  letter-spacing:-1px;
+  font-size:64px;
 }
 
 .hero p {
+  color:var(--muted);
   margin-top:20px;
   font-size:18px;
-  color:var(--muted);
-  line-height:1.6;
-  max-width:700px;
-  margin-left:auto;
-  margin-right:auto;
 }
 
+/* CTA */
 .cta {
   margin-top:30px;
   display:inline-block;
@@ -105,58 +66,10 @@ nav {
   border-radius:14px;
   border:1px solid var(--border);
   background:var(--card);
-  backdrop-filter: blur(20px);
   cursor:pointer;
-  transition:.2s;
-}
-.cta:hover { transform: scale(1.03); }
-
-/* ===== SECTIONS ===== */
-.section {
-  padding:90px 40px;
-  max-width:1100px;
-  margin:auto;
 }
 
-.section h2 {
-  font-size:34px;
-  font-family:"Instrument Serif";
-  margin-bottom:24px;
-}
-
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:20px;
-}
-
-.card {
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:22px;
-  border-radius:18px;
-  backdrop-filter: blur(20px);
-  transition:.2s;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(255,255,255,0.25);
-}
-
-.card p {
-  color:var(--muted);
-  margin-top:8px;
-  font-size:14px;
-}
-
-/* ===== PRICING ===== */
-.price {
-  font-size:34px;
-  margin:12px 0;
-}
-
-/* ===== CHAT ===== */
+/* CHAT */
 .fab {
   position:fixed;
   bottom:24px;
@@ -178,7 +91,7 @@ nav {
   right:24px;
   width:380px;
   height:520px;
-  background:rgba(10,10,10,0.9);
+  background:rgba(10,10,10,0.95);
   border:1px solid var(--border);
   border-radius:18px;
   display:flex;
@@ -187,7 +100,6 @@ nav {
   transform:translateY(10px);
   pointer-events:none;
   transition:.25s;
-  backdrop-filter: blur(20px);
 }
 
 .panel.open {
@@ -196,13 +108,15 @@ nav {
   pointer-events:auto;
 }
 
+/* HEADER */
 .header {
-  padding:14px;
+  padding:12px;
   border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
 }
 
+/* MESSAGES */
 .messages {
   flex:1;
   padding:12px;
@@ -217,7 +131,6 @@ nav {
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
-  line-height:1.4;
 }
 
 .user {
@@ -231,28 +144,28 @@ nav {
   color:white;
 }
 
-.quick {
+/* INPUT */
+.input {
   display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-
-.quick button {
-  font-size:12px;
-  padding:6px 10px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  background:transparent;
-  color:white;
-  cursor:pointer;
-}
-
-/* ===== FOOTER ===== */
-footer {
-  padding:50px;
-  text-align:center;
-  color:var(--muted);
   border-top:1px solid var(--border);
+  padding:10px;
+  gap:8px;
+}
+
+input {
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+}
+
+button.send {
+  width:42px;
+  background:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -260,43 +173,14 @@ footer {
 <body>
 
 <nav>
-  <div class="logo">Sanche Solutions</div>
-  <div class="nav-links">
-    <div>Features</div>
-    <div>Pricing</div>
-    <div>Contact</div>
-  </div>
+  <div>Sanche Solutions</div>
 </nav>
 
 <section class="hero">
-  <h1>Build AI Systems That Sell While You Sleep</h1>
-  <p>We design conversion-driven websites, AI chat systems, and automation pipelines that turn traffic into paying clients.</p>
-  <div class="cta" onclick="document.getElementById('panel').classList.add('open')">
-    Start Your System
-  </div>
+  <h1>AI Systems That Sell While You Sleep</h1>
+  <p>High converting websites + automation + AI chat systems.</p>
+  <div class="cta" onclick="toggleChat()">Start Chat</div>
 </section>
-
-<section class="section">
-  <h2>What We Build</h2>
-  <div class="grid">
-    <div class="card">
-      <h3>AI Sales Bots</h3>
-      <p>Convert visitors into leads automatically 24/7.</p>
-    </div>
-    <div class="card">
-      <h3>High-Converting Sites</h3>
-      <p>Fast, modern websites built for revenue.</p>
-    </div>
-    <div class="card">
-      <h3>Automation Systems</h3>
-      <p>Email, CRM, and workflow automation.</p>
-    </div>
-  </div>
-</section>
-
-<footer>
-  © 2026 Sanche Solutions — Systems > Websites
-</footer>
 
 <!-- CHAT -->
 <button class="fab" onclick="toggleChat()">💬</button>
@@ -308,17 +192,25 @@ footer {
   </div>
 
   <div class="messages" id="messages"></div>
+
+  <div class="input">
+    <input id="input" placeholder="Type your message..." />
+    <button class="send" onclick="send()">➤</button>
+  </div>
 </div>
 
 <script>
 const API_URL = "https://sanchesolutions.onrender.com/api/bot";
+
 const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
+const input = document.getElementById("input");
 
 function toggleChat() {
   panel.classList.toggle("open");
+
   if (messages.children.length === 0) {
-    add("Hey 👋 What are you trying to build?", "bot");
+    add("Hey 👋 How can I help you today?", "bot");
   }
 }
 
@@ -329,6 +221,32 @@ function add(text, type) {
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
+
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  add(text, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+    add(data.reply || "No response", "bot");
+
+  } catch (err) {
+    add("Server not responding. Check backend.", "bot");
+  }
+}
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") send();
+});
 </script>
 
 </body>
