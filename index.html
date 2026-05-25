@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions | AI Automation Systems for Business Growth</title>
+<title>SancheSolutions | AI Automation Systems That Grow Revenue</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -34,15 +34,13 @@ nav{
   display:flex;
   justify-content:space-between;
   padding:16px 28px;
-  background:rgba(5,8,20,0.8);
+  background:rgba(5,8,20,0.85);
   backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
   z-index:10;
 }
 
-.logo{
-  font-weight:700;
-}
+.logo{font-weight:700;}
 .logo span{color:var(--blue);}
 
 .btn{
@@ -67,7 +65,7 @@ nav{
 }
 
 h1{
-  font-size:58px;
+  font-size:56px;
   max-width:900px;
   line-height:1.05;
 }
@@ -94,15 +92,6 @@ h2{
   font-size:26px;
 }
 
-.card{
-  border:1px solid var(--border);
-  background:rgba(255,255,255,0.03);
-  padding:18px;
-  border-radius:14px;
-  color:var(--muted);
-  margin-top:12px;
-}
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -116,6 +105,7 @@ h2{
   border-radius:12px;
   text-align:center;
   color:var(--blue);
+  background:rgba(255,255,255,0.03);
 }
 
 /* CTA */
@@ -138,15 +128,16 @@ h2{
   color:white;
   font-size:22px;
   cursor:pointer;
+  z-index:30;
 }
 
-/* CHAT */
+/* CHAT PANEL */
 .panel{
   position:fixed;
   bottom:90px;
   right:20px;
-  width:380px;
-  height:540px;
+  width:360px;
+  height:520px;
   background:rgba(10,14,30,0.96);
   border:1px solid var(--border);
   border-radius:18px;
@@ -183,6 +174,7 @@ h2{
   border-radius:12px;
   margin-bottom:10px;
   white-space:pre-wrap;
+  font-size:14px;
 }
 
 .user{
@@ -230,10 +222,10 @@ button.send{
 </nav>
 
 <section class="hero">
-  <h1>AI Systems That <span>Grow & Automate Your Business</span></h1>
+  <h1>AI Systems That <span>Generate Leads & Automate Sales</span></h1>
   <p>
-    We build AI automation systems, SaaS tools, and intelligent chat engines
-    that generate leads, qualify prospects, and increase revenue 24/7.
+    We build AI automation systems, chat assistants, and SaaS tools that help businesses
+    respond instantly, qualify leads, and increase revenue 24/7.
   </p>
 </section>
 
@@ -241,15 +233,17 @@ button.send{
   <h2>What We Build</h2>
   <div class="grid">
     <div class="tag">AI Chatbots</div>
+    <div class="tag">Lead Automation</div>
     <div class="tag">Sales Funnels</div>
-    <div class="tag">SaaS Platforms</div>
-    <div class="tag">Automation Systems</div>
+    <div class="tag">CRM Integrations</div>
+    <div class="tag">SaaS Tools</div>
+    <div class="tag">Business Automation</div>
   </div>
 </section>
 
 <section class="cta">
-  <h2>Ready to automate your revenue?</h2>
-  <p>Book a demo and see your AI system in action.</p>
+  <h2>Ready to automate your business?</h2>
+  <p>Talk to our AI system or book a demo in under 60 seconds.</p>
 </section>
 
 <!-- CHAT BUTTON -->
@@ -257,12 +251,12 @@ button.send{
 
 <!-- CHAT PANEL -->
 <div class="panel" id="panel">
-  <div class="header">SancheSolutions AI</div>
+  <div class="header">SancheSolutions AI Assistant</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask about automation, AI, pricing..." />
+    <input id="input" placeholder="Ask about automation, pricing, or demos..." />
     <button class="send" onclick="send()">→</button>
   </div>
 </div>
@@ -279,7 +273,7 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    add("Hi 👋 I’m the SancheSolutions AI assistant. How can I help your business today?", "bot");
+    add("Hi 👋 I’m your AI assistant. Ask me anything about automating your business or booking a demo.", "bot");
   }
 }
 
@@ -292,7 +286,9 @@ function add(text, type){
   return el;
 }
 
-/* STREAMING CHAT (FIXED) */
+/* ============================
+   FIXED STREAMING CHAT
+============================ */
 async function send(){
   const text = input.value.trim();
   if(!text) return;
@@ -300,7 +296,7 @@ async function send(){
   input.value = "";
 
   add(text, "user");
-  const bot = add("", "bot");
+  const bot = add("...", "bot");
 
   try {
     const res = await fetch(API, {
@@ -309,29 +305,41 @@ async function send(){
       body: JSON.stringify({ message: text })
     });
 
-    /* ✅ FIX IS HERE */
-    if (!res.ok || !res.body) {
-      bot.textContent = "Server error or AI unavailable.";
+    if (!res.ok) {
+      bot.textContent = "Server error. Try again.";
       return;
     }
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
+    const reader = res.body?.getReader();
 
-    let out = "";
-
-    while(true){
-      const {value, done} = await reader.read();
-      if(done) break;
-
-      out += decoder.decode(value, {stream:true});
-      bot.textContent = out;
+    if (!reader) {
+      bot.textContent = await res.text();
+      return;
     }
 
-  } catch(err){
+    const decoder = new TextDecoder();
+    let output = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      output += decoder.decode(value, { stream: true });
+      bot.textContent = output;
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    bot.textContent = output || "No response received.";
+
+  } catch (err) {
     bot.textContent = "AI temporarily unavailable.";
   }
 }
+
+/* ENTER TO SEND */
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send();
+});
 
 </script>
 
