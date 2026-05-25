@@ -7,46 +7,49 @@ app.use(cors());
 app.use(express.json());
 
 /* ===============================
-   FREE AI (HUGGING FACE)
+   GROQ FAST AI (LLaMA 3)
 =============================== */
 
-const HF_API_TOKEN = process.env.HF_API_TOKEN; // optional but recommended
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 async function generateReply(message = "") {
   try {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": HF_API_TOKEN ? `Bearer ${HF_API_TOKEN}` : "",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          inputs: `You are a helpful business AI assistant.\nUser: ${message}\nAssistant:`,
-          parameters: {
-            max_new_tokens: 200,
-            return_full_text: false
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful AI assistant for a business automation company. Be concise and practical."
+          },
+          {
+            role: "user",
+            content: message
           }
-        })
-      }
-    );
+        ],
+        temperature: 0.7,
+        max_tokens: 300
+      })
+    });
 
     const data = await response.json();
 
-    return (
-      data?.[0]?.generated_text ||
-      "I can help you with AI automation, SEO, and business systems."
-    );
+    return data?.choices?.[0]?.message?.content ||
+      "I can help you with automation, SEO, and AI systems.";
 
   } catch (err) {
-    console.error("HF error:", err);
-    return "AI service temporarily unavailable.";
+    console.error("Groq error:", err);
+    return "AI temporarily unavailable.";
   }
 }
 
 /* ===============================
-   CHAT ROUTE (STREAM STYLE)
+   CHAT ENDPOINT (STREAM STYLE)
 =============================== */
 
 app.post("/chat", async (req, res) => {
@@ -54,18 +57,18 @@ app.post("/chat", async (req, res) => {
     const { message } = req.body;
 
     if (!message) {
-      return res.status(400).json({ success: false, reply: "No message" });
+      return res.status(400).end("No message");
     }
 
     const reply = await generateReply(message);
 
-    // streaming effect (fake ChatGPT typing)
+    // fake streaming (smooth ChatGPT feel)
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
 
     for (let i = 0; i < reply.length; i++) {
       res.write(reply[i]);
-      await new Promise(r => setTimeout(r, 8));
+      await new Promise(r => setTimeout(r, 5)); // VERY FAST typing
     }
 
     res.end();
@@ -83,16 +86,16 @@ app.post("/chat", async (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
-    ai: "huggingface-mistral"
+    ai: "groq-llama3-fast"
   });
 });
 
 /* ===============================
-   START
+   START SERVER
 =============================== */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("🚀 Server running on port", PORT);
+  console.log("⚡ Fast AI running on port", PORT);
 });
