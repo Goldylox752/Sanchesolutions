@@ -1,7 +1,16 @@
 {
   "name": "sanche-bot",
   "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
   "engines": {
     "node": "24.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }
