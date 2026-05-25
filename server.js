@@ -1,97 +1,145 @@
 import express from "express";
 import cors from "cors";
+import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 
+/* =========================
+   ENV SETUP
+========================= */
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+/* =========================
+   MIDDLEWARE
+========================= */
+
 app.use(cors({ origin: "*" }));
-app.use(express.json());
+
+// IMPORTANT:
+// Stripe webhook needs raw body, so we split routes
+app.use("/api/bot", express.json());
+app.use("/api/checkout", express.json());
 
 /* =========================
-   SMART INTENT BOT ENGINE
+   SMART BOT
 ========================= */
 
-const INTENTS = [
-  {
-    id: "website",
-    keywords: ["website", "web", "build", "site", "landing page"],
-    reply:
-      "We build high-converting websites designed to bring you leads, not just look good. What type of business do you run?"
-  },
-  {
-    id: "seo",
-    keywords: ["seo", "google", "rank", "traffic", "search"],
-    reply:
-      "We help businesses rank higher on Google and generate consistent organic leads without ads."
-  },
-  {
-    id: "pricing",
-    keywords: ["price", "cost", "pricing", "how much", "$", "budget"],
-    reply:
-      "Most projects range from $300–$800 depending on features. If you tell me your goals, I can give an exact quote."
-  },
-  {
-    id: "automation",
-    keywords: ["automation", "ai", "bot", "crm", "system", "workflow"],
-    reply:
-      "We build automation systems that capture, follow up, and convert leads automatically for your business."
-  },
-  {
-    id: "contact",
-    keywords: ["contact", "whatsapp", "call", "talk", "human"],
-    reply:
-      "You can reach us directly on WhatsApp at +1 780-267-9673 and we’ll respond quickly."
-  },
-  {
-    id: "stripe",
-    keywords: ["pay", "checkout", "buy", "start", "purchase"],
-    reply:
-      "You can start your project securely through our checkout system. Want me to send you the payment link?"
-  }
-];
-
-/* =========================
-   BOT ENDPOINT
-========================= */
-
-app.post("/api/bot", (req, res) => {
+app.post("/api/bot", async (req, res) => {
   try {
-    const msg = (req.body.message || "").toLowerCase().trim();
+    const msg = (req.body.message || "").toLowerCase();
 
-    // find best matching intent
-    const match = INTENTS.find(intent =>
-      intent.keywords.some(keyword => msg.includes(keyword))
-    );
+    // store lead in Supabase
+    await supabase.from("leads").insert([
+      {
+        message: msg,
+        source: "chatbot"
+      }
+    ]);
 
-    // fallback responses (more natural)
-    const fallback = [
-      "Got it — what kind of business are you running?",
-      "I can help you with websites, SEO, or automation. What are you trying to achieve?",
-      "Tell me a bit more so I can recommend the right solution."
-    ];
+    const reply = "Got it — what kind of business are you running? I can help you build a system that generates leads automatically.";
 
-    const reply = match
-      ? match.reply
-      : fallback[Math.floor(Math.random() * fallback.length)];
-
-    res.json({
-      reply,
-      intent: match?.id || "fallback"
-    });
+    res.json({ reply });
 
   } catch (err) {
-    console.error("BOT ERROR:", err);
-    res.status(500).json({
-      reply: "Server error — please try WhatsApp instead."
-    });
+    console.error(err);
+    res.status(500).json({ reply: "Server error" });
   }
 });
+
+/* =========================
+   STRIPE CHECKOUT
+========================= */
+
+app.post("/api/checkout", async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+
+      line_items: [
+        {
+          price_data: {
+            currency: "cad",
+            product_data: {
+              name: "Sanche AI System Setup",
+              description: "Full AI chatbot + automation + website system",
+            },
+            unit_amount: 29900,
+          },
+          quantity: 1,
+        },
+      ],
+
+      success_url: `${process.env.FRONTEND_URL}?success=true`,
+      cancel_url: `${process.env.FRONTEND_URL}?cancel=true`,
+    });
+
+    res.json({ url: session.url });
+
+  } catch (err) {
+    console.error("CHECKOUT ERROR:", err);
+    res.status(500).json({ error: "Checkout failed" });
+  }
+});
+
+/* =========================
+   STRIPE WEBHOOK
+========================= */
+
+// IMPORTANT: raw body required here
+app.post(
+  "/api/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("WEBHOOK ERROR:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // PAYMENT SUCCESS
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      console.log("PAYMENT SUCCESS:", session.id);
+
+      // store payment in Supabase
+      await supabase.from("payments").insert([
+        {
+          stripe_session_id: session.id,
+          email: session.customer_details?.email,
+          amount: session.amount_total,
+          status: "paid"
+        }
+      ]);
+    }
+
+    res.json({ received: true });
+  }
+);
 
 /* =========================
    HEALTH CHECK
 ========================= */
 
 app.get("/", (req, res) => {
-  res.send("Sanche Smart Bot API Running 🚀");
+  res.send("Sanche SaaS Backend Running 🚀");
 });
 
 /* =========================
