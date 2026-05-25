@@ -1,171 +1,261 @@
-import express from "express";
-import cors from "cors";
-import { createClient } from "@supabase/supabase-js";
+import OpenAI from "openai";
 
-const app = express();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-/* ───── MIDDLEWARE ───── */
-app.use(cors({ origin: "*" }));
-app.use(express.json());
+/* ─────────────────────────────────────────────
+   MULTI-AGENT AI SYSTEM
+───────────────────────────────────────────── */
 
-/* ───── SUPABASE ───── */
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const agents = {
+  router: {
+    role: `
+You are the routing agent.
 
-/* ───── MEMORY STORE (session context) ───── */
-const sessions = {};
+Your ONLY job:
+- Analyze user intent
+- Decide which specialist agent should respond
 
-/* ───── KNOWLEDGE BASE ───── */
-const knowledge = {
-  website: [
-    "We build high-converting websites designed to turn visitors into paying customers.",
-    "A strong website focuses on speed, clarity, and conversion."
-  ],
-  seo: [
-    "We help businesses rank on Google and generate consistent organic traffic.",
-    "SEO is the long-term strategy for free leads without ads."
-  ],
-  pricing: [
-    "Most projects range between $300–$1500 depending on complexity.",
-    "Pricing depends on features like SEO, automation, and integrations."
-  ],
-  automation: [
-    "We build AI-style automation systems that handle leads, follow-ups, and CRM workflows.",
-    "Automation increases conversions while saving time."
-  ],
-  contact: [
-    "You can reach us on WhatsApp at +1 780-267-9673 for fastest response."
-  ]
+Available agents:
+- sales
+- technical
+- seo
+- automation
+- closer
+- support
+
+Return ONLY the agent name.
+`
+  },
+
+  sales: {
+    role: `
+You are a high-converting AI sales consultant.
+
+Goals:
+- Understand business needs
+- Build excitement
+- Ask strategic questions
+- Position services clearly
+- Move toward booking or payment
+
+Tone:
+- Professional
+- Confident
+- Human
+- Concise
+`
+  },
+
+  technical: {
+    role: `
+You are a senior technical consultant.
+
+Responsibilities:
+- Explain websites
+- Explain hosting
+- Explain APIs
+- Explain software architecture
+- Explain integrations
+- Explain deployment systems
+
+Keep explanations simple but intelligent.
+`
+  },
+
+  seo: {
+    role: `
+You are an elite SEO strategist.
+
+Responsibilities:
+- Local SEO
+- Technical SEO
+- Google rankings
+- Keyword targeting
+- Content strategy
+- SEO audits
+
+Focus on business growth and traffic.
+`
+  },
+
+  automation: {
+    role: `
+You are an AI automation engineer.
+
+Responsibilities:
+- CRM systems
+- Lead automation
+- AI chatbots
+- Sales pipelines
+- Workflow systems
+- Integrations
+
+Focus on saving time and increasing revenue.
+`
+  },
+
+  closer: {
+    role: `
+You are the closing agent.
+
+Responsibilities:
+- Handle objections
+- Push toward decision
+- Encourage booking/payment
+- Create urgency
+- Increase conversions
+
+Never sound aggressive.
+`
+  },
+
+  support: {
+    role: `
+You are a customer support specialist.
+
+Responsibilities:
+- Help users
+- Solve issues
+- Explain next steps
+- Be calm and helpful
+`
+  }
 };
 
-/* ───── INTENT SCORING (UPGRADED) ───── */
-const intentMap = {
-  website: ["website", "web", "site", "landing", "build"],
-  seo: ["seo", "google", "rank", "traffic"],
-  pricing: ["price", "cost", "how much", "pricing", "$"],
-  automation: ["automation", "ai", "bot", "crm", "system"],
-  contact: ["whatsapp", "contact", "call", "talk"]
-};
+/* ─────────────────────────────────────────────
+   ROUTER AGENT
+───────────────────────────────────────────── */
 
-function detectIntent(message = "") {
+async function routeAgent(message) {
+  const completion =
+    await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+
+      temperature: 0,
+
+      messages: [
+        {
+          role: "system",
+          content: agents.router.role
+        },
+
+        {
+          role: "user",
+          content: message
+        }
+      ]
+    });
+
+  return completion.choices[0].message.content
+    .trim()
+    .toLowerCase();
+}
+
+/* ─────────────────────────────────────────────
+   SPECIALIST RESPONSE
+───────────────────────────────────────────── */
+
+async function runAgent({
+  agentName,
+  session,
+  message
+}) {
+  const agent =
+    agents[agentName] || agents.sales;
+
+  const completion =
+    await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+
+      temperature: 0.8,
+
+      messages: [
+        {
+          role: "system",
+          content: agent.role
+        },
+
+        ...session.messages,
+
+        {
+          role: "user",
+          content: message
+        }
+      ]
+    });
+
+  return completion.choices[0].message.content;
+}
+
+/* ─────────────────────────────────────────────
+   SMART SALES PIPELINE
+───────────────────────────────────────────── */
+
+function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  let best = { intent: null, score: 0 };
-
-  for (const key in intentMap) {
-    let score = 0;
-
-    for (const keyword of intentMap[key]) {
-      if (msg.includes(keyword)) {
-        score += 1;
-      }
-    }
-
-    if (score > best.score) {
-      best = { intent: key, score };
-    }
+  if (
+    msg.includes("price") ||
+    msg.includes("cost") ||
+    msg.includes("quote")
+  ) {
+    return "decision";
   }
 
-  return best.intent;
+  if (
+    msg.includes("seo") ||
+    msg.includes("website") ||
+    msg.includes("automation")
+  ) {
+    return "interest";
+  }
+
+  if (
+    msg.includes("start") ||
+    msg.includes("book") ||
+    msg.includes("pay")
+  ) {
+    return "purchase";
+  }
+
+  return "awareness";
 }
 
-/* ───── LLM-STYLE RESPONSE ENGINE ───── */
-function generateReply(intent, message, sessionId) {
-  const session = sessions[sessionId];
+/* ─────────────────────────────────────────────
+   MAIN AI ENGINE
+───────────────────────────────────────────── */
 
-  // store last message context
-  session.lastMessage = message;
+async function generateMultiAgentReply({
+  session,
+  message
+}) {
+  /* Step 1: detect sales stage */
+  const stage = detectStage(message);
 
-  const fallback = [
-    "Got it — what are you trying to build exactly?",
-    "I can help you with websites, SEO, or automation. What are you focused on?",
-    "Tell me a bit more about your business so I can guide you properly."
-  ];
+  /* Step 2: choose specialist */
+  let selectedAgent =
+    await routeAgent(message);
 
-  if (!intent) {
-    return fallback[Math.floor(Math.random() * fallback.length)];
+  /* Step 3: override with closer */
+  if (
+    stage === "decision" ||
+    stage === "purchase"
+  ) {
+    selectedAgent = "closer";
   }
 
-  const base =
-    knowledge[intent][
-      Math.floor(Math.random() * knowledge[intent].length)
-    ];
+  /* Step 4: run specialist */
+  const reply = await runAgent({
+    agentName: selectedAgent,
+    session,
+    message
+  });
 
-  // contextual expansion (makes it feel “AI-like”)
-  const contextAdditions = {
-    website: "What type of business is this for?",
-    seo: "Are you currently getting traffic?",
-    pricing: "What budget range are you thinking?",
-    automation: "Do you want leads automated or full CRM setup?",
-    contact: "Want me to connect you directly with a rep?"
+  return {
+    reply,
+    agent: selectedAgent,
+    stage
   };
-
-  return `${base} ${contextAdditions[intent] || ""}`;
 }
-
-/* ───── BOT ENDPOINT ───── */
-app.post("/api/bot", async (req, res) => {
-  try {
-    const { message, sessionId = "default" } = req.body;
-
-    if (!message) {
-      return res.status(400).json({ reply: "No message provided" });
-    }
-
-    /* session init */
-    if (!sessions[sessionId]) {
-      sessions[sessionId] = {
-        createdAt: Date.now(),
-        messages: []
-      };
-    }
-
-    const intent = detectIntent(message);
-    const reply = generateReply(intent, message, sessionId);
-
-    /* save memory */
-    sessions[sessionId].messages.push({
-      role: "user",
-      message
-    });
-
-    sessions[sessionId].messages.push({
-      role: "bot",
-      message: reply
-    });
-
-    /* supabase logging */
-    await supabase.from("leads").insert([
-      {
-        session_id: sessionId,
-        message,
-        reply,
-        intent: intent || "unknown"
-      }
-    ]);
-
-    res.json({
-      reply,
-      intent: intent || "unknown"
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      reply: "Server error — please try again."
-    });
-  }
-});
-
-/* ───── HEALTH ───── */
-app.get("/", (req, res) => {
-  res.send("Sanche AI Bot (LLaMA-style engine) 🚀");
-});
-
-/* ───── START ───── */
-const port = process.env.PORT || 3000;
-app.listen(port, () =>
-  console.log("Server running on port", port)
-);
