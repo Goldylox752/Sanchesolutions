@@ -9,52 +9,102 @@ const openai = new OpenAI({
 });
 
 /* ─────────────────────────────────────────────
-   AGENTS
+   AGENTS (STRONGER SYSTEM PROMPTS)
 ───────────────────────────────────────────── */
 
 const agents = {
   router: `
-You are a routing system.
+You are a routing classifier for an AI sales system.
 
-Return ONLY one word from:
-sales, technical, seo, automation, closer, support
-No punctuation. No explanation.
+Choose ONLY ONE label:
+
+sales | technical | seo | automation | closer | support
+
+Rules:
+- Output ONLY the word
+- No punctuation
+- No explanation
+- If unsure → sales
+- If pricing/booking/decision intent → closer
 `,
 
   sales: `
-You are a sales consultant for Sanche AI.
-Be concise, helpful, and conversational.
-Focus on business value and outcomes.
+You are an AI sales consultant for Sanche AI.
+
+Your job:
+- Identify business needs
+- Explain value clearly
+- Keep responses short (2–6 lines)
+- Ask 1 smart follow-up question
+- Focus on revenue outcomes, not features
 `,
 
   technical: `
 You are a senior software engineer.
-Explain APIs, hosting, deployment, and systems clearly and simply.
+
+Explain:
+- APIs
+- hosting
+- deployment
+- integrations
+
+Rules:
+- simple language
+- practical solutions only
 `,
 
   seo: `
-You are an SEO expert.
-Focus on rankings, traffic, and actionable improvements.
+You are an elite SEO strategist.
+
+Focus on:
+- rankings
+- traffic growth
+- conversions
+
+Give actionable steps only.
 `,
 
   automation: `
-You are an automation engineer.
-Focus on workflows, integrations, and scaling systems.
+You are an AI automation engineer.
+
+Focus on:
+- workflows
+- CRM systems
+- integrations
+- scaling operations
+
+Keep answers structured and practical.
 `,
 
   closer: `
-You are a conversion specialist.
-Be persuasive but calm. Focus on clarity and next steps.
+You are a HIGH-CONVERSION sales closer for an AI agency.
+
+Your job:
+- Turn interest into action
+- Push toward booking or deposit
+- Create urgency without being aggressive
+- Always end with a CTA
+
+Rules:
+- Be confident
+- Be short
+- Always suggest next step:
+  "Book a $500 strategy call" OR "Secure a $1K build slot"
 `,
 
   support: `
-You are support.
-Solve issues clearly and simply.
+You are customer support.
+
+Be:
+- simple
+- helpful
+- fast
+- solution-focused
 `
 };
 
 /* ─────────────────────────────────────────────
-   ROUTER
+   ROUTER (IMPROVED ACCURACY)
 ───────────────────────────────────────────── */
 
 async function routeAgent(message) {
@@ -62,7 +112,7 @@ async function routeAgent(message) {
     const res = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0,
-      max_tokens: 10,
+      max_tokens: 8,
       messages: [
         { role: "system", content: agents.router },
         { role: "user", content: message }
@@ -73,16 +123,17 @@ async function routeAgent(message) {
       ?.trim()
       ?.toLowerCase();
 
-    const valid = [
+    const valid = new Set([
       "sales",
       "technical",
       "seo",
       "automation",
       "closer",
       "support"
-    ];
+    ]);
 
-    return valid.includes(result) ? result : "sales";
+    return valid.has(result) ? result : "sales";
+
   } catch (err) {
     console.error("Router error:", err);
     return "sales";
@@ -90,26 +141,41 @@ async function routeAgent(message) {
 }
 
 /* ─────────────────────────────────────────────
-   STAGE DETECTION
+   STAGE DETECTION (FIXED LOGIC)
 ───────────────────────────────────────────── */
 
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  if (["price", "cost", "quote", "pricing"].some(w => msg.includes(w)))
+  const decisionKeywords = [
+    "price", "pricing", "cost", "quote", "how much", "$"
+  ];
+
+  const purchaseKeywords = [
+    "book", "pay", "buy", "start", "ready", "let's do it"
+  ];
+
+  const interestKeywords = [
+    "seo", "website", "automation", "chatbot", "ai", "leads"
+  ];
+
+  if (decisionKeywords.some(w => msg.includes(w))) {
     return "decision";
+  }
 
-  if (["book", "pay", "start", "ready"].some(w => msg.includes(w)))
+  if (purchaseKeywords.some(w => msg.includes(w))) {
     return "purchase";
+  }
 
-  if (["seo", "website", "automation", "chatbot", "ai"].some(w => msg.includes(w)))
+  if (interestKeywords.some(w => msg.includes(w))) {
     return "interest";
+  }
 
   return "awareness";
 }
 
 /* ─────────────────────────────────────────────
-   AGENT RUNNER
+   AGENT RUNNER (MORE RELIABLE)
 ───────────────────────────────────────────── */
 
 async function runAgent({ agentName, session, message }) {
@@ -120,27 +186,28 @@ async function runAgent({ agentName, session, message }) {
       { role: "system", content: systemPrompt }
     ];
 
-    // safe memory
+    // safe memory handling
     if (Array.isArray(session?.messages)) {
-      messages.push(...session.messages.slice(-10));
+      messages.push(...session.messages.slice(-8));
     }
 
     messages.push({ role: "user", content: message });
 
     const res = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: 0.7,
+      temperature: agentName === "closer" ? 0.5 : 0.7,
       max_tokens: 300,
       messages
     });
 
     return (
       res.choices?.[0]?.message?.content ||
-      "Can you tell me a bit more?"
+      "Can you give me a bit more detail?"
     );
+
   } catch (err) {
     console.error("Agent error:", err);
-    return "Something went wrong. Please try again.";
+    return "Something went wrong. Try again shortly.";
   }
 }
 
@@ -153,11 +220,12 @@ export async function generateMultiAgentReply({
   message = ""
 }) {
   try {
+
     const stage = detectStage(message);
 
     let agent = await routeAgent(message);
 
-    // override for sales intent
+    // FORCE CLOSER FOR MONEY INTENT
     if (stage === "decision" || stage === "purchase") {
       agent = "closer";
     }
@@ -173,9 +241,10 @@ export async function generateMultiAgentReply({
       reply,
       agent,
       stage,
-      priority: stage === "decision" || stage === "purchase"
-        ? "hot"
-        : "normal"
+      priority:
+        stage === "decision" || stage === "purchase"
+          ? "hot"
+          : "normal"
     };
 
   } catch (err) {
