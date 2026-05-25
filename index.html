@@ -1,340 +1,1117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sanche AI | Build Systems That Sell</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg1:#050505;
-  --bg2:#0b0f1a;
-  --card:rgba(255,255,255,0.06);
-  --border:rgba(255,255,255,0.12);
-  --text:#fff;
-  --muted:rgba(255,255,255,0.65);
+  --blue-deep:#050d1f;
+  --blue-mid:#071530;
+  --blue-accent:#1a6bff;
+  --blue-bright:#4d8eff;
+  --blue-glow:#1a6bff33;
+  --blue-border:rgba(74,142,255,0.2);
+  --card:rgba(255,255,255,0.04);
+  --card-hover:rgba(26,107,255,0.08);
+  --text:#f0f4ff;
+  --muted:rgba(180,200,255,0.65);
+  --white:#ffffff;
 }
 
-/* BACKGROUND */
+html{scroll-behavior:smooth}
+
 body{
-  font-family:Geist,sans-serif;
+  font-family:'DM Sans',sans-serif;
   color:var(--text);
   min-height:100vh;
-  background:
-    radial-gradient(circle at 20% 20%, #1a2a6c33, transparent 40%),
-    radial-gradient(circle at 80% 30%, #b21f1f22, transparent 40%),
-    radial-gradient(circle at 50% 80%, #0f202733, transparent 40%),
-    linear-gradient(180deg,var(--bg1),var(--bg2));
+  background:var(--blue-deep);
+  overflow-x:hidden;
 }
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.4;
+}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:18px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--blue-border);
+  background:rgba(5,13,31,0.85);
+  backdrop-filter:blur(20px);
+}
+.logo{
+  font-family:'Instrument Serif',serif;
+  font-size:22px;
+  letter-spacing:-0.5px;
+}
+.logo span{color:var(--blue-bright)}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:14px;
+  font-weight:500;
+  transition:.2s;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{
+  padding:9px 20px;
+  background:var(--blue-accent);
+  color:white!important;
+  border-radius:10px;
+  font-weight:600!important;
+  transition:all .2s!important;
+}
+.nav-cta:hover{background:#2979ff!important;transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,107,255,0.35)!important}
 
 /* HERO */
 .hero{
+  position:relative;
   text-align:center;
-  padding:140px 20px 70px;
-  max-width:900px;
+  padding:180px 20px 100px;
+  max-width:960px;
   margin:auto;
+  z-index:1;
 }
+
+/* GLOWING ORBS */
+.orb{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(80px);
+  pointer-events:none;
+  z-index:0;
+}
+.orb1{
+  width:600px;height:600px;
+  top:-100px;left:-150px;
+  background:radial-gradient(circle,rgba(26,107,255,0.18),transparent 70%);
+}
+.orb2{
+  width:500px;height:500px;
+  top:200px;right:-100px;
+  background:radial-gradient(circle,rgba(77,142,255,0.12),transparent 70%);
+}
+.orb3{
+  width:400px;height:400px;
+  bottom:0;left:30%;
+  background:radial-gradient(circle,rgba(26,107,255,0.1),transparent 70%);
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 16px;
+  border-radius:100px;
+  border:1px solid var(--blue-border);
+  background:rgba(26,107,255,0.1);
+  font-size:13px;
+  font-weight:500;
+  color:var(--blue-bright);
+  margin-bottom:28px;
+  animation:fadeUp .6s ease both;
+}
+.badge-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--blue-bright);
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(77,142,255,0.6)}
+  50%{box-shadow:0 0 0 6px rgba(77,142,255,0)}
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
 .hero h1{
-  font-family:"Instrument Serif";
-  font-size:74px;
-  line-height:1.05;
+  font-family:'Instrument Serif',serif;
+  font-size:76px;
+  line-height:1.04;
+  letter-spacing:-2px;
+  animation:fadeUp .7s .1s ease both;
 }
-.hero p{
+.hero h1 em{
+  font-style:italic;
+  color:var(--blue-bright);
+}
+.hero-sub{
   color:var(--muted);
-  margin-top:18px;
-  font-size:18px;
-  line-height:1.6;
-  max-width:700px;
+  margin-top:22px;
+  font-size:19px;
+  line-height:1.65;
+  max-width:640px;
   margin-left:auto;
   margin-right:auto;
+  animation:fadeUp .7s .2s ease both;
 }
-
-.cta{
-  margin-top:30px;
-  display:inline-block;
-  padding:14px 26px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:var(--card);
+.hero-btns{
+  margin-top:36px;
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  flex-wrap:wrap;
+  animation:fadeUp .7s .3s ease both;
+}
+.btn-primary{
+  padding:15px 30px;
+  background:var(--blue-accent);
+  color:white;
+  border:none;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:600;
   cursor:pointer;
-  transition:.2s;
+  transition:all .2s;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 0 40px rgba(26,107,255,0.3);
 }
-.cta:hover{transform:scale(1.05)}
+.btn-primary:hover{
+  background:#2979ff;
+  transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(26,107,255,0.45);
+}
+.btn-ghost{
+  padding:15px 30px;
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--blue-border);
+  border-radius:12px;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.btn-ghost:hover{background:var(--card-hover);border-color:rgba(74,142,255,0.4)}
 
-/* FEATURES */
+/* SOCIAL PROOF */
+.proof{
+  margin-top:64px;
+  animation:fadeUp .7s .4s ease both;
+}
+.proof-label{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:14px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+.proof-logos{
+  display:flex;
+  gap:32px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  opacity:0.5;
+}
+.proof-logo{
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* STATS BAR */
+.stats{
+  position:relative;
+  z-index:1;
+  max-width:900px;
+  margin:0 auto 80px;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border:1px solid var(--blue-border);
+  border-radius:20px;
+  overflow:hidden;
+  background:rgba(26,107,255,0.04);
+}
+.stat{
+  padding:32px 24px;
+  text-align:center;
+  border-right:1px solid var(--blue-border);
+}
+.stat:last-child{border-right:none}
+.stat-num{
+  font-family:'Instrument Serif',serif;
+  font-size:46px;
+  color:var(--blue-bright);
+  line-height:1;
+}
+.stat-label{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
+
+/* SECTION */
 .section{
+  position:relative;
+  z-index:1;
   padding:80px 20px;
   max-width:1100px;
   margin:auto;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:18px;
+.section-tag{
+  display:inline-block;
+  color:var(--blue-bright);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:14px;
 }
-.card{
-  padding:20px;
-  border-radius:16px;
-  background:var(--card);
-  border:1px solid var(--border);
+.section-title{
+  font-family:'Instrument Serif',serif;
+  font-size:46px;
+  letter-spacing:-1px;
+  line-height:1.1;
+  margin-bottom:14px;
+}
+.section-sub{
+  color:var(--muted);
+  font-size:17px;
+  max-width:520px;
+  line-height:1.6;
+  margin-bottom:50px;
 }
 
-/* CHAT BUTTON */
+/* SERVICES GRID */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:16px;
+}
+.service-card{
+  padding:28px;
+  border-radius:18px;
+  background:var(--card);
+  border:1px solid var(--blue-border);
+  transition:all .25s;
+  cursor:default;
+}
+.service-card:hover{
+  background:var(--card-hover);
+  border-color:rgba(74,142,255,0.4);
+  transform:translateY(-3px);
+  box-shadow:0 20px 40px rgba(26,107,255,0.12);
+}
+.service-icon{
+  font-size:28px;
+  margin-bottom:16px;
+  display:block;
+}
+.service-card h3{
+  font-size:17px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+.service-card p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+.service-tag{
+  display:inline-block;
+  margin-top:16px;
+  padding:4px 10px;
+  border-radius:100px;
+  background:rgba(26,107,255,0.15);
+  color:var(--blue-bright);
+  font-size:12px;
+  font-weight:500;
+}
+
+/* HOW IT WORKS */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+.step{
+  padding:28px;
+  border-radius:18px;
+  border:1px solid var(--blue-border);
+  background:var(--card);
+  position:relative;
+}
+.step-num{
+  font-family:'Instrument Serif',serif;
+  font-size:52px;
+  color:rgba(26,107,255,0.25);
+  line-height:1;
+  margin-bottom:12px;
+}
+.step h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.step p{color:var(--muted);font-size:14px;line-height:1.6}
+
+/* TESTIMONIALS */
+.testimonials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.testi{
+  padding:28px;
+  border-radius:18px;
+  background:var(--card);
+  border:1px solid var(--blue-border);
+}
+.testi-text{
+  font-size:15px;
+  line-height:1.65;
+  margin-bottom:20px;
+  color:var(--muted);
+}
+.testi-author{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.testi-avatar{
+  width:38px;height:38px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;
+}
+.testi-name{font-size:14px;font-weight:600}
+.testi-role{font-size:12px;color:var(--muted)}
+.stars{color:#f0b429;font-size:13px;margin-bottom:14px}
+
+/* PRICING */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.price-card{
+  padding:32px;
+  border-radius:20px;
+  background:var(--card);
+  border:1px solid var(--blue-border);
+  transition:all .25s;
+}
+.price-card.featured{
+  background:linear-gradient(135deg,rgba(26,107,255,0.15),rgba(77,142,255,0.08));
+  border-color:rgba(74,142,255,0.5);
+  box-shadow:0 0 60px rgba(26,107,255,0.15);
+}
+.price-card:hover:not(.featured){
+  border-color:rgba(74,142,255,0.4);
+  transform:translateY(-3px);
+}
+.price-tier{font-size:13px;font-weight:600;color:var(--blue-bright);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.price-amount{
+  font-family:'Instrument Serif',serif;
+  font-size:52px;
+  line-height:1;
+  margin-bottom:6px;
+}
+.price-amount span{font-size:18px;font-family:'DM Sans',sans-serif;font-weight:400;color:var(--muted)}
+.price-desc{color:var(--muted);font-size:14px;margin-bottom:24px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.price-features li{font-size:14px;display:flex;gap:10px;align-items:flex-start;color:var(--muted)}
+.price-features li::before{content:'✓';color:var(--blue-bright);font-weight:700;flex-shrink:0}
+.price-btn{
+  width:100%;
+  padding:13px;
+  border-radius:11px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.price-btn-primary{
+  background:var(--blue-accent);
+  color:white;
+  border:none;
+  box-shadow:0 0 30px rgba(26,107,255,0.3);
+}
+.price-btn-primary:hover{background:#2979ff;box-shadow:0 8px 24px rgba(26,107,255,0.4)}
+.price-btn-ghost{
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--blue-border);
+}
+.price-btn-ghost:hover{background:var(--card-hover)}
+
+/* CTA SECTION */
+.cta-section{
+  position:relative;
+  z-index:1;
+  margin:0 20px 100px;
+  max-width:1060px;
+  margin-left:auto;
+  margin-right:auto;
+  padding:70px 40px;
+  border-radius:24px;
+  background:linear-gradient(135deg,rgba(26,107,255,0.2),rgba(77,142,255,0.08));
+  border:1px solid rgba(74,142,255,0.3);
+  text-align:center;
+  overflow:hidden;
+}
+.cta-section::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(26,107,255,0.2),transparent 60%);
+  pointer-events:none;
+}
+.cta-section h2{
+  font-family:'Instrument Serif',serif;
+  font-size:50px;
+  letter-spacing:-1px;
+  margin-bottom:16px;
+  position:relative;
+}
+.cta-section p{
+  color:var(--muted);
+  font-size:18px;
+  max-width:500px;
+  margin:0 auto 32px;
+  line-height:1.6;
+  position:relative;
+}
+.cta-btns{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  position:relative;
+}
+
+/* FOOTER */
+footer{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:32px 20px;
+  border-top:1px solid var(--blue-border);
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* ============ CHATBOT ============ */
 .fab{
   position:fixed;
   bottom:24px;
   right:24px;
-  width:58px;
-  height:58px;
+  width:60px;
+  height:60px;
   border-radius:50%;
-  background:white;
-  color:black;
+  background:var(--blue-accent);
+  color:white;
   border:none;
   cursor:pointer;
   z-index:9999;
-  font-size:20px;
+  font-size:22px;
+  box-shadow:0 8px 32px rgba(26,107,255,0.5);
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
 }
+.fab:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(26,107,255,0.65)}
 
-/* PANEL */
 .panel{
   position:fixed;
-  bottom:90px;
+  bottom:96px;
   right:24px;
-  width:380px;
-  height:560px;
-  background:rgba(10,10,10,0.96);
-  border:1px solid var(--border);
-  border-radius:18px;
+  width:390px;
+  height:580px;
+  background:rgba(5,13,31,0.97);
+  border:1px solid rgba(74,142,255,0.3);
+  border-radius:22px;
   display:flex;
   flex-direction:column;
   opacity:0;
-  transform:translateY(10px);
+  transform:translateY(16px) scale(0.97);
   pointer-events:none;
-  transition:.25s;
-  backdrop-filter:blur(20px);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  backdrop-filter:blur(24px);
+  z-index:9998;
+  overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(26,107,255,0.1) inset;
 }
 .panel.open{
   opacity:1;
-  transform:translateY(0);
+  transform:translateY(0) scale(1);
   pointer-events:auto;
 }
 
-/* HEADER */
-.header{
-  padding:14px;
-  border-bottom:1px solid var(--border);
+.panel-header{
+  padding:16px 18px;
+  border-bottom:1px solid rgba(74,142,255,0.15);
   display:flex;
   justify-content:space-between;
-  font-weight:500;
+  align-items:center;
+  background:rgba(26,107,255,0.06);
 }
+.panel-brand{display:flex;align-items:center;gap:10px}
+.panel-avatar{
+  width:34px;height:34px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.panel-name{font-size:14px;font-weight:600}
+.panel-status{font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px}
+.panel-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.panel-close{
+  width:28px;height:28px;
+  border:none;
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.panel-close:hover{background:rgba(255,255,255,0.1);color:white}
 
-/* MESSAGES */
 .messages{
   flex:1;
-  padding:12px;
-  overflow:auto;
+  padding:14px;
+  overflow-y:auto;
   display:flex;
   flex-direction:column;
   gap:10px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(74,142,255,0.2) transparent;
 }
 
 .msg{
-  max-width:85%;
-  padding:10px 12px;
-  border-radius:12px;
-  font-size:13px;
-  line-height:1.4;
+  max-width:86%;
+  padding:11px 14px;
+  border-radius:14px;
+  font-size:13.5px;
+  line-height:1.5;
+  animation:msgIn .2s ease;
 }
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .user{
-  background:white;
-  color:black;
+  background:var(--blue-accent);
+  color:white;
   margin-left:auto;
+  border-bottom-right-radius:4px;
 }
 .bot{
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  border-bottom-left-radius:4px;
+  border:1px solid rgba(74,142,255,0.12);
 }
 
-/* INPUT */
-.input{
-  display:flex;
-  border-top:1px solid var(--border);
-  padding:10px;
-  gap:8px;
-}
-
-input{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:rgba(255,255,255,0.08);
-  color:white;
-}
-
-button.send{
-  width:42px;
-  border:none;
-  border-radius:10px;
-  background:white;
-  cursor:pointer;
-}
-
-/* QUICK BUTTONS */
 .quick{
   display:flex;
   flex-wrap:wrap;
-  gap:6px;
+  gap:7px;
+  margin-top:4px;
 }
-
 .quick button{
   font-size:12px;
-  padding:6px 10px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  background:transparent;
-  color:white;
+  padding:7px 12px;
+  border-radius:100px;
+  border:1px solid rgba(74,142,255,0.3);
+  background:rgba(26,107,255,0.08);
+  color:var(--blue-bright);
   cursor:pointer;
+  transition:all .15s;
+  font-family:'DM Sans',sans-serif;
+  font-weight:500;
+}
+.quick button:hover{
+  background:rgba(26,107,255,0.2);
+  border-color:rgba(74,142,255,0.6);
 }
 
-/* TYPING */
-.typing{
-  font-size:12px;
-  opacity:0.7;
+.typing-bubble{
+  display:flex;gap:5px;
+  padding:12px 16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(74,142,255,0.12);
+  border-radius:14px;
+  border-bottom-left-radius:4px;
+  width:fit-content;
+}
+.typing-bubble span{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--blue-bright);
+  animation:typingDot 1.2s infinite;
+}
+.typing-bubble span:nth-child(2){animation-delay:.2s}
+.typing-bubble span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{
+  0%,60%,100%{opacity:0.3;transform:scale(0.8)}
+  30%{opacity:1;transform:scale(1)}
+}
+
+.panel-input{
+  display:flex;
+  border-top:1px solid rgba(74,142,255,0.15);
+  padding:12px;
+  gap:8px;
+  align-items:center;
+  background:rgba(26,107,255,0.03);
+}
+.panel-input input{
+  flex:1;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(74,142,255,0.2);
+  outline:none;
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-size:13.5px;
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .15s;
+}
+.panel-input input:focus{border-color:rgba(74,142,255,0.5)}
+.panel-input input::placeholder{color:rgba(180,200,255,0.35)}
+.send-btn{
+  width:40px;height:40px;
+  border:none;
+  border-radius:11px;
+  background:var(--blue-accent);
+  color:white;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+  flex-shrink:0;
+}
+.send-btn:hover{background:#2979ff;transform:scale(1.05)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  .hero h1{font-size:46px;letter-spacing:-1px}
+  .hero-sub{font-size:16px}
+  .stats{grid-template-columns:1fr}
+  .stat{border-right:none;border-bottom:1px solid var(--blue-border)}
+  .stat:last-child{border-bottom:none}
+  .section-title{font-size:34px}
+  .panel{width:calc(100vw - 32px);right:16px;bottom:84px}
+  .cta-section h2{font-size:36px}
 }
 </style>
 </head>
-
 <body>
 
+<!-- ORBS -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sanche<span>AI</span></div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#how">Process</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#" class="nav-cta" onclick="toggleChat();return false;">Talk to AI ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
 <section class="hero">
-  <h1>AI Systems That Close Leads For You</h1>
-  <p>
-    We build automation systems, AI chat agents, and high-converting websites
-    that turn traffic into paying customers — on autopilot.
+  <div class="badge">
+    <div class="badge-dot"></div>
+    Now accepting new clients — limited spots
+  </div>
+  <h1>AI Systems That<br><em>Close Deals</em><br>While You Sleep</h1>
+  <p class="hero-sub">
+    We build AI sales agents, automation flows, and high-converting websites that turn cold traffic into paying customers — 24/7, no manual follow-up needed.
   </p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="toggleChat()">Get My Free Strategy Call →</button>
+    <button class="btn-ghost" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">See What We Build</button>
+  </div>
 
-  <div class="cta" onclick="toggleChat()">
-    Start Building
+  <div class="proof" style="margin-top:52px">
+    <div class="proof-label">Trusted by founders & agencies</div>
+    <div class="proof-logos">
+      <span class="proof-logo">Founders</span>
+      <span class="proof-logo">·</span>
+      <span class="proof-logo">E-commerce</span>
+      <span class="proof-logo">·</span>
+      <span class="proof-logo">SaaS Startups</span>
+      <span class="proof-logo">·</span>
+      <span class="proof-logo">Agencies</span>
+      <span class="proof-logo">·</span>
+      <span class="proof-logo">Coaches</span>
+    </div>
   </div>
 </section>
 
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">3×</div>
+    <div class="stat-label">Average conversion lift</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">24/7</div>
+    <div class="stat-label">Lead capture & qualification</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">14d</div>
+    <div class="stat-label">Average delivery time</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-tag">What We Build</div>
+  <h2 class="section-title">Every Tool You Need<br>to Sell More</h2>
+  <p class="section-sub">We don't do cookie-cutter. Every system is built around your business, your customers, your goals.</p>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <span class="service-icon">🤖</span>
+      <h3>AI Sales Agents</h3>
+      <p>Custom chatbots trained on your offers that qualify leads, answer objections, and book calls automatically — day and night.</p>
+      <span class="service-tag">Most Popular</span>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">⚡</span>
+      <h3>Automation & CRM Flows</h3>
+      <p>End-to-end workflows that nurture leads, send follow-ups, and update your CRM without you lifting a finger.</p>
+      <span class="service-tag">High ROI</span>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🎯</span>
+      <h3>High-Converting Websites</h3>
+      <p>Landing pages and full sites engineered to convert visitors into buyers with persuasive copy and proven design principles.</p>
+      <span class="service-tag">Fast Delivery</span>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">📈</span>
+      <h3>Lead Generation Systems</h3>
+      <p>Full funnel builds from ad creative to thank-you page — designed to bring in qualified leads at scale.</p>
+      <span class="service-tag">Done-For-You</span>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🔗</span>
+      <h3>API & SaaS Integrations</h3>
+      <p>Connect your tools, build custom dashboards, and automate data flows between platforms you already use.</p>
+      <span class="service-tag">Custom Build</span>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">💬</span>
+      <h3>Voice & SMS Bots</h3>
+      <p>AI that calls leads back within seconds, qualifies them over the phone, and routes hot prospects straight to your calendar.</p>
+      <span class="service-tag">New</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-tag">The Process</div>
+  <h2 class="section-title">Up & Running in 14 Days</h2>
+  <p class="section-sub">No bloated retainers. No 6-week discovery phases. We move fast and ship faster.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Strategy Call</h3>
+      <p>We audit your current funnel, identify the biggest gaps, and map out exactly what to build first for maximum ROI.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Build & Integrate</h3>
+      <p>We build your AI system, connect it to your stack, and write all the copy and scripts — you don't write a word.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Launch & Optimize</h3>
+      <p>We launch, monitor performance, and keep tuning until your conversion numbers make you smile.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Scale</h3>
+      <p>Once the machine is printing leads, we help you pour fuel on it — more traffic, more automations, more revenue.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
 <section class="section">
-  <div class="grid">
-    <div class="card">AI Sales Bots That Convert 24/7</div>
-    <div class="card">Automation Systems & CRM Flows</div>
-    <div class="card">High-Converting SaaS Websites</div>
+  <div class="section-tag">Results</div>
+  <h2 class="section-title">What Clients Say</h2>
+  <div class="testimonials">
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"The AI bot they built books 4–6 calls a week on autopilot. I've completely stopped manually following up with leads. Best investment I've made this year."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">MR</div>
+        <div>
+          <div class="testi-name">Marcus R.</div>
+          <div class="testi-role">Business Coach</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Our new site converted at 11% out of the gate. Previous agency gave us a pretty site with 1.5% conversions. Night and day difference."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">SL</div>
+        <div>
+          <div class="testi-name">Sofia L.</div>
+          <div class="testi-role">E-commerce Founder</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Automation flows saved my team 20+ hours a week. That's 20 hours we put back into actually closing deals instead of copy-pasting emails."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">JK</div>
+        <div>
+          <div class="testi-name">James K.</div>
+          <div class="testi-role">SaaS Founder</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- CHAT -->
-<button class="fab" onclick="toggleChat()">💬</button>
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-tag">Pricing</div>
+  <h2 class="section-title">Simple, Honest Pricing</h2>
+  <p class="section-sub">No hidden fees. No surprise invoices. Pick the plan that fits where you are right now.</p>
 
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Starter</div>
+      <div class="price-amount">$1,497<span>/project</span></div>
+      <div class="price-desc">Perfect for getting your first AI system live fast.</div>
+      <ul class="price-features">
+        <li>AI chatbot (1 use case)</li>
+        <li>Landing page or lead form</li>
+        <li>Basic CRM integration</li>
+        <li>Email follow-up sequence</li>
+        <li>14-day delivery</li>
+      </ul>
+      <button class="price-btn price-btn-ghost" onclick="toggleChat()">Get Started</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-tier">Growth</div>
+      <div class="price-amount">$3,997<span>/project</span></div>
+      <div class="price-desc">Full funnel + AI agent + automation stack. Most popular.</div>
+      <ul class="price-features">
+        <li>Advanced AI sales agent</li>
+        <li>Full website or funnel build</li>
+        <li>Complete automation flows</li>
+        <li>CRM + calendar integration</li>
+        <li>SMS / email sequences</li>
+        <li>30-day optimization support</li>
+      </ul>
+      <button class="price-btn price-btn-primary" onclick="toggleChat()">Book My Strategy Call →</button>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">Scale</div>
+      <div class="price-amount">Custom</div>
+      <div class="price-desc">For teams that want an ongoing build-and-optimize partner.</div>
+      <ul class="price-features">
+        <li>Everything in Growth</li>
+        <li>Monthly sprints & new builds</li>
+        <li>Performance reporting</li>
+        <li>Priority support</li>
+        <li>Dedicated Slack channel</li>
+      </ul>
+      <button class="price-btn price-btn-ghost" onclick="toggleChat()">Let's Talk</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to Stop Leaving<br>Money on the Table?</h2>
+  <p>Every day without an AI system is a day your competitors are closing leads you could have had.</p>
+  <div class="cta-btns">
+    <button class="btn-primary" onclick="toggleChat()">Start My Free Strategy Call →</button>
+    <button class="btn-ghost" onclick="toggleChat()">Ask a Quick Question</button>
+  </div>
+</section>
+
+<footer>
+  © 2025 Sanche AI · Built to convert · <a href="mailto:hello@sancheai.com" style="color:var(--blue-bright);text-decoration:none">hello@sancheai.com</a>
+</footer>
+
+<!-- FAB -->
+<button class="fab" onclick="toggleChat()" title="Chat with Sanche AI">💬</button>
+
+<!-- CHAT PANEL -->
 <div class="panel" id="panel">
-
-  <div class="header">
-    <div>Sanche AI</div>
-    <button onclick="toggleChat()">✕</button>
+  <div class="panel-header">
+    <div class="panel-brand">
+      <div class="panel-avatar">🤖</div>
+      <div>
+        <div class="panel-name">Sanche AI</div>
+        <div class="panel-status">Online now</div>
+      </div>
+    </div>
+    <button class="panel-close" onclick="toggleChat()">✕</button>
   </div>
 
   <div class="messages" id="messages"></div>
 
-  <div class="input">
-    <input id="input" placeholder="Ask about pricing, websites, SEO..." />
-    <button class="send" onclick="send()">➤</button>
+  <div class="panel-input">
+    <input id="chatInput" placeholder="Ask about pricing, services, timelines…" autocomplete="off"/>
+    <button class="send-btn" onclick="sendMessage()" title="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
-
 </div>
 
 <script>
-const API_URL = "https://sanchesolutions.onrender.com/api/bot";
-const SESSION_ID = "user_" + Math.random().toString(36).slice(2,10);
+// ============ CHATBOT ============
+const SYSTEM_PROMPT = `You are the AI sales assistant for Sanche AI, a boutique agency that builds AI systems, automation flows, and high-converting websites for founders, coaches, and e-commerce brands.
+
+Your personality: warm, confident, direct, results-focused. You close deals — but never feel pushy. You genuinely want to help the visitor figure out the right solution.
+
+Your goals:
+1. Understand what the visitor needs (lead gen, automation, a new website, AI chatbot, etc.)
+2. Match their problem to one of our services and explain the value clearly
+3. Build trust by being specific and honest about what we build and how long it takes
+4. Get them to book a free strategy call or ask for a custom quote
+
+Key facts:
+- Starter plan: $1,497 — AI chatbot + landing page, 14-day delivery
+- Growth plan: $3,997 — Full funnel + AI agent + automation + 30 days support (most popular)
+- Scale plan: Custom pricing — ongoing monthly build & optimize retainer
+- Delivery is typically 14 days
+- We use Anthropic's Claude API (not OpenAI) — more reliable, better value
+- We build with tools like Make, Zapier, GoHighLevel, Airtable, Notion, Stripe, Calendly
+- Strategy calls are FREE with no pressure
+- We work with coaches, SaaS founders, agencies, and e-commerce brands
+
+Never make up prices or timelines beyond what's listed above. If you're unsure, say "let's figure that out on a quick call."
+
+Keep replies concise (2–4 sentences max unless explaining something complex). Use a conversational tone. End with a soft CTA when natural — e.g., "Want me to book you a free strategy call?" or "Should I put together a custom quote for you?"`;
 
 const panel = document.getElementById("panel");
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
+const messagesEl = document.getElementById("messages");
+const chatInput = document.getElementById("chatInput");
+
+let chatHistory = [];
+let isOpen = false;
 
 function toggleChat(){
-  panel.classList.toggle("open");
-
-  if(messages.children.length === 0){
-    add("Hey 👋 What are you trying to build?", "bot");
-    addQuick();
+  isOpen = !isOpen;
+  panel.classList.toggle("open", isOpen);
+  if(isOpen && messagesEl.children.length === 0){
+    addMessage("Hey! 👋 I'm the Sanche AI assistant. What are you trying to build or fix in your business?", "bot");
+    addQuickReplies();
   }
+  if(isOpen) setTimeout(()=>chatInput.focus(), 300);
 }
 
-function add(text,type){
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.textContent=text;
-  messages.appendChild(div);
-  messages.scrollTop=messages.scrollHeight;
+function addMessage(text, type){
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function addQuick(){
-  const div=document.createElement("div");
-  div.className="quick";
-
-  [
-    ["Get Quote","quote"],
-    ["Pricing","pricing"],
-    ["Website Build","website"],
-    ["Automation","automation"]
-  ].forEach(i=>{
-    const b=document.createElement("button");
-    b.textContent=i[0];
-    b.onclick=()=>send(i[1]);
-    div.appendChild(b);
+function addQuickReplies(){
+  const wrap = document.createElement("div");
+  wrap.className = "quick";
+  const options = [
+    ["💰 Get a Quote", "I'd like to get a quote for my project"],
+    ["🤖 AI Chatbot", "Tell me about your AI chatbot service"],
+    ["🌐 New Website", "I need a high-converting website"],
+    ["⚡ Automation", "I want to automate my lead follow-up"],
+  ];
+  options.forEach(([label, msg]) => {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.onclick = () => sendMessage(msg);
+    wrap.appendChild(btn);
   });
-
-  messages.appendChild(div);
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function typing(){
-  const div=document.createElement("div");
-  div.className="typing";
-  div.id="typing";
-  div.textContent="Sanche AI is thinking...";
-  messages.appendChild(div);
+function showTyping(){
+  const div = document.createElement("div");
+  div.className = "typing-bubble";
+  div.id = "typing";
+  div.innerHTML = "<span></span><span></span><span></span>";
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-async function send(text){
-  const msg=(text || input.value).trim();
-  if(!msg) return;
+function removeTyping(){
+  document.getElementById("typing")?.remove();
+}
 
-  add(msg,"user");
-  input.value="";
+async function sendMessage(overrideText){
+  const text = (overrideText || chatInput.value).trim();
+  if(!text) return;
 
-  typing();
+  addMessage(text, "user");
+  chatInput.value = "";
+  chatHistory.push({ role: "user", content: text });
 
-  try{
-    const res=await fetch(API_URL,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        message:msg,
-        sessionId:SESSION_ID
+  showTyping();
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
       })
     });
 
-    const data=await res.json();
+    const data = await res.json();
+    removeTyping();
 
-    document.getElementById("typing")?.remove();
-    add(data.reply || "No response","bot");
+    const reply = data.content?.[0]?.text || "Sorry, something went wrong. Try again!";
+    chatHistory.push({ role: "assistant", content: reply });
+    addMessage(reply, "bot");
 
-  }catch(e){
-    document.getElementById("typing")?.remove();
-    add("Server offline — try again later.","bot");
+  } catch(err) {
+    removeTyping();
+    addMessage("Hmm, hit a snag. Try refreshing — or email us at hello@sancheai.com", "bot");
   }
 }
 
-input.addEventListener("keydown",(e)=>{
-  if(e.key==="Enter") send();
+chatInput.addEventListener("keydown", e => {
+  if(e.key === "Enter" && !e.shiftKey) sendMessage();
 });
 </script>
 
