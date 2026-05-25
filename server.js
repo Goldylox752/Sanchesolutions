@@ -1,51 +1,83 @@
 import express from "express";
 import cors from "cors";
-import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 
-/* =========================
-   ENV SETUP
-========================= */
+app.use(cors({ origin: "*" }));
+app.use(express.json());
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
+// Supabase setup
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-/* =========================
-   MIDDLEWARE
-========================= */
+// memory (optional fallback)
+const sessions = {};
 
-app.use(cors({ origin: "*" }));
+// intents
+const intents = [
+  {
+    name: "website",
+    keywords: ["website", "web", "site"],
+    reply: "We build high-converting websites that turn visitors into leads. What kind of business do you run?"
+  },
+  {
+    name: "seo",
+    keywords: ["seo", "google", "rank"],
+    reply: "We help you rank on Google and get organic leads without ads."
+  },
+  {
+    name: "pricing",
+    keywords: ["price", "cost", "how much"],
+    reply: "Most websites range from $300–$1500 depending on features. What are you looking for?"
+  },
+  {
+    name: "whatsapp",
+    keywords: ["whatsapp", "call", "contact"],
+    reply: "You can reach us on WhatsApp at +1 780-267-9673 for fastest response."
+  }
+];
 
-// IMPORTANT:
-// Stripe webhook needs raw body, so we split routes
-app.use("/api/bot", express.json());
-app.use("/api/checkout", express.json());
+// intent matcher
+function getIntent(msg) {
+  msg = msg.toLowerCase();
 
-/* =========================
-   SMART BOT
-========================= */
+  return intents.find(i =>
+    i.keywords.some(k => msg.includes(k))
+  );
+}
 
+// BOT ENDPOINT
 app.post("/api/bot", async (req, res) => {
   try {
-    const msg = (req.body.message || "").toLowerCase();
+    const { message, sessionId = "default" } = req.body;
 
-    // store lead in Supabase
+    if (!sessions[sessionId]) {
+      sessions[sessionId] = { step: 0 };
+    }
+
+    const intent = getIntent(message);
+
+    let reply =
+      intent?.reply ||
+      "What type of business are you trying to grow?";
+
+    // save to Supabase
     await supabase.from("leads").insert([
       {
-        message: msg,
-        source: "chatbot"
+        session_id: sessionId,
+        message,
+        reply,
+        intent: intent?.name || "unknown"
       }
     ]);
 
-    const reply = "Got it — what kind of business are you running? I can help you build a system that generates leads automatically.";
-
-    res.json({ reply });
+    res.json({
+      reply,
+      intent: intent?.name || "unknown"
+    });
 
   } catch (err) {
     console.error(err);
@@ -53,100 +85,10 @@ app.post("/api/bot", async (req, res) => {
   }
 });
 
-/* =========================
-   STRIPE CHECKOUT
-========================= */
-
-app.post("/api/checkout", async (req, res) => {
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-
-      line_items: [
-        {
-          price_data: {
-            currency: "cad",
-            product_data: {
-              name: "Sanche AI System Setup",
-              description: "Full AI chatbot + automation + website system",
-            },
-            unit_amount: 29900,
-          },
-          quantity: 1,
-        },
-      ],
-
-      success_url: `${process.env.FRONTEND_URL}?success=true`,
-      cancel_url: `${process.env.FRONTEND_URL}?cancel=true`,
-    });
-
-    res.json({ url: session.url });
-
-  } catch (err) {
-    console.error("CHECKOUT ERROR:", err);
-    res.status(500).json({ error: "Checkout failed" });
-  }
-});
-
-/* =========================
-   STRIPE WEBHOOK
-========================= */
-
-// IMPORTANT: raw body required here
-app.post(
-  "/api/webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
-    const sig = req.headers["stripe-signature"];
-
-    let event;
-
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
-    } catch (err) {
-      console.error("WEBHOOK ERROR:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // PAYMENT SUCCESS
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-
-      console.log("PAYMENT SUCCESS:", session.id);
-
-      // store payment in Supabase
-      await supabase.from("payments").insert([
-        {
-          stripe_session_id: session.id,
-          email: session.customer_details?.email,
-          amount: session.amount_total,
-          status: "paid"
-        }
-      ]);
-    }
-
-    res.json({ received: true });
-  }
-);
-
-/* =========================
-   HEALTH CHECK
-========================= */
-
+// health
 app.get("/", (req, res) => {
-  res.send("Sanche SaaS Backend Running 🚀");
+  res.send("Sanche Bot + Supabase Running 🚀");
 });
-
-/* =========================
-   START SERVER
-========================= */
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log("Server running on port", port);
-});
+app.listen(port, () => console.log("Server running on", port));
