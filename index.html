@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions | Full Stack AI SaaS Developer</title>
+<title>SancheSolutions | AI Automation & SaaS Systems</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -15,6 +15,7 @@
   --muted:rgba(210,220,255,0.65);
   --border:rgba(120,160,255,0.18);
   --blue:#4f8cff;
+  --blue2:#7aa8ff;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -33,14 +34,27 @@ nav{
   display:flex;
   justify-content:space-between;
   padding:16px 28px;
-  background:rgba(5,8,20,0.7);
-  backdrop-filter:blur(16px);
+  background:rgba(5,8,20,0.75);
+  backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
   z-index:10;
 }
 
-.logo{font-weight:700;}
+.logo{
+  font-weight:700;
+  letter-spacing:0.5px;
+}
 .logo span{color:var(--blue);}
+
+.btn{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  border:none;
+  padding:12px 18px;
+  border-radius:12px;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
 
 /* HERO */
 .hero{
@@ -54,18 +68,21 @@ nav{
 }
 
 h1{
-  font-size:54px;
+  font-size:56px;
   max-width:900px;
-  line-height:1.1;
+  line-height:1.05;
 }
 
-h1 span{color:var(--blue);}
+h1 span{
+  color:var(--blue);
+}
 
 p{
   margin-top:18px;
   max-width:780px;
   color:var(--muted);
   font-size:18px;
+  line-height:1.6;
 }
 
 /* SECTIONS */
@@ -75,9 +92,11 @@ p{
   padding:80px 20px;
 }
 
-h2{margin-bottom:12px;}
+h2{
+  margin-bottom:14px;
+  font-size:24px;
+}
 
-/* CARD */
 .card{
   border:1px solid var(--border);
   background:rgba(255,255,255,0.03);
@@ -87,10 +106,9 @@ h2{margin-bottom:12px;}
   margin-top:12px;
 }
 
-/* GRID */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:12px;
   margin-top:20px;
 }
@@ -103,7 +121,22 @@ h2{margin-bottom:12px;}
   color:var(--blue);
 }
 
-/* CHAT BUTTON */
+/* CTA */
+.cta{
+  text-align:center;
+  padding:90px 20px;
+  border-top:1px solid var(--border);
+}
+
+.cta h2{
+  font-size:28px;
+}
+
+.cta p{
+  color:var(--muted);
+}
+
+/* CHAT */
 .fab{
   position:fixed;
   bottom:20px;
@@ -112,13 +145,12 @@ h2{margin-bottom:12px;}
   height:58px;
   border-radius:50%;
   border:none;
-  background:var(--blue);
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
   font-size:20px;
   cursor:pointer;
 }
 
-/* CHAT PANEL */
 .panel{
   position:fixed;
   bottom:90px;
@@ -164,7 +196,7 @@ h2{margin-bottom:12px;}
 }
 
 .user{
-  background:linear-gradient(135deg,var(--blue),#7aa8ff);
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
   margin-left:auto;
   max-width:80%;
 }
@@ -175,7 +207,6 @@ h2{margin-bottom:12px;}
   max-width:80%;
 }
 
-/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -204,47 +235,51 @@ button.send{
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <div>Full Stack AI Developer</div>
+  <button class="btn">Book Demo</button>
 </nav>
 
 <section class="hero">
-  <h1>AI SaaS Funnel System & <span>Full Stack Engineering Case Study</span></h1>
+  <h1>We Build AI Systems That <span>Automate Sales & Operations</span></h1>
   <p>
-    I build AI automation systems that generate leads, qualify prospects,
-    and convert users into customers using real-time AI streaming.
+    SancheSolutions builds AI automation systems, SaaS platforms, and intelligent chat systems
+    that help businesses generate leads, qualify prospects, and increase revenue 24/7.
   </p>
 </section>
 
 <section class="section">
-  <h2>Tech Stack</h2>
+  <h2>What We Do</h2>
   <div class="grid">
-    <div class="tag">Frontend (HTML/CSS/JS)</div>
-    <div class="tag">Node.js + Express</div>
-    <div class="tag">Groq LLaMA 3 AI</div>
-    <div class="tag">Streaming API</div>
-    <div class="tag">Stripe Payments</div>
-    <div class="tag">Render + Vercel</div>
+    <div class="tag">AI Chat Systems</div>
+    <div class="tag">Sales Funnel Automation</div>
+    <div class="tag">SaaS Platforms</div>
+    <div class="tag">Business Automation</div>
   </div>
 </section>
 
 <section class="section">
-  <h2>Architecture</h2>
+  <h2>How It Works</h2>
   <div class="card">
-    User → Chat UI → API (Express) → Groq AI → Streaming Response → Funnel Logic → Conversion System
+    We deploy AI systems that engage customers instantly, qualify leads automatically,
+    and guide users through a structured conversion funnel.
   </div>
+</section>
+
+<section class="cta">
+  <h2>Ready to automate your business?</h2>
+  <p>Book a demo and see how AI can increase your conversions.</p>
 </section>
 
 <!-- CHAT BUTTON -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
-<!-- CHAT -->
+<!-- CHAT PANEL -->
 <div class="panel" id="panel">
   <div class="header">SancheSolutions AI Assistant</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask about automation, SEO, or AI systems..." />
+    <input id="input" placeholder="Ask about AI systems, automation, pricing..." />
     <button class="send" onclick="send()">→</button>
   </div>
 </div>
@@ -261,7 +296,7 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    add("Hi 👋 I’m the SancheSolutions AI assistant.", "bot");
+    add("Hi 👋 I’m the SancheSolutions AI assistant. How can we help your business?", "bot");
   }
 }
 
@@ -274,7 +309,7 @@ function add(text, type){
   return el;
 }
 
-/* STREAM CHAT (GROQ BACKEND) */
+/* STREAM CHAT */
 async function send(){
   const text = input.value.trim();
   if(!text) return;
