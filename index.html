@@ -3,201 +3,299 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sanche Solutions</title>
+<title>Sanche AI | Build Systems That Sell</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg:#0f0f10;
-  --card:#161616;
+  --bg:#0a0a0a;
+  --card:#121212;
   --text:#ffffff;
   --muted:#a1a1a1;
+  --border:#262626;
   --accent:#ffffff;
-  --border:#2a2a2a;
+  --soft:#1a1a1a;
 }
 
-/* PAGE BACKGROUND */
 body {
   font-family: Geist, sans-serif;
-  background: radial-gradient(circle at top, #1a1a1a, #0a0a0a);
+  background: radial-gradient(circle at top, #1a1a1a, #000);
   color: var(--text);
-  min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  display:flex;
+  justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  font-family:"Instrument Serif";
+  font-size:20px;
+}
+
+.nav-links {
+  display:flex;
+  gap:20px;
+  color:var(--muted);
+  font-size:14px;
 }
 
 /* HERO */
 .hero {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 120px 20px;
-  text-align: center;
+  text-align:center;
+  padding:140px 20px 80px;
+  max-width:900px;
+  margin:auto;
 }
 
 .hero h1 {
-  font-size: 52px;
-  font-family: "Instrument Serif";
-  font-weight: 400;
+  font-size:64px;
+  font-family:"Instrument Serif";
+  font-weight:400;
+  letter-spacing:-1px;
 }
 
 .hero p {
-  margin-top: 20px;
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1.6;
+  margin-top:20px;
+  font-size:18px;
+  color:var(--muted);
+  line-height:1.6;
 }
 
 .cta {
-  margin-top: 30px;
-  display: inline-block;
-  padding: 12px 20px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
+  margin-top:30px;
+  display:inline-block;
+  padding:12px 22px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
 }
 
-/* FLOAT BUTTON */
+/* SECTIONS */
+.section {
+  padding:80px 40px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.section h2 {
+  font-size:34px;
+  font-family:"Instrument Serif";
+  margin-bottom:20px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:20px;
+  border-radius:16px;
+}
+
+.card h3 {
+  margin-bottom:10px;
+}
+
+.card p {
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* PRICING */
+.pricing {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.price-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:25px;
+  border-radius:16px;
+}
+
+.price {
+  font-size:32px;
+  margin:10px 0;
+}
+
+/* CHAT WIDGET */
 .fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: black;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  z-index: 9999;
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:white;
+  color:black;
+  border:none;
+  cursor:pointer;
+  font-size:20px;
+  z-index:9999;
 }
 
-/* CHAT PANEL */
 .panel {
-  position: fixed;
-  bottom: 90px;
-  right: 24px;
-  width: 360px;
-  height: 520px;
-  background: #111;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: .2s;
-  overflow: hidden;
+  position:fixed;
+  bottom:90px;
+  right:24px;
+  width:360px;
+  height:520px;
+  background:#111;
+  border:1px solid var(--border);
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:.2s;
 }
 
 .panel.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
 }
 
-/* HEADER */
 .header {
-  padding: 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding:14px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
 }
 
-.title {
-  font-family: "Instrument Serif";
-  font-size: 18px;
-}
-
-/* MESSAGES */
 .messages {
-  flex: 1;
-  padding: 12px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex:1;
+  padding:12px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
 .msg {
-  max-width: 80%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.4;
+  max-width:80%;
+  padding:10px;
+  border-radius:12px;
+  font-size:13px;
 }
 
-.user {
-  background: white;
-  color: black;
-  margin-left: auto;
-}
-
-.bot {
-  background: #1c1c1c;
-  color: white;
-}
+.user { background:white; color:black; margin-left:auto; }
+.bot { background:#1c1c1c; }
 
 /* QUICK */
 .quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
 }
 
 .quick button {
-  font-size: 12px;
-  padding: 5px 10px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: transparent;
-  color: white;
-  cursor: pointer;
+  font-size:12px;
+  padding:5px 10px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:white;
+  cursor:pointer;
 }
 
-/* INPUT */
-.input {
-  display: flex;
-  border-top: 1px solid var(--border);
-  padding: 10px;
-  gap: 8px;
-}
-
-textarea {
-  flex: 1;
-  resize: none;
-  border: none;
-  outline: none;
-  background: #1a1a1a;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-button.send {
-  width: 42px;
-  border: none;
-  background: white;
-  color: black;
-  border-radius: 10px;
-  cursor: pointer;
+/* FOOTER */
+footer {
+  padding:40px;
+  text-align:center;
+  color:var(--muted);
+  border-top:1px solid var(--border);
 }
 </style>
 </head>
 
 <body>
 
-<!-- HERO BACKGROUND -->
-<div class="hero">
-  <h1>Sanche Solutions</h1>
-  <p>We build websites, automation systems, and AI tools that turn visitors into paying customers.</p>
-  <div class="cta">Start a Project</div>
-</div>
+<nav>
+  <div class="logo">Sanche AI</div>
+  <div class="nav-links">
+    <div>Features</div>
+    <div>Pricing</div>
+    <div>Contact</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Turn Visitors Into Paying Customers</h1>
+  <p>We build AI systems, automation tools, and high-converting websites that help businesses grow without ads or guesswork.</p>
+  <div class="cta">Start Building</div>
+</section>
+
+<section class="section">
+  <h2>What You Get</h2>
+  <div class="grid">
+
+    <div class="card">
+      <h3>AI Sales Systems</h3>
+      <p>Chatbots and automation tools that convert leads automatically 24/7.</p>
+    </div>
+
+    <div class="card">
+      <h3>High-Converting Websites</h3>
+      <p>Modern, fast websites designed to turn traffic into revenue.</p>
+    </div>
+
+    <div class="card">
+      <h3>SEO Growth</h3>
+      <p>Rank higher on Google and get consistent organic traffic.</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <h2>Pricing</h2>
+  <div class="pricing">
+
+    <div class="price-card">
+      <h3>Starter</h3>
+      <div class="price">$299</div>
+      <p>Basic website + setup</p>
+    </div>
+
+    <div class="price-card">
+      <h3>Growth</h3>
+      <div class="price">$599</div>
+      <p>Website + SEO + automation</p>
+    </div>
+
+    <div class="price-card">
+      <h3>Scale</h3>
+      <div class="price">$999+</div>
+      <p>Full AI system + CRM + funnels</p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  © 2026 Sanche AI — Built to convert, not just exist.
+</footer>
 
 <!-- CHAT -->
 <button class="fab" id="fab">💬</button>
@@ -205,16 +303,11 @@ button.send {
 <div class="panel" id="panel">
 
   <div class="header">
-    <div class="title">Sanche AI</div>
+    <div>Sanche AI</div>
     <button id="close">✕</button>
   </div>
 
   <div class="messages" id="messages"></div>
-
-  <div class="input">
-    <textarea id="input" placeholder="Ask about websites, SEO..." rows="1"></textarea>
-    <button class="send" id="send">➤</button>
-  </div>
 
 </div>
 
@@ -224,8 +317,6 @@ const API_URL = "https://sanchesolutions.onrender.com/api/bot";
 const fab = document.getElementById("fab");
 const panel = document.getElementById("panel");
 const closeBtn = document.getElementById("close");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("send");
 const messages = document.getElementById("messages");
 
 fab.onclick = () => panel.classList.toggle("open");
@@ -239,11 +330,11 @@ function add(text, type) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-function addQuickReplies() {
+function quickReplies() {
   const div = document.createElement("div");
   div.className = "quick";
 
-  ["Get Quote", "Pricing", "WhatsApp"].forEach(t => {
+  ["Get Quote", "Pricing", "Book Call"].forEach(t => {
     const b = document.createElement("button");
     b.textContent = t;
     b.onclick = () => send(t);
@@ -254,37 +345,19 @@ function addQuickReplies() {
 }
 
 async function send(text) {
-  const msg = (text || input.value).trim();
-  if (!msg) return;
+  add(text, "user");
 
-  add(msg, "user");
-  input.value = "";
+  const res = await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ message:text })
+  });
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg })
-    });
+  const data = await res.json();
+  add(data.reply || "No response", "bot");
 
-    const data = await res.json();
-    add(data.reply || "No response", "bot");
-
-    addQuickReplies();
-
-  } catch (e) {
-    add("Server error. Try again.", "bot");
-  }
+  quickReplies();
 }
-
-sendBtn.onclick = () => send();
-
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    send();
-  }
-});
 </script>
 
 </body>
