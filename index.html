@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions | AI Automation & SaaS Systems</title>
+<title>SancheSolutions | AI Automation Systems for Business Growth</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -34,7 +34,7 @@ nav{
   display:flex;
   justify-content:space-between;
   padding:16px 28px;
-  background:rgba(5,8,20,0.75);
+  background:rgba(5,8,20,0.8);
   backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
   z-index:10;
@@ -68,7 +68,7 @@ nav{
 }
 
 h1{
-  font-size:56px;
+  font-size:58px;
   max-width:900px;
   line-height:1.05;
 }
@@ -94,7 +94,7 @@ p{
 
 h2{
   margin-bottom:14px;
-  font-size:24px;
+  font-size:26px;
 }
 
 .card{
@@ -115,49 +115,47 @@ h2{
 
 .tag{
   border:1px solid var(--border);
-  padding:12px;
-  border-radius:10px;
+  padding:14px;
+  border-radius:12px;
   text-align:center;
   color:var(--blue);
+  font-weight:500;
 }
 
 /* CTA */
 .cta{
   text-align:center;
-  padding:90px 20px;
+  padding:100px 20px;
   border-top:1px solid var(--border);
 }
 
 .cta h2{
-  font-size:28px;
+  font-size:30px;
 }
 
-.cta p{
-  color:var(--muted);
-}
-
-/* CHAT */
+/* CHAT BUTTON */
 .fab{
   position:fixed;
   bottom:20px;
   right:20px;
-  width:58px;
-  height:58px;
+  width:60px;
+  height:60px;
   border-radius:50%;
   border:none;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
-  font-size:20px;
+  font-size:22px;
   cursor:pointer;
 }
 
+/* CHAT */
 .panel{
   position:fixed;
   bottom:90px;
   right:20px;
-  width:360px;
-  height:520px;
-  background:rgba(10,14,30,0.95);
+  width:380px;
+  height:540px;
+  background:rgba(10,14,30,0.96);
   border:1px solid var(--border);
   border-radius:18px;
   display:flex;
@@ -207,6 +205,7 @@ h2{
   max-width:80%;
 }
 
+/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -222,7 +221,7 @@ input{
 }
 
 button.send{
-  width:50px;
+  width:52px;
   background:var(--blue);
   border:none;
   color:white;
@@ -239,34 +238,34 @@ button.send{
 </nav>
 
 <section class="hero">
-  <h1>We Build AI Systems That <span>Automate Sales & Operations</span></h1>
+  <h1>AI Systems That <span>Grow & Automate Your Business</span></h1>
   <p>
-    SancheSolutions builds AI automation systems, SaaS platforms, and intelligent chat systems
-    that help businesses generate leads, qualify prospects, and increase revenue 24/7.
+    We build AI automation systems, SaaS tools, and intelligent chat engines
+    that generate leads, qualify prospects, and increase revenue 24/7.
   </p>
 </section>
 
 <section class="section">
-  <h2>What We Do</h2>
+  <h2>What We Build</h2>
   <div class="grid">
-    <div class="tag">AI Chat Systems</div>
-    <div class="tag">Sales Funnel Automation</div>
+    <div class="tag">AI Chatbots</div>
+    <div class="tag">Sales Funnels</div>
     <div class="tag">SaaS Platforms</div>
-    <div class="tag">Business Automation</div>
+    <div class="tag">Automation Systems</div>
   </div>
 </section>
 
 <section class="section">
-  <h2>How It Works</h2>
+  <h2>Why Businesses Use Us</h2>
   <div class="card">
-    We deploy AI systems that engage customers instantly, qualify leads automatically,
-    and guide users through a structured conversion funnel.
+    Traditional businesses lose leads due to slow response times and manual processes.
+    Our AI systems respond instantly, qualify customers, and guide them to conversion.
   </div>
 </section>
 
 <section class="cta">
-  <h2>Ready to automate your business?</h2>
-  <p>Book a demo and see how AI can increase your conversions.</p>
+  <h2>Ready to automate your revenue?</h2>
+  <p>Book a demo and see your AI system in action.</p>
 </section>
 
 <!-- CHAT BUTTON -->
@@ -274,12 +273,12 @@ button.send{
 
 <!-- CHAT PANEL -->
 <div class="panel" id="panel">
-  <div class="header">SancheSolutions AI Assistant</div>
+  <div class="header">SancheSolutions AI</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask about AI systems, automation, pricing..." />
+    <input id="input" placeholder="Ask about automation, AI, pricing..." />
     <button class="send" onclick="send()">→</button>
   </div>
 </div>
@@ -296,7 +295,7 @@ function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    add("Hi 👋 I’m the SancheSolutions AI assistant. How can we help your business?", "bot");
+    add("Hi 👋 I’m the SancheSolutions AI assistant. How can I help your business today?", "bot");
   }
 }
 
@@ -309,7 +308,7 @@ function add(text, type){
   return el;
 }
 
-/* STREAM CHAT */
+/* STREAMING CHAT */
 async function send(){
   const text = input.value.trim();
   if(!text) return;
