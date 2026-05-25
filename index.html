@@ -42,7 +42,6 @@ nav{
 
 .logo{
   font-weight:700;
-  letter-spacing:0.5px;
 }
 .logo span{color:var(--blue);}
 
@@ -73,9 +72,7 @@ h1{
   line-height:1.05;
 }
 
-h1 span{
-  color:var(--blue);
-}
+h1 span{color:var(--blue);}
 
 p{
   margin-top:18px;
@@ -119,7 +116,6 @@ h2{
   border-radius:12px;
   text-align:center;
   color:var(--blue);
-  font-weight:500;
 }
 
 /* CTA */
@@ -127,10 +123,6 @@ h2{
   text-align:center;
   padding:100px 20px;
   border-top:1px solid var(--border);
-}
-
-.cta h2{
-  font-size:30px;
 }
 
 /* CHAT BUTTON */
@@ -255,14 +247,6 @@ button.send{
   </div>
 </section>
 
-<section class="section">
-  <h2>Why Businesses Use Us</h2>
-  <div class="card">
-    Traditional businesses lose leads due to slow response times and manual processes.
-    Our AI systems respond instantly, qualify customers, and guide them to conversion.
-  </div>
-</section>
-
 <section class="cta">
   <h2>Ready to automate your revenue?</h2>
   <p>Book a demo and see your AI system in action.</p>
@@ -308,7 +292,7 @@ function add(text, type){
   return el;
 }
 
-/* STREAMING CHAT */
+/* STREAMING CHAT (FIXED) */
 async function send(){
   const text = input.value.trim();
   if(!text) return;
@@ -324,6 +308,12 @@ async function send(){
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({ message: text })
     });
+
+    /* ✅ FIX IS HERE */
+    if (!res.ok || !res.body) {
+      bot.textContent = "Server error or AI unavailable.";
+      return;
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
