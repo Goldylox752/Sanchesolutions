@@ -9,201 +9,71 @@ const openai = new OpenAI({
 });
 
 /* ─────────────────────────────────────────────
-   MULTI-AGENT AI SYSTEM
+   AGENTS
 ───────────────────────────────────────────── */
 
 const agents = {
-  router: {
-    role: `
-You are the routing agent.
+  router: `
+You are a routing system.
 
-Your ONLY responsibility:
-- Analyze the user's message
-- Decide which specialist should respond
+Return ONLY one word from:
+sales, technical, seo, automation, closer, support
+No punctuation. No explanation.
+`,
 
-Available agents:
-- sales
-- technical
-- seo
-- automation
-- closer
-- support
+  sales: `
+You are a sales consultant for Sanche AI.
+Be concise, helpful, and conversational.
+Focus on business value and outcomes.
+`,
 
-Rules:
-- Return ONLY the agent name
-- No explanations
-- No punctuation
+  technical: `
+You are a senior software engineer.
+Explain APIs, hosting, deployment, and systems clearly and simply.
+`,
+
+  seo: `
+You are an SEO expert.
+Focus on rankings, traffic, and actionable improvements.
+`,
+
+  automation: `
+You are an automation engineer.
+Focus on workflows, integrations, and scaling systems.
+`,
+
+  closer: `
+You are a conversion specialist.
+Be persuasive but calm. Focus on clarity and next steps.
+`,
+
+  support: `
+You are support.
+Solve issues clearly and simply.
 `
-  },
-
-  sales: {
-    role: `
-You are a high-converting AI sales consultant for Sanche AI.
-
-Goals:
-- Understand the client's business
-- Identify pain points
-- Position solutions clearly
-- Build trust
-- Move conversations toward booking
-
-Services include:
-- AI chatbots
-- Automation systems
-- CRM integrations
-- High-converting websites
-- SEO systems
-- Lead generation infrastructure
-
-Tone:
-- Professional
-- Clear
-- Concise
-- Human
-- Helpful
-
-Rules:
-- Keep replies short and conversational
-- Ask strategic follow-up questions
-- Never sound robotic
-`
-  },
-
-  technical: {
-    role: `
-You are a senior technical consultant.
-
-Responsibilities:
-- Explain APIs
-- Explain hosting
-- Explain integrations
-- Explain deployment
-- Explain software architecture
-- Explain frontend/backend systems
-
-Rules:
-- Keep explanations simple
-- Avoid unnecessary jargon
-- Be practical and solution-focused
-`
-  },
-
-  seo: {
-    role: `
-You are an elite SEO strategist.
-
-Responsibilities:
-- Local SEO
-- Technical SEO
-- Google indexing
-- Keyword strategy
-- Content optimization
-- SEO audits
-- Performance optimization
-
-Focus:
-- Rankings
-- Organic traffic
-- Lead generation
-- Business growth
-
-Rules:
-- Give actionable advice
-- Focus on measurable impact
-`
-  },
-
-  automation: {
-    role: `
-You are an AI automation engineer.
-
-Responsibilities:
-- CRM automation
-- Lead follow-up systems
-- AI chatbots
-- Workflow automation
-- Sales pipelines
-- API integrations
-
-Focus:
-- Saving time
-- Increasing revenue
-- Reducing manual work
-
-Rules:
-- Explain systems clearly
-- Prioritize scalable solutions
-`
-  },
-
-  closer: {
-    role: `
-You are the closing specialist.
-
-Responsibilities:
-- Handle objections
-- Create urgency
-- Encourage booking
-- Push toward action
-- Increase conversion rates
-
-Rules:
-- Never sound aggressive
-- Be persuasive but professional
-- Focus on value and outcomes
-`
-  },
-
-  support: {
-    role: `
-You are a support specialist.
-
-Responsibilities:
-- Help users
-- Solve problems
-- Explain next steps
-- Stay calm and professional
-
-Rules:
-- Be concise
-- Be helpful
-- Avoid technical overload
-`
-  }
 };
 
 /* ─────────────────────────────────────────────
-   ROUTER AGENT
+   ROUTER
 ───────────────────────────────────────────── */
 
 async function routeAgent(message) {
   try {
-    const completion =
-      await openai.chat.completions.create({
-        model: "gpt-4.1-mini",
+    const res = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0,
+      max_tokens: 10,
+      messages: [
+        { role: "system", content: agents.router },
+        { role: "user", content: message }
+      ]
+    });
 
-        temperature: 0,
+    const result = res.choices?.[0]?.message?.content
+      ?.trim()
+      ?.toLowerCase();
 
-        max_tokens: 10,
-
-        messages: [
-          {
-            role: "system",
-            content: agents.router.role
-          },
-          {
-            role: "user",
-            content: message
-          }
-        ]
-      });
-
-    const result =
-      completion.choices?.[0]?.message?.content
-        ?.trim()
-        ?.toLowerCase();
-
-    const validAgents = [
+    const valid = [
       "sales",
       "technical",
       "seo",
@@ -212,116 +82,70 @@ async function routeAgent(message) {
       "support"
     ];
 
-    return validAgents.includes(result)
-      ? result
-      : "sales";
-
-  } catch (error) {
-    console.error("Router Agent Error:", error);
-
+    return valid.includes(result) ? result : "sales";
+  } catch (err) {
+    console.error("Router error:", err);
     return "sales";
   }
 }
 
 /* ─────────────────────────────────────────────
-   SALES STAGE DETECTION
+   STAGE DETECTION
 ───────────────────────────────────────────── */
 
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  if (
-    msg.includes("price") ||
-    msg.includes("pricing") ||
-    msg.includes("cost") ||
-    msg.includes("quote")
-  ) {
+  if (["price", "cost", "quote", "pricing"].some(w => msg.includes(w)))
     return "decision";
-  }
 
-  if (
-    msg.includes("book") ||
-    msg.includes("pay") ||
-    msg.includes("start") ||
-    msg.includes("ready")
-  ) {
+  if (["book", "pay", "start", "ready"].some(w => msg.includes(w)))
     return "purchase";
-  }
 
-  if (
-    msg.includes("seo") ||
-    msg.includes("website") ||
-    msg.includes("automation") ||
-    msg.includes("chatbot") ||
-    msg.includes("ai")
-  ) {
+  if (["seo", "website", "automation", "chatbot", "ai"].some(w => msg.includes(w)))
     return "interest";
-  }
 
   return "awareness";
 }
 
 /* ─────────────────────────────────────────────
-   SPECIALIST RESPONSE
+   AGENT RUNNER
 ───────────────────────────────────────────── */
 
-async function runAgent({
-  agentName,
-  session,
-  message
-}) {
+async function runAgent({ agentName, session, message }) {
   try {
-    const agent =
-      agents[agentName] || agents.sales;
+    const systemPrompt = agents[agentName] || agents.sales;
 
     const messages = [
-      {
-        role: "system",
-        content: agent.role
-      }
+      { role: "system", content: systemPrompt }
     ];
 
-    /* SESSION MEMORY */
-    if (
-      session?.messages &&
-      Array.isArray(session.messages)
-    ) {
-      messages.push(
-        ...session.messages.slice(-10)
-      );
+    // safe memory
+    if (Array.isArray(session?.messages)) {
+      messages.push(...session.messages.slice(-10));
     }
 
-    messages.push({
-      role: "user",
-      content: message
+    messages.push({ role: "user", content: message });
+
+    const res = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.7,
+      max_tokens: 300,
+      messages
     });
 
-    const completion =
-      await openai.chat.completions.create({
-        model: "gpt-4.1-mini",
-
-        temperature: 0.7,
-
-        max_tokens: 300,
-
-        messages
-      });
-
     return (
-      completion.choices?.[0]?.message
-        ?.content ||
-      "I'd be happy to help. Can you tell me a bit more about what you're looking to build?"
+      res.choices?.[0]?.message?.content ||
+      "Can you tell me a bit more?"
     );
-
-  } catch (error) {
-    console.error("Agent Error:", error);
-
-    return "Something went wrong on our side. Please try again in a moment.";
+  } catch (err) {
+    console.error("Agent error:", err);
+    return "Something went wrong. Please try again.";
   }
 }
 
 /* ─────────────────────────────────────────────
-   MAIN AI ENGINE
+   MAIN ENGINE
 ───────────────────────────────────────────── */
 
 export async function generateMultiAgentReply({
@@ -329,65 +153,39 @@ export async function generateMultiAgentReply({
   message = ""
 }) {
   try {
-    /* STEP 1: DETECT STAGE */
-    const stage =
-      detectStage(message);
+    const stage = detectStage(message);
 
-    /* STEP 2: ROUTE AGENT */
-    let selectedAgent =
-      await routeAgent(message);
+    let agent = await routeAgent(message);
 
-    /* STEP 3: CLOSER OVERRIDE */
-    if (
-      stage === "decision" ||
-      stage === "purchase"
-    ) {
-      selectedAgent = "closer";
+    // override for sales intent
+    if (stage === "decision" || stage === "purchase") {
+      agent = "closer";
     }
 
-    /* STEP 4: GENERATE RESPONSE */
-    const reply =
-      await runAgent({
-        agentName: selectedAgent,
-        session,
-        message
-      });
-
-    /* STEP 5: HOT LEAD DETECTION */
-    const hotLead =
-      stage === "decision" ||
-      stage === "purchase";
+    const reply = await runAgent({
+      agentName: agent,
+      session,
+      message
+    });
 
     return {
       success: true,
-
       reply,
-
-      agent: selectedAgent,
-
+      agent,
       stage,
-
-      priority: hotLead
+      priority: stage === "decision" || stage === "purchase"
         ? "hot"
         : "normal"
     };
 
-  } catch (error) {
-    console.error(
-      "Multi-Agent System Error:",
-      error
-    );
+  } catch (err) {
+    console.error("System error:", err);
 
     return {
       success: false,
-
-      reply:
-        "Something went wrong. Please try again shortly.",
-
+      reply: "Service temporarily unavailable. Try again.",
       agent: "support",
-
       stage: "awareness",
-
       priority: "normal"
     };
   }
