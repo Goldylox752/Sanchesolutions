@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Sanche AI | AI Systems That Close Sales Automatically</title>
+<title>Sanche AI | AI Sales Funnel System</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -158,6 +158,15 @@ p{
   max-width:80%;
 }
 
+.cta{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--blue2);
+  font-size:13px;
+}
+
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -197,12 +206,12 @@ button.send{
 <button class="fab" onclick="toggleChat()">💬</button>
 
 <div class="panel" id="panel">
-  <div class="header">AI Assistant</div>
+  <div class="header">AI Sales Assistant</div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask anything..." />
+    <input id="input" placeholder="Ask about pricing, automation, SEO..." />
     <button class="send" onclick="handleSend()">→</button>
   </div>
 </div>
@@ -215,35 +224,59 @@ const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 
+/* INTENT DETECTION (Funnel Engine) */
+function getStage(text){
+  text = text.toLowerCase();
+
+  if(text.includes("price") || text.includes("cost") || text.includes("how much"))
+    return "decision";
+
+  if(text.includes("buy") || text.includes("book") || text.includes("start"))
+    return "purchase";
+
+  if(text.includes("ai") || text.includes("automation") || text.includes("seo"))
+    return "interest";
+
+  return "awareness";
+}
+
+/* CHAT OPEN */
 function toggleChat(){
   panel.classList.toggle("open");
 
   if(messages.children.length === 0){
-    addMessage("Hi 👋 How can I help you scale your business?", "bot");
+    addMessage("Hi 👋 I can help you build AI systems that generate leads and close sales.", "bot");
   }
 }
 
+/* MESSAGE UI */
 function addMessage(text, type){
   const el = document.createElement("div");
   el.className = `msg ${type}`;
   el.textContent = text;
-
   messages.appendChild(el);
   messages.scrollTop = messages.scrollHeight;
-
   return el;
 }
 
-function scroll(){
-  messages.scrollTop = messages.scrollHeight;
+/* ADD CTA INSIDE CHAT */
+function addCTA(stage){
+  if(stage === "decision" || stage === "purchase"){
+    const cta = document.createElement("div");
+    cta.className = "msg bot cta";
+    cta.textContent = "🔥 Want this built for your business? Book a strategy call today.";
+    messages.appendChild(cta);
+  }
 }
 
-/* STREAMING CHAT */
+/* SEND */
 async function handleSend(){
   const text = input.value.trim();
   if(!text) return;
 
   input.value = "";
+
+  const stage = getStage(text);
 
   addMessage(text, "user");
 
@@ -256,25 +289,20 @@ async function handleSend(){
       body: JSON.stringify({ message: text })
     });
 
-    if(!res.body){
-      botBubble.textContent = "No response from server";
-      return;
-    }
-
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
 
-    let fullText = "";
+    let full = "";
 
     while(true){
       const { value, done } = await reader.read();
       if(done) break;
 
-      fullText += decoder.decode(value, { stream:true });
-
-      botBubble.textContent = fullText;
-      scroll();
+      full += decoder.decode(value, { stream:true });
+      botBubble.textContent = full;
     }
+
+    addCTA(stage);
 
   } catch(err){
     botBubble.textContent = "Connection error. Try again.";
