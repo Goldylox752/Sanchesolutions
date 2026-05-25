@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
 
 :root{
   --bg1:#050505;
@@ -19,12 +19,10 @@
   --muted:rgba(255,255,255,0.65);
 }
 
-/* BACKGROUND */
 body{
   font-family:Geist,sans-serif;
   color:var(--text);
   min-height:100vh;
-  overflow-x:hidden;
   background:
     radial-gradient(circle at 20% 20%, #1a2a6c33, transparent 40%),
     radial-gradient(circle at 80% 30%, #b21f1f22, transparent 40%),
@@ -41,14 +39,12 @@ body{
 }
 .hero h1{
   font-family:"Instrument Serif";
-  font-size:68px;
-  line-height:1.05;
+  font-size:70px;
 }
 .hero p{
-  margin-top:18px;
   color:var(--muted);
+  margin-top:18px;
   font-size:18px;
-  line-height:1.6;
 }
 .cta{
   margin-top:28px;
@@ -60,25 +56,7 @@ body{
   cursor:pointer;
 }
 
-/* SECTIONS */
-.section{
-  padding:80px 40px;
-  max-width:1100px;
-  margin:auto;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:20px;
-}
-.card{
-  padding:20px;
-  border-radius:16px;
-  background:var(--card);
-  border:1px solid var(--border);
-}
-
-/* CHAT BUTTON */
+/* CHAT */
 .fab{
   position:fixed;
   bottom:24px;
@@ -90,10 +68,8 @@ body{
   color:black;
   border:none;
   cursor:pointer;
-  z-index:9999;
 }
 
-/* CHAT PANEL */
 .panel{
   position:fixed;
   bottom:90px;
@@ -109,8 +85,8 @@ body{
   transform:translateY(10px);
   pointer-events:none;
   transition:.25s;
-  backdrop-filter:blur(20px);
 }
+
 .panel.open{
   opacity:1;
   transform:translateY(0);
@@ -145,48 +121,32 @@ body{
   color:black;
   margin-left:auto;
 }
+
 .bot{
   background:rgba(255,255,255,0.08);
-}
-
-.input{
-  display:flex;
-  border-top:1px solid var(--border);
-  padding:10px;
-  gap:8px;
-}
-textarea{
-  flex:1;
-  resize:none;
-  border:none;
-  outline:none;
-  border-radius:10px;
-  padding:10px;
-  background:rgba(255,255,255,0.08);
-  color:white;
-}
-button.send{
-  width:42px;
-  background:white;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
 }
 
 .quick{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  margin-top:6px;
 }
+
 .quick button{
   font-size:12px;
-  padding:5px 10px;
+  padding:6px 10px;
   border-radius:20px;
   border:1px solid var(--border);
   background:transparent;
   color:white;
   cursor:pointer;
+}
+
+/* typing */
+.typing{
+  font-size:12px;
+  opacity:0.6;
+  padding:6px 10px;
 }
 </style>
 </head>
@@ -195,22 +155,10 @@ button.send{
 
 <section class="hero">
   <h1>AI Systems That Close Leads For You</h1>
-  <p>We build automation, AI chat systems, and high-converting websites for modern businesses.</p>
-
-  <div class="cta" onclick="toggleChat()">
-    Start Chat
-  </div>
+  <p>Automation, websites, and AI chat systems that turn visitors into customers.</p>
+  <div class="cta" onclick="toggleChat()">Start Chat</div>
 </section>
 
-<section class="section">
-  <div class="grid">
-    <div class="card"><h3>AI Sales Bot</h3><p>Converts visitors into leads 24/7.</p></div>
-    <div class="card"><h3>Automation</h3><p>Email + CRM workflows.</p></div>
-    <div class="card"><h3>Web Design</h3><p>High-conversion SaaS landing pages.</p></div>
-  </div>
-</section>
-
-<!-- CHAT -->
 <button class="fab" onclick="toggleChat()">💬</button>
 
 <div class="panel" id="panel">
@@ -222,19 +170,14 @@ button.send{
 
   <div class="messages" id="messages"></div>
 
-  <div class="input">
-    <textarea id="input" placeholder="Ask something..."></textarea>
-    <button class="send" onclick="send()">➤</button>
-  </div>
-
 </div>
 
 <script>
 const API_URL = "https://sanchesolutions.onrender.com/api/bot";
+const SESSION_ID = "user_" + Math.random().toString(36).substring(2, 9);
 
 const panel = document.getElementById("panel");
 const messages = document.getElementById("messages");
-const input = document.getElementById("input");
 
 function toggleChat(){
   panel.classList.toggle("open");
@@ -253,21 +196,28 @@ function add(text,type){
   messages.scrollTop=messages.scrollHeight;
 }
 
+function typing(){
+  const div=document.createElement("div");
+  div.className="typing";
+  div.id="typing";
+  div.textContent="Sanche AI is typing...";
+  messages.appendChild(div);
+  messages.scrollTop=messages.scrollHeight;
+}
+
 function addQuick(){
   const div=document.createElement("div");
   div.className="quick";
 
-  const items=[
-    {t:"Get Quote",v:"I want a quote"},
-    {t:"Start ($299)",v:"I want to start a project"},
-    {t:"Stripe Payment",v:"show me payment options"},
-    {t:"WhatsApp",v:"contact me"}
-  ];
-
-  items.forEach(i=>{
+  [
+    ["Get Quote","I want a quote"],
+    ["Pricing","how much?"],
+    ["Start Project","I want to build a website"],
+    ["WhatsApp","contact me"]
+  ].forEach(i=>{
     const b=document.createElement("button");
-    b.textContent=i.t;
-    b.onclick=()=>send(i.v);
+    b.textContent=i[0];
+    b.onclick=()=>send(i[1]);
     div.appendChild(b);
   });
 
@@ -275,23 +225,29 @@ function addQuick(){
 }
 
 async function send(text){
-  const msg=(text||input.value).trim();
+  const msg=text || prompt("Message?");
   if(!msg) return;
 
   add(msg,"user");
-  input.value="";
+  typing();
 
   try{
     const res=await fetch(API_URL,{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ message:msg })
+      body:JSON.stringify({
+        message:msg,
+        sessionId:SESSION_ID
+      })
     });
 
     const data=await res.json();
+
+    document.getElementById("typing")?.remove();
     add(data.reply || "No response","bot");
 
   }catch(e){
+    document.getElementById("typing")?.remove();
     add("Server offline. Try WhatsApp.","bot");
   }
 }
