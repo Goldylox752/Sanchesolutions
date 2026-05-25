@@ -8,7 +8,6 @@
 <title>Sanche AI | AI Systems That Generate Leads & Close Sales</title>
 
 <meta name="description" content="We install AI systems that generate leads, automate follow-ups, and close sales for service businesses and agencies."/>
-<meta name="robots" content="index, follow"/>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
@@ -47,7 +46,6 @@ nav{
   background:rgba(5,8,20,0.6);
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
-  z-index:1000;
 }
 
 .logo{font-weight:600;}
@@ -80,13 +78,12 @@ nav{
   border-radius:999px;
   color:var(--blue2);
   font-size:12px;
-  background:rgba(255,255,255,0.03);
 }
 
 h1{
-  font-size:66px;
-  line-height:1.05;
+  font-size:62px;
   max-width:900px;
+  line-height:1.05;
   margin-top:20px;
 }
 
@@ -96,7 +93,7 @@ h1 span{
   -webkit-text-fill-color:transparent;
 }
 
-.hero p{
+p{
   margin-top:18px;
   max-width:720px;
   color:var(--muted);
@@ -104,13 +101,13 @@ h1 span{
   line-height:1.6;
 }
 
-/* VALUE STRIP */
+/* STRIP */
 .strip{
-  max-width:900px;
-  margin:40px auto 0;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:12px;
+  margin-top:40px;
+  max-width:900px;
 }
 
 .strip div{
@@ -118,12 +115,10 @@ h1 span{
   border:1px solid var(--border);
   padding:18px;
   border-radius:16px;
-  text-align:center;
 }
 
 .strip h3{
   color:var(--blue);
-  font-size:26px;
 }
 
 /* SECTION */
@@ -140,8 +135,6 @@ h1 span{
 .sub{
   color:var(--muted);
   margin-top:10px;
-  max-width:700px;
-  line-height:1.6;
 }
 
 /* GRID */
@@ -256,7 +249,6 @@ h1 span{
   border:1px solid var(--border);
 }
 
-/* INPUT */
 .input{
   display:flex;
   border-top:1px solid var(--border);
@@ -285,7 +277,7 @@ button.send{
 
 <nav>
   <div class="logo">Sanche<span>AI</span></div>
-  <button class="btn" onclick="toggleChat()">Book Strategy</button>
+  <button class="btn" onclick="startCheckout(500)">Book Strategy ($500)</button>
 </nav>
 
 <section class="hero">
@@ -295,14 +287,15 @@ button.send{
   <h1>
     We Build AI Systems That
     <span>Generate Leads & Close Sales</span>
+    in 14 Days
   </h1>
 
   <p>
-    We install automated AI sales systems that replace manual lead handling, improve conversion rates, and help businesses scale faster in 14 days.
+    We install AI automation systems that replace manual sales work, qualify leads, and close more clients automatically.
   </p>
 
-  <button class="btn" onclick="toggleChat()" style="margin-top:25px;">
-    Get Free Strategy →
+  <button class="btn" onclick="startCheckout(500)">
+    Book Strategy Call – $500 Deposit
   </button>
 
   <div class="strip">
@@ -316,12 +309,12 @@ button.send{
 <section class="section">
 
   <h2 class="title">What You Get</h2>
-  <p class="sub">Everything needed to turn your website into a sales system.</p>
+  <p class="sub">Complete AI sales system for your business.</p>
 
   <div class="grid">
     <div class="card">AI Lead Qualification System</div>
-    <div class="card">Automated Follow-up Engine</div>
-    <div class="card">Conversion Optimized Website</div>
+    <div class="card">Automated Follow-ups</div>
+    <div class="card">Conversion Website Setup</div>
   </div>
 
 </section>
@@ -334,12 +327,12 @@ button.send{
 
     <div class="price">
       <h2>$2K</h2>
-      <p>Starter AI Setup</p>
+      <p>Starter System</p>
     </div>
 
     <div class="price">
       <h2>$5K</h2>
-      <p>Growth Automation System</p>
+      <p>Growth Automation</p>
     </div>
 
     <div class="price">
@@ -353,11 +346,11 @@ button.send{
 
 <section class="cta">
 
-  <h2 class="title">Want This Built for Your Business?</h2>
-  <p class="sub">Talk to our AI and get a custom strategy plan instantly.</p>
+  <h2 class="title">Want This Built For You?</h2>
+  <p class="sub">Pay deposit and we’ll map your full system.</p>
 
-  <button class="btn" onclick="toggleChat()" style="margin-top:20px;">
-    Start Now
+  <button class="btn" onclick="startCheckout(1000)">
+    Secure VIP Build – $1,000 Deposit
   </button>
 
 </section>
@@ -373,11 +366,10 @@ button.send{
 <div class="panel" id="panel">
 
   <div class="header">AI Assistant</div>
-
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="chatInput" placeholder="Ask about pricing or automation..." />
+    <input id="chatInput" placeholder="Ask anything..." />
     <button class="send" onclick="sendMessage()">→</button>
   </div>
 
@@ -392,7 +384,7 @@ const input=document.getElementById("chatInput");
 function toggleChat(){
   panel.classList.toggle("open");
   if(messages.children.length===0){
-    add("Hey 👋 What kind of business are you trying to grow?","bot");
+    add("What business are you trying to scale?","bot");
   }
 }
 
@@ -402,6 +394,29 @@ function add(text,type){
   d.textContent=text;
   messages.appendChild(d);
   messages.scrollTop=messages.scrollHeight;
+}
+
+/* STRIPE */
+async function startCheckout(amount){
+
+  try{
+    const res = await fetch("https://YOUR-RENDER-URL.onrender.com/create-checkout",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({amount})
+    });
+
+    const data = await res.json();
+
+    if(data.url){
+      window.location.href = data.url;
+    }else{
+      alert("Checkout failed");
+    }
+
+  }catch(e){
+    alert("Connection error");
+  }
 }
 
 async function sendMessage(){
@@ -420,10 +435,10 @@ async function sendMessage(){
     });
 
     const data=await res.json();
-    add(data.reply||"Got it.","bot");
+    add(data.reply||"Got it","bot");
 
   }catch(e){
-    add("Connection issue.","bot");
+    add("Connection issue","bot");
   }
 }
 
