@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanFlow AI - AI Receptionist for Cleaning Businesses</title>
+  <title>CleanFlow AI - AI Receptionist SaaS</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f6fb;
+      background: #f5f7fb;
       color: #111;
     }
 
-    /* NAV */
     .nav {
       display: flex;
       justify-content: space-between;
@@ -23,7 +22,6 @@
       font-weight: bold;
     }
 
-    /* HERO */
     .hero {
       text-align: center;
       padding: 120px 20px 90px;
@@ -53,14 +51,10 @@
       border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.2s;
     }
 
-    .btn:hover {
-      transform: scale(1.05);
-    }
+    .btn:hover { transform: scale(1.05); }
 
-    /* FEATURES */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -78,7 +72,6 @@
       text-align: center;
     }
 
-    /* SECTION */
     .section {
       text-align: center;
       padding: 70px 20px;
@@ -86,17 +79,6 @@
       margin: auto;
     }
 
-    .section h2 {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-
-    .section p {
-      color: #555;
-      line-height: 1.7;
-    }
-
-    /* CTA */
     .cta {
       text-align: center;
       padding: 90px 20px;
@@ -107,11 +89,8 @@
     .price {
       font-size: 26px;
       font-weight: bold;
-      margin: 12px 0;
-      color: #111;
     }
 
-    /* CHAT BUTTON */
     #bot-btn {
       position: fixed;
       bottom: 20px;
@@ -126,10 +105,8 @@
       align-items: center;
       font-size: 28px;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
-    /* CHAT */
     #chat {
       position: fixed;
       bottom: 95px;
@@ -141,7 +118,6 @@
       border: 1px solid #ddd;
       display: none;
       flex-direction: column;
-      overflow: hidden;
     }
 
     #header {
@@ -150,7 +126,6 @@
       padding: 12px;
       display: flex;
       justify-content: space-between;
-      font-weight: bold;
     }
 
     #messages {
@@ -197,79 +172,52 @@
 
 <div class="nav">
   <span>🧼 CleanFlow AI</span>
-  <span>AI Receptionist That Books Cleaning Jobs</span>
+  <span>AI SaaS That Books Cleaning Jobs</span>
 </div>
 
 <div class="hero">
-  <h1>Turn Website Visitors Into Paying Customers</h1>
-
+  <h1>Turn Conversations Into Paying Customers</h1>
   <p>
-    CleanFlow AI is a 24/7 AI receptionist that responds instantly, qualifies leads, and pushes customers to book your cleaning service automatically.
+    CleanFlow AI is a 24/7 AI receptionist that captures leads, qualifies them, stores them in your CRM,
+    and helps you automatically book cleaning jobs.
   </p>
 
-  <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
-    Try Live Demo
-  </div>
+  <div class="btn" onclick="openChat()">Try Live Demo</div>
 </div>
 
 <div class="features">
-
-  <div class="card">
-    <h3>💰 More Bookings</h3>
-    <p>Turn traffic into paying customers automatically</p>
-  </div>
-
-  <div class="card">
-    <h3>⚡ Instant Replies</h3>
-    <p>Never miss a lead again — reply instantly</p>
-  </div>
-
-  <div class="card">
-    <h3>📅 Lead Qualification</h3>
-    <p>We filter serious customers before you respond</p>
-  </div>
-
-  <div class="card">
-    <h3>📲 24/7 AI Worker</h3>
-    <p>Your business never stops generating leads</p>
-  </div>
-
+  <div class="card"><h3>💰 More Revenue</h3><p>Turn traffic into booked jobs</p></div>
+  <div class="card"><h3>⚡ Instant AI Replies</h3><p>Never miss another lead</p></div>
+  <div class="card"><h3>📊 Lead Capture</h3><p>All leads saved to database</p></div>
+  <div class="card"><h3>📲 24/7 System</h3><p>Works while you sleep</p></div>
 </div>
 
 <div class="section">
-  <h2>Why Cleaning Businesses Lose Revenue</h2>
+  <h2>Most Cleaning Businesses Lose 50%+ of Leads</h2>
   <p>
-    Most cleaning companies lose 40–70% of leads due to slow response times.
-    CleanFlow AI fixes this instantly by replying in seconds and guiding users to booking.
+    Slow response = lost money. CleanFlow AI responds instantly and pushes customers toward booking automatically.
   </p>
 </div>
 
 <div class="cta">
-  <h2>Start Getting More Cleaning Jobs Today</h2>
-  <p class="price">$49/month — Cancel Anytime</p>
+  <h2>Start Your AI Receptionist Today</h2>
+  <p class="price">$49/month</p>
 
-  <!-- STRIPE HOOK BUTTON -->
   <div class="btn" onclick="startCheckout()">
     Start Free Trial
   </div>
 </div>
 
-<!-- CHAT BUTTON -->
-<div id="bot-btn">🧼</div>
-
 <!-- CHAT -->
+<div id="bot-btn" onclick="openChat()">🧼</div>
+
 <div id="chat">
   <div id="header">
     <span>CleanFlow AI</span>
-    <span id="close">✕</span>
+    <span onclick="closeChat()">✕</span>
   </div>
 
-  <div id="messages">
-    <div class="msg bot">
-      👋 Hey! I help cleaning businesses get more booked jobs.<br><br>
-      What type of cleaning do you offer?
-    </div>
-  </div>
+  <div id="messages"></div>
 
   <div id="input-area">
     <input id="input" placeholder="Type here..." />
@@ -279,55 +227,108 @@
 
 <script>
 let step = 0;
+let lead = {
+  cleaning_type: "",
+  city: "",
+  property: "",
+  timing: "",
+  contact: ""
+};
 
-const btn = document.getElementById("bot-btn");
-const chat = document.getElementById("chat");
-const close = document.getElementById("close");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
-const send = document.getElementById("send");
 
-btn.onclick = () => chat.style.display = "flex";
-close.onclick = () => chat.style.display = "none";
+function openChat(){
+  document.getElementById("chat").style.display = "flex";
+  if (!messages.innerHTML) {
+    addBot("Hey 👋 What type of cleaning service do you offer?");
+  }
+}
 
-send.onclick = handle;
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") handle();
-});
+function closeChat(){
+  document.getElementById("chat").style.display = "none";
+}
 
-function handle() {
+function send(){
   const text = input.value.trim();
-  if (!text) return;
+  if(!text) return;
 
-  add(text, "user");
+  addUser(text);
   input.value = "";
 
-  setTimeout(() => add(bot(text), "bot"), 400);
+  handleBot(text);
 }
 
-function bot(msg) {
+document.getElementById("send").onclick = send;
+input.addEventListener("keypress", e => e.key === "Enter" && send());
+
+function handleBot(msg){
   msg = msg.toLowerCase();
 
-  if (step === 0) { step = 1; return "Perfect 👍 What area do you serve?"; }
-  if (step === 1) { step = 2; return "Nice 👍 What type of properties do you clean?"; }
-  if (step === 2) { step = 3; return "Great 👍 How soon can you take new bookings?"; }
-  if (step === 3) { step = 4; return "Almost done 🔥 What’s your phone or email?"; }
-  if (step === 4) { step = 5; return "Perfect 🎉 You're ready to start getting more cleaning jobs."; }
+  if(step === 0){
+    lead.cleaning_type = msg;
+    step++;
+    return addBot("Nice 👍 What city do you serve?");
+  }
 
-  return "What type of cleaning do you offer? 🧼";
+  if(step === 1){
+    lead.city = msg;
+    step++;
+    return addBot("What type of properties? (homes, offices, etc)");
+  }
+
+  if(step === 2){
+    lead.property = msg;
+    step++;
+    return addBot("How soon can you take new bookings?");
+  }
+
+  if(step === 3){
+    lead.timing = msg;
+    step++;
+    return addBot("Perfect 🔥 Leave your email or phone so customers can reach you.");
+  }
+
+  if(step === 4){
+    lead.contact = msg;
+    step++;
+
+    saveLead();
+
+    return addBot("Perfect 🎉 You’re set. Your AI receptionist is now active.");
+  }
 }
 
-function add(text, type) {
+function addBot(text){
   const div = document.createElement("div");
-  div.className = "msg " + type;
+  div.className = "msg bot";
   div.innerHTML = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
 
-/* STRIPE HOOK (connect your backend here) */
-async function startCheckout() {
-  alert("Connect Stripe backend endpoint here");
+function addUser(text){
+  const div = document.createElement("div");
+  div.className = "msg user";
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* SUPABASE READY (HOOK) */
+async function saveLead(){
+  try {
+    await fetch("/api/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lead)
+    });
+  } catch(e){}
+}
+
+/* STRIPE CHECKOUT */
+async function startCheckout(){
+  window.location.href = "/api/checkout";
 }
 </script>
 
