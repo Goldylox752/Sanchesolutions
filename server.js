@@ -1,161 +1,139 @@
 import express from "express";
 import cors from "cors";
 import Groq from "groq-sdk";
+import twilio from "twilio";
 
 const app = express();
 
-/* ─────────────────────────────
-   MIDDLEWARE
-───────────────────────────── */
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // needed for Twilio
+app.use(express.urlencoded({ extended: true }));
 
 /* ─────────────────────────────
-   GROQ CLIENT
+   CLIENTS
 ───────────────────────────── */
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
+const twiml = twilio.twiml.VoiceResponse;
+
 /* ─────────────────────────────
-   AI CORE FUNCTION (REUSABLE)
+   AI FUNCTION
 ───────────────────────────── */
-async function getAIReply(message, systemPrompt = "") {
-  const completion = await groq.chat.completions.create({
+
+async function getAI(text) {
+  const res = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
         role: "system",
         content:
-          systemPrompt ||
-          "You are SancheAI, an AI business assistant and voice receptionist."
+          "You are an AI phone receptionist. Keep responses under 2 sentences."
       },
-      {
-        role: "user",
-        content: message || ""
-      }
+      { role: "user", content: text }
     ]
   });
 
-  return completion.choices?.[0]?.message?.content || "No response";
+  return res.choices[0].message.content;
 }
 
 /* ─────────────────────────────
-   HEALTH CHECK
+   INBOUND CALL ENTRY
 ───────────────────────────── */
-app.get("/", (req, res) => {
-  res.send("SancheAI backend running 🚀");
+
+app.post("/voice", (req, res) => {
+  const response = new twiml();
+
+  const gather = response.gather({
+    input: "speech dtmf",
+    numDigits: 1,
+    speechTimeout: "auto",
+    action: "/voice/handle",
+    method: "POST"
+  });
+
+  gather.say(
+    "Welcome to Sanche AI. Press 1 for sales. Press 2 for support. Or just speak."
+  );
+
+  res.type("text/xml");
+  res.send(response.toString());
 });
 
 /* ─────────────────────────────
-   CHAT ENDPOINT (WEB APP)
+   CALL HANDLER
 ───────────────────────────── */
-app.post("/chat", async (req, res) => {
-  try {
-    const { message, session } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Missing message" });
-    }
-
-    const reply = await getAIReply(
-      message,
-      "You are SancheAI, an AI sales and automation assistant."
-    );
-
-    res.json({
-      reply,
-      session
-    });
-
-  } catch (err) {
-    console.error("CHAT ERROR:", err);
-    res.status(500).json({ error: "AI chat failed" });
-  }
-});
-
-/* ─────────────────────────────
-   VOICE ENDPOINT (TWILIO READY)
-───────────────────────────── */
-app.post("/voice", async (req, res) => {
-  try {
-    const twilio = await import("twilio");
-    const VoiceResponse = twilio.twiml.VoiceResponse;
-
-    const twiml = new VoiceResponse();
-
-    const gather = twiml.gather({
-      input: "speech dtmf",
-      numDigits: 1,
-      speechTimeout: "auto",
-      action: "/voice/handle",
-      method: "POST"
-    });
-
-    gather.say(
-      "Welcome to Sanche AI. Press 1 for sales. Press 2 for support. Or tell me how I can help."
-    );
-
-    res.type("text/xml");
-    res.send(twiml.toString());
-
-  } catch (err) {
-    console.error("VOICE ERROR:", err);
-    res.status(500).send("Voice system error");
-  }
-});
-
-/* ─────────────────────────────
-   VOICE ROUTING LOGIC
-───────────────────────────── */
 app.post("/voice/handle", async (req, res) => {
+  const response = new twiml();
+
+  const digit = req.body.Digits;
+  const speech = req.body.SpeechResult;
+
+  // PRESS 1 → SALES ROUTE
+  if (digit === "1") {
+    response.say("Connecting you to sales.");
+    response.dial("+1780XXXXXXX"); // YOUR NUMBER
+  }
+
+  // PRESS 2 → SUPPORT
+  else if (digit === "2") {
+    response.say("Connecting support.");
+    response.dial("+1780XXXXXXX");
+  }
+
+  // AI MODE (SPEECH)
+  else {
+    const aiReply = await getAI(speech || "Hello");
+
+    response.say(aiReply);
+    response.redirect("/voice");
+  }
+
+  res.type("text/xml");
+  res.send(response.toString());
+});
+
+/* ─────────────────────────────
+   OUTBOUND CALL SYSTEM
+───────────────────────────── */
+
+app.post("/call", async (req, res) => {
   try {
-    const twilio = await import("twilio");
-    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const { to } = req.body;
 
-    const twiml = new VoiceResponse();
+    const client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
 
-    const digit = req.body.Digits;
-    const speech = req.body.SpeechResult;
+    const call = await client.calls.create({
+      url: "https://YOUR-BACKEND.onrender.com/voice",
+      to,
+      from: process.env.TWILIO_PHONE
+    });
 
-    // PRESS 1 → SALES
-    if (digit === "1") {
-      twiml.say("Connecting you to sales.");
-      twiml.dial("+1780XXXXXXX"); // replace
-    }
-
-    // PRESS 2 → SUPPORT
-    else if (digit === "2") {
-      twiml.say("Connecting you to support.");
-      twiml.dial("+1780XXXXXXX"); // replace
-    }
-
-    // AI MODE
-    else {
-      const reply = await getAIReply(
-        speech,
-        "You are a phone receptionist. Keep responses short and natural."
-      );
-
-      twiml.say(reply);
-      twiml.redirect("/voice");
-    }
-
-    res.type("text/xml");
-    res.send(twiml.toString());
+    res.json({ success: true, callSid: call.sid });
 
   } catch (err) {
-    console.error("VOICE HANDLE ERROR:", err);
-    res.status(500).send("Error handling voice");
+    console.error(err);
+    res.status(500).json({ error: "Call failed" });
   }
 });
 
 /* ─────────────────────────────
-   START SERVER
+   HEALTH
 ───────────────────────────── */
-const PORT = process.env.PORT || 3000;
 
+app.get("/", (req, res) => {
+  res.send("AI Call Center Online");
+});
+
+/* ───────────────────────────── */
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`SancheAI running on port ${PORT}`);
+  console.log("AI Call Center running on", PORT);
 });
