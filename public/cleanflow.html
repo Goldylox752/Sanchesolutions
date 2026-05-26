@@ -1,193 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>CleanFlow AI</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #111;
+    }
+
+    .hero {
+      padding: 80px 20px;
+      text-align: center;
+      background: white;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .card {
+      display: inline-block;
+      width: 250px;
+      margin: 10px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+  </style>
 </head>
 
 <body>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.createElement("div");
-  button.id = "cleanflow-button";
-  button.innerHTML = "🧼";
+  <!-- HERO -->
+  <div class="hero">
+    <h1>🧼 CleanFlow AI</h1>
+    <p>AI-powered cleaning bookings & lead automation for service businesses</p>
+  </div>
 
-  const chat = document.createElement("div");
-  chat.id = "cleanflow-chat";
+  <!-- FEATURES -->
+  <div class="section">
+    <h2>Why Businesses Use It</h2>
 
-  chat.innerHTML = `
-    <div id="cleanflow-header">
-      <h3>CleanFlow AI</h3>
-      <span id="cleanflow-close">✕</span>
-    </div>
+    <div class="card">⚡ Instant replies 24/7</div>
+    <div class="card">📅 Auto booking system</div>
+    <div class="card">💰 More leads converted</div>
+    <div class="card">📲 WhatsApp integration</div>
+  </div>
 
-    <div id="cleanflow-messages">
-      <div class="bot-message">
-        Hey 👋 I’m CleanFlow AI.<br><br>
-        What type of cleaning do you need today?
-      </div>
-    </div>
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <h2>How It Works</h2>
+    <p>Customer messages → AI qualifies → Booking is scheduled → You get paid jobs</p>
+  </div>
 
-    <div id="cleanflow-input-area">
-      <input type="text" id="cleanflow-input" placeholder="Type your message..." />
-      <button id="cleanflow-send">Send</button>
-    </div>
-  `;
+  <!-- BOT SCRIPT -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const button = document.createElement("div");
+      button.innerHTML = "🧼";
+      button.style.cssText = `
+        position:fixed;bottom:20px;right:20px;
+        width:60px;height:60px;background:#111;
+        color:white;border-radius:50%;
+        display:flex;align-items:center;
+        justify-content:center;font-size:28px;
+        cursor:pointer;
+      `;
 
-  document.body.appendChild(button);
-  document.body.appendChild(chat);
+      const chat = document.createElement("div");
+      chat.style.cssText = `
+        position:fixed;bottom:90px;right:20px;
+        width:320px;height:420px;background:white;
+        border:1px solid #ddd;border-radius:12px;
+        display:none;padding:10px;font-family:Arial;
+      `;
 
-  const style = document.createElement("style");
+      chat.innerHTML = `
+        <h3>CleanFlow AI</h3>
+        <p>What type of cleaning do you need?</p>
+      `;
 
-  style.innerHTML = `
-    #cleanflow-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 65px;
-      height: 65px;
-      background: #0f0f0f;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 30px;
-      cursor: pointer;
-      z-index: 9999;
-    }
+      document.body.appendChild(button);
+      document.body.appendChild(chat);
 
-    #cleanflow-chat {
-      position: fixed;
-      bottom: 95px;
-      right: 20px;
-      width: 340px;
-      max-height: 520px;
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      display: none;
-      flex-direction: column;
-      z-index: 9999;
-    }
-
-    #cleanflow-header {
-      background: #0f0f0f;
-      color: white;
-      padding: 14px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    #cleanflow-messages {
-      padding: 15px;
-      height: 360px;
-      overflow-y: auto;
-      background: #f6f6f6;
-    }
-
-    .bot-message, .user-message {
-      padding: 10px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      max-width: 80%;
-    }
-
-    .bot-message { background: white; }
-    .user-message { background: #111; color: white; margin-left: auto; }
-
-    #cleanflow-input-area {
-      display: flex;
-      border-top: 1px solid #ddd;
-    }
-
-    #cleanflow-input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      outline: none;
-    }
-
-    #cleanflow-send {
-      background: #111;
-      color: white;
-      border: none;
-      padding: 0 16px;
-    }
-  `;
-
-  document.head.appendChild(style);
-
-  let step = "intro";
-
-  button.onclick = () => {
-    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-  };
-
-  document.getElementById("cleanflow-close").onclick = () => {
-    chat.style.display = "none";
-  };
-
-  const input = document.getElementById("cleanflow-input");
-  const sendBtn = document.getElementById("cleanflow-send");
-  const messages = document.getElementById("cleanflow-messages");
-
-  sendBtn.onclick = handleSend;
-
-  function handleSend() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage(text, "user-message");
-    input.value = "";
-
-    setTimeout(() => {
-      addMessage(botLogic(text), "bot-message");
-    }, 500);
-  }
-
-  function botLogic(text) {
-    const msg = text.toLowerCase();
-
-    if (step === "intro") {
-      step = "service";
-      return "Great 👍 What type of cleaning do you need?";
-    }
-
-    if (msg.includes("house") || msg.includes("deep") || msg.includes("move")) {
-      step = "location";
-      return "Perfect 👍 What area are you in?";
-    }
-
-    if (step === "location") {
-      step = "size";
-      return "Awesome 👍 How big is the place?";
-    }
-
-    if (step === "size") {
-      step = "booking";
-      return "When would you like it cleaned?";
-    }
-
-    if (step === "booking") {
-      step = "lead";
-      return "Perfect 👍 What’s your phone or email?";
-    }
-
-    return "What type of cleaning do you need? 🧼";
-  }
-
-  function addMessage(text, className) {
-    const div = document.createElement("div");
-    div.className = className;
-    div.innerHTML = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-});
-</script>
+      button.onclick = () => {
+        chat.style.display = chat.style.display === "none" ? "block" : "none";
+      };
+    });
+  </script>
 
 </body>
 </html>
