@@ -1,158 +1,237 @@
 import express from "express";
 import cors from "cors";
+import OpenAI from "openai";
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+/* ─────────────────────────────
+   AI CLIENT
+───────────────────────────── */
 
-/* =========================================
-   HEALTH CHECK
-========================================= */
-
-app.get("/", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "groq-stream-ai",
-    model: "llama3-8b-8192",
-    streaming: true,
-  });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
-/* =========================================
-   GROQ STREAM ENGINE (FIXED + STABLE)
-========================================= */
+/* ─────────────────────────────
+   MEMORY (upgrade later to DB)
+───────────────────────────── */
 
-async function streamGroq(message, res) {
-  if (!GROQ_API_KEY) {
-    res.status(500).send("Missing GROQ_API_KEY");
-    return;
+const sessions = new Map();
+const leads = [];
+
+/* ─────────────────────────────
+   UTIL: EMAIL EXTRACTION
+───────────────────────────── */
+
+function extractEmail(text = "") {
+  const match = text.match(
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i
+  );
+  return match ? match[0] : null;
+}
+
+/* ─────────────────────────────
+   LEAD SCORING ENGINE
+───────────────────────────── */
+
+function scoreLead(message = "") {
+  const msg = message.toLowerCase();
+  let score = 0;
+
+  if (msg.includes("price")) score += 20;
+  if (msg.includes("cost")) score += 20;
+  if (msg.includes("buy")) score += 40;
+  if (msg.includes("start")) score += 40;
+  if (msg.includes("demo")) score += 30;
+  if (msg.includes("book")) score += 30;
+  if (msg.includes("now")) score += 25;
+  if (msg.includes("soon")) score += 10;
+
+  return Math.min(score, 100);
+}
+
+/* ─────────────────────────────
+   ROUTER (REVENUE OPTIMIZED)
+───────────────────────────── */
+
+async function route(message) {
+  const score = scoreLead(message);
+
+  if (score >= 70) return "closer";
+  if (score >= 40) return "sales";
+  return "automation";
+}
+
+/* ─────────────────────────────
+   AGENTS (REVENUE FOCUSED)
+───────────────────────────── */
+
+const agents = {
+  automation: `
+You are a Revenue AI strategist.
+
+Goal:
+- Educate
+- Build curiosity
+- Qualify lead softly
+- Ask about business size and goals
+`,
+
+  sales: `
+You are a revenue-focused sales engineer.
+
+Goal:
+- Show ROI
+- Push value
+- Encourage demo booking
+- Qualify lead aggressively but politely
+`,
+
+  closer: `
+You are a high-performance closer AI.
+
+Goal:
+- Convert NOW
+- Push urgency
+- Ask for booking or next step immediately
+- Focus on transformation and ROI
+`
+};
+
+/* ─────────────────────────────
+   MEMORY STORE
+───────────────────────────── */
+
+function getSession(id) {
+  if (!sessions.has(id)) {
+    sessions.set(id, []);
   }
+  return sessions.get(id);
+}
 
+/* ─────────────────────────────
+   STREAM AI RESPONSE
+───────────────────────────── */
+
+async function streamAI({ message, agent, res }) {
   try {
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama3-8b-8192",
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 500,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a high-performance SaaS automation assistant. Be concise, practical, and sales-focused.",
-            },
-            { role: "user", content: message },
-          ],
-        }),
-      }
-    );
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 400,
+      messages: [
+        { role: "system", content: agents[agent] },
+        { role: "user", content: message }
+      ]
+    });
 
-    if (!response.ok || !response.body) {
-      const err = await response.text();
-      console.error("Groq API error:", err);
-      res.status(500).send("AI temporarily unavailable.");
-      return;
-    }
+    let output = "";
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
 
-    let buffer = "";
-
-    // IMPORTANT: force headers flush (fixes Render buffering)
-    res.flushHeaders?.();
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-
-      const lines = buffer.split("\n");
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-
-        if (!trimmed.startsWith("data:")) continue;
-
-        const jsonStr = trimmed.replace("data:", "").trim();
-
-        if (!jsonStr || jsonStr === "[DONE]") continue;
-
-        try {
-          const json = JSON.parse(jsonStr);
-          const token = json?.choices?.[0]?.delta?.content;
-
-          if (token) {
-            res.write(token);
-          }
-        } catch (e) {
-          // ignore malformed chunks from Groq stream
-        }
+    for await (const chunk of completion) {
+      const token = chunk.choices?.[0]?.delta?.content;
+      if (token) {
+        output += token;
+        res.write(token);
       }
     }
 
     res.end();
+
+    return output;
+
   } catch (err) {
-    console.error("Stream crash:", err);
-    res.status(500).send("Stream error occurred.");
+    console.error("AI error:", err);
+    res.write("AI temporarily unavailable.");
+    res.end();
+    return "";
   }
 }
 
-/* =========================================
-   CHAT ROUTE
-========================================= */
+/* ─────────────────────────────
+   MAIN CHAT ROUTE (REVENUE ENGINE)
+───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
+  const { message = "", sessionId = "default" } = req.body;
 
-    if (!message || typeof message !== "string") {
-      return res.status(400).json({ error: "Invalid message" });
-    }
-
-    // FIX: streaming-safe headers for Render + proxies
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "no-cache, no-transform");
-    res.setHeader("Connection", "keep-alive");
-    res.setHeader("X-Accel-Buffering", "no");
-
-    await streamGroq(message, res);
-  } catch (err) {
-    console.error("Route error:", err);
-    res.status(500).send("Server error");
+  if (!message.trim()) {
+    return res.status(400).json({ error: "No message provided" });
   }
+
+  /* ── LEAD PROCESSING ── */
+  const email = extractEmail(message);
+  const score = scoreLead(message);
+  const agent = await route(message);
+
+  const session = getSession(sessionId);
+
+  session.push({
+    role: "user",
+    message,
+    score
+  });
+
+  if (email) {
+    leads.push({
+      email,
+      score,
+      time: new Date().toISOString(),
+      message
+    });
+
+    console.log("🔥 NEW LEAD CAPTURED:", email, "Score:", score);
+  }
+
+  /* ── STREAM RESPONSE ── */
+  const responseText = await streamAI({
+    message,
+    agent,
+    res
+  });
+
+  session.push({
+    role: "assistant",
+    message: responseText
+  });
 });
 
-/* =========================================
-   GLOBAL ERROR SAFETY
-========================================= */
+/* ─────────────────────────────
+   LEADS DASHBOARD ENDPOINT
+───────────────────────────── */
 
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err);
+app.get("/leads", (req, res) => {
+  res.json({
+    total: leads.length,
+    leads
+  });
 });
 
-process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Rejection:", err);
+/* ─────────────────────────────
+   HEALTH CHECK
+───────────────────────────── */
+
+app.get("/", (req, res) => {
+  res.json({
+    status: "Revenue AI Active",
+    leadsCaptured: leads.length
+  });
 });
 
-/* =========================================
+/* ─────────────────────────────
    START SERVER
-========================================= */
+───────────────────────────── */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Groq AI server running on port ${PORT}`);
+  console.log("🚀 Revenue AI running on port", PORT);
 });
