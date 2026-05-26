@@ -40,9 +40,12 @@ app.post("/chat", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, a SaaS sales assistant that converts leads into booked calls."
+            "You are SancheAI, a SaaS sales assistant that helps convert leads into booked calls."
         },
-        { role: "user", content: message }
+        {
+          role: "user",
+          content: message
+        }
       ]
     });
 
@@ -50,7 +53,7 @@ app.post("/chat", async (req, res) => {
       ai?.choices?.[0]?.message?.content ??
       "No response generated.";
 
-    /* ───── SUPABASE LOGGING (SAFE GUARD) ───── */
+    /* ───── SUPABASE LOGGING (SAFE) ───── */
 
     if (user_id && supabase) {
       await supabase.from("chat_logs").insert({
@@ -88,9 +91,12 @@ app.post("/voice", async (req, res) => {
         {
           role: "system",
           content:
-            "You are a professional AI phone receptionist. Be short, clear, and helpful (max 2 sentences)."
+            "You are a professional AI phone receptionist. Keep responses under 2 sentences."
         },
-        { role: "user", content: speech }
+        {
+          role: "user",
+          content: speech
+        }
       ]
     });
 
