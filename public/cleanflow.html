@@ -2,36 +2,107 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>CleanFlow AI - Cleaning Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanFlow AI</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f6f7fb;
+      color: #111;
     }
 
+    /* NAV */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 30px;
+      background: white;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+    }
+
+    .nav span {
+      color: #111;
+    }
+
+    /* HERO */
     .hero {
       text-align: center;
-      padding: 70px 20px;
+      padding: 90px 20px 60px;
       background: white;
     }
 
     .hero h1 {
-      font-size: 42px;
-      margin-bottom: 10px;
+      font-size: 48px;
+      margin-bottom: 12px;
     }
 
     .hero p {
+      font-size: 18px;
       color: #555;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
+    .btn {
+      margin-top: 25px;
+      display: inline-block;
+      padding: 14px 22px;
+      background: #111;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 60px 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+    }
+
+    /* SOCIAL PROOF */
+    .section {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .section h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .section p {
+      color: #555;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    /* BOT BUTTON */
     #bot-btn {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 60px;
-      height: 60px;
+      width: 62px;
+      height: 62px;
       background: #111;
       color: white;
       border-radius: 50%;
@@ -40,17 +111,18 @@
       align-items: center;
       font-size: 28px;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
+    /* CHAT */
     #chat {
       position: fixed;
-      bottom: 90px;
+      bottom: 95px;
       right: 20px;
-      width: 340px;
-      height: 450px;
+      width: 350px;
+      height: 470px;
       background: white;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #ddd;
       display: none;
       flex-direction: column;
@@ -63,12 +135,12 @@
       padding: 12px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      font-weight: bold;
     }
 
     #messages {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       overflow-y: auto;
       background: #f7f7f7;
       font-size: 14px;
@@ -81,15 +153,8 @@
       max-width: 80%;
     }
 
-    .bot {
-      background: white;
-    }
-
-    .user {
-      background: #111;
-      color: white;
-      margin-left: auto;
-    }
+    .bot { background: white; }
+    .user { background: #111; color: white; margin-left: auto; }
 
     #input-area {
       display: flex;
@@ -107,7 +172,7 @@
       background: #111;
       color: white;
       border: none;
-      padding: 0 15px;
+      padding: 0 16px;
       cursor: pointer;
     }
   </style>
@@ -115,33 +180,77 @@
 
 <body>
 
-  <!-- HERO -->
-  <div class="hero">
-    <h1>🧼 CleanFlow AI</h1>
-    <p>Automated Cleaning Booking Assistant</p>
+<!-- NAV -->
+<div class="nav">
+  <span>🧼 CleanFlow AI</span>
+  <span>Automate Your Cleaning Business</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Get More Cleaning Jobs Automatically</h1>
+  <p>
+    CleanFlow AI turns website visitors into booked cleaning jobs using automated AI chat, 24/7 lead capture, and instant qualification.
+  </p>
+
+  <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
+    Get Instant Quote
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="card">
+    <h3>⚡ Instant Replies</h3>
+    <p>Respond to customers instantly 24/7</p>
   </div>
 
-  <!-- BOT -->
-  <div id="bot-btn">🧼</div>
+  <div class="card">
+    <h3>📅 Auto Booking Flow</h3>
+    <p>Turn chats into scheduled jobs</p>
+  </div>
 
-  <div id="chat">
-    <div id="header">
-      <span>CleanFlow AI</span>
-      <span id="close">✕</span>
-    </div>
+  <div class="card">
+    <h3>💰 More Leads</h3>
+    <p>Never miss a customer again</p>
+  </div>
 
-    <div id="messages">
-      <div class="msg bot">
-        Hey 👋 I can help you book a cleaning service.<br><br>
-        What type of cleaning do you need? (House, Office, Deep, Move-out)
-      </div>
-    </div>
+  <div class="card">
+    <h3>📲 WhatsApp Ready</h3>
+    <p>Connect directly to real customers</p>
+  </div>
+</div>
 
-    <div id="input-area">
-      <input id="input" placeholder="Type here..." />
-      <button id="send">Send</button>
+<!-- SOCIAL PROOF -->
+<div class="section">
+  <h2>Built for Cleaning Businesses</h2>
+  <p>
+    CleanFlow AI helps cleaning companies automate customer conversations and increase bookings without extra staff.
+  </p>
+</div>
+
+<!-- BOT BUTTON -->
+<div id="bot-btn">🧼</div>
+
+<!-- CHAT -->
+<div id="chat">
+  <div id="header">
+    <span>CleanFlow AI</span>
+    <span id="close">✕</span>
+  </div>
+
+  <div id="messages">
+    <div class="msg bot">
+      👋 Hey! I can help you get a cleaning quote in under 60 seconds.<br><br>
+      What type of cleaning do you need?
     </div>
   </div>
+
+  <div id="input-area">
+    <input id="input" placeholder="Type here..." />
+    <button id="send">Send</button>
+  </div>
+</div>
 
 <script>
 let step = 0;
@@ -183,17 +292,22 @@ function bot(msg) {
 
   if (step === 1) {
     step = 2;
-    return "Nice 👍 How big is the space? (1 bed / 2–3 bed / large home / office)";
+    return "Nice 👍 How big is the space?";
   }
 
   if (step === 2) {
     step = 3;
-    return "Great 👍 When would you like the cleaning done?";
+    return "Great 👍 When would you like it cleaned?";
   }
 
   if (step === 3) {
     step = 4;
-    return "Last step 👍 What’s the best phone number or email to confirm your booking?";
+    return "Almost done 🔥 What’s your phone or email?";
+  }
+
+  if (step === 4) {
+    step = 5;
+    return "Perfect 🎉 A cleaning specialist will contact you shortly with pricing & availability.";
   }
 
   return "What type of cleaning do you need? 🧼";
