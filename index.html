@@ -3,19 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <title>SancheSolutions · AI Automation & Revenue Systems</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* (your original styles stay unchanged — no need to rewrite UI) */
 body {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
-  background: #020617;
+  background: radial-gradient(circle at 20% 20%, #0b1a3a, #020617 60%);
   color: white;
+  overflow-x: hidden;
 }
 
+/* Floating Action Button */
 .fab {
   position: fixed;
   bottom: 24px;
@@ -23,28 +25,37 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #4f8cff;
+  background: linear-gradient(135deg, #4f8cff, #2a57cf);
   border: none;
   font-size: 24px;
   color: white;
   cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: 0.25s;
+}
+.fab:hover {
+  transform: scale(1.05);
 }
 
+/* Chat Panel */
 .chat-panel {
   position: fixed;
   bottom: 100px;
   right: 24px;
   width: 380px;
-  height: 560px;
-  background: #0b1220;
-  border-radius: 16px;
+  height: 580px;
+  background: rgba(10,14,25,0.95);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(79,140,255,0.3);
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   opacity: 0;
   transform: translateY(20px);
   pointer-events: none;
-  transition: 0.2s;
+  transition: 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 .chat-panel.open {
@@ -53,38 +64,44 @@ body {
   pointer-events: auto;
 }
 
+/* Messages */
 .messages-area {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .msg {
-  margin: 6px 0;
-  padding: 10px 14px;
-  border-radius: 14px;
   max-width: 85%;
-  word-wrap: break-word;
+  padding: 10px 14px;
+  border-radius: 16px;
   font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .user {
-  background: #4f8cff;
+  background: linear-gradient(135deg, #4f8cff, #2a57cf);
   margin-left: auto;
 }
 
 .bot {
-  background: #1a2238;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(79,140,255,0.25);
 }
 
+/* Input */
 .input-area {
   display: flex;
-  border-top: 1px solid #222;
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
 
 .input-area input {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border: none;
   outline: none;
   background: transparent;
@@ -97,6 +114,14 @@ body {
   background: #4f8cff;
   color: white;
   cursor: pointer;
+  font-weight: bold;
+}
+
+/* Typing indicator */
+.typing {
+  font-size: 12px;
+  opacity: 0.7;
+  font-style: italic;
 }
 </style>
 </head>
@@ -106,14 +131,12 @@ body {
 <button class="fab" id="fab">💬</button>
 
 <div class="chat-panel" id="panel">
-
   <div class="messages-area" id="messages"></div>
 
   <div class="input-area">
-    <input id="input" placeholder="Ask about pricing, demo, automation..." />
+    <input id="input" placeholder="Ask about pricing, demos, automation..." />
     <button id="send">➤</button>
   </div>
-
 </div>
 
 <script>
@@ -127,7 +150,7 @@ const send = document.getElementById("send");
 
 let isSending = false;
 
-/* ---------------- UI HELPERS ---------------- */
+/* ---------------- UI ---------------- */
 
 function addMsg(text, type) {
   const div = document.createElement("div");
@@ -138,7 +161,16 @@ function addMsg(text, type) {
   return div;
 }
 
-/* ---------------- CHAT CORE (FIXED) ---------------- */
+function addTyping() {
+  const div = document.createElement("div");
+  div.className = "msg bot typing";
+  div.textContent = "AI is thinking...";
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+  return div;
+}
+
+/* ---------------- CHAT ---------------- */
 
 async function sendMessage(text) {
   if (!text.trim() || isSending) return;
@@ -148,7 +180,7 @@ async function sendMessage(text) {
   addMsg(text, "user");
   input.value = "";
 
-  const botMsg = addMsg("Thinking...", "bot");
+  const botMsg = addTyping();
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
@@ -167,7 +199,6 @@ async function sendMessage(text) {
 
     const reader = res.body?.getReader();
 
-    // ✅ STREAMING SUPPORT
     if (reader) {
       const decoder = new TextDecoder();
       let full = "";
@@ -176,25 +207,18 @@ async function sendMessage(text) {
         const { value, done } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        full += chunk;
-
+        full += decoder.decode(value, { stream: true });
         botMsg.textContent = full;
         messages.scrollTop = messages.scrollHeight;
       }
-
-      isSending = false;
-      return;
+    } else {
+      botMsg.textContent = await res.text();
     }
 
-    // ✅ NON-STREAMING FALLBACK
-    const text = await res.text();
-    botMsg.textContent = text;
-
   } catch (err) {
-    console.warn(err);
+    console.log(err);
     botMsg.textContent =
-      "⚠️ AI is temporarily unavailable. Please try again or contact support.";
+      "⚠️ AI temporarily unavailable. Try again or refresh.";
   }
 
   isSending = false;
@@ -204,8 +228,9 @@ async function sendMessage(text) {
 
 fab.onclick = () => {
   panel.classList.toggle("open");
+
   if (messages.children.length === 0) {
-    addMsg("👋 Hey! Ask me anything about automation, pricing, or demos.", "bot");
+    addMsg("👋 Hey, I’m your AI assistant. Ask me about automation, pricing, or demos.", "bot");
   }
 };
 
