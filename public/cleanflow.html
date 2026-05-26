@@ -2,19 +2,18 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>CleanFlow AI</title>
+  <title>CleanFlow AI - Cleaning Bot</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #111;
+      background: #f5f5f5;
     }
 
     .hero {
-      padding: 80px 20px;
       text-align: center;
+      padding: 70px 20px;
       background: white;
     }
 
@@ -24,23 +23,92 @@
     }
 
     .hero p {
-      font-size: 18px;
       color: #555;
     }
 
-    .section {
-      padding: 60px 20px;
-      text-align: center;
+    #bot-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #111;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    .card {
-      display: inline-block;
-      width: 250px;
-      margin: 10px;
-      padding: 20px;
+    #chat {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 340px;
+      height: 450px;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #header {
+      background: #111;
+      color: white;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f7f7f7;
+      font-size: 14px;
+    }
+
+    .msg {
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+
+    .bot {
+      background: white;
+    }
+
+    .user {
+      background: #111;
+      color: white;
+      margin-left: auto;
+    }
+
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    #send {
+      background: #111;
+      color: white;
+      border: none;
+      padding: 0 15px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -50,60 +118,95 @@
   <!-- HERO -->
   <div class="hero">
     <h1>🧼 CleanFlow AI</h1>
-    <p>AI-powered cleaning bookings & lead automation for service businesses</p>
+    <p>Automated Cleaning Booking Assistant</p>
   </div>
 
-  <!-- FEATURES -->
-  <div class="section">
-    <h2>Why Businesses Use It</h2>
+  <!-- BOT -->
+  <div id="bot-btn">🧼</div>
 
-    <div class="card">⚡ Instant replies 24/7</div>
-    <div class="card">📅 Auto booking system</div>
-    <div class="card">💰 More leads converted</div>
-    <div class="card">📲 WhatsApp integration</div>
+  <div id="chat">
+    <div id="header">
+      <span>CleanFlow AI</span>
+      <span id="close">✕</span>
+    </div>
+
+    <div id="messages">
+      <div class="msg bot">
+        Hey 👋 I can help you book a cleaning service.<br><br>
+        What type of cleaning do you need? (House, Office, Deep, Move-out)
+      </div>
+    </div>
+
+    <div id="input-area">
+      <input id="input" placeholder="Type here..." />
+      <button id="send">Send</button>
+    </div>
   </div>
 
-  <!-- HOW IT WORKS -->
-  <div class="section">
-    <h2>How It Works</h2>
-    <p>Customer messages → AI qualifies → Booking is scheduled → You get paid jobs</p>
-  </div>
+<script>
+let step = 0;
 
-  <!-- BOT SCRIPT -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const button = document.createElement("div");
-      button.innerHTML = "🧼";
-      button.style.cssText = `
-        position:fixed;bottom:20px;right:20px;
-        width:60px;height:60px;background:#111;
-        color:white;border-radius:50%;
-        display:flex;align-items:center;
-        justify-content:center;font-size:28px;
-        cursor:pointer;
-      `;
+const btn = document.getElementById("bot-btn");
+const chat = document.getElementById("chat");
+const close = document.getElementById("close");
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
 
-      const chat = document.createElement("div");
-      chat.style.cssText = `
-        position:fixed;bottom:90px;right:20px;
-        width:320px;height:420px;background:white;
-        border:1px solid #ddd;border-radius:12px;
-        display:none;padding:10px;font-family:Arial;
-      `;
+btn.onclick = () => chat.style.display = "flex";
+close.onclick = () => chat.style.display = "none";
 
-      chat.innerHTML = `
-        <h3>CleanFlow AI</h3>
-        <p>What type of cleaning do you need?</p>
-      `;
+send.onclick = handle;
+input.addEventListener("keypress", e => {
+  if (e.key === "Enter") handle();
+});
 
-      document.body.appendChild(button);
-      document.body.appendChild(chat);
+function handle() {
+  const text = input.value.trim();
+  if (!text) return;
 
-      button.onclick = () => {
-        chat.style.display = chat.style.display === "none" ? "block" : "none";
-      };
-    });
-  </script>
+  add(text, "user");
+  input.value = "";
+
+  setTimeout(() => {
+    add(bot(text), "bot");
+  }, 500);
+}
+
+function bot(msg) {
+  msg = msg.toLowerCase();
+
+  if (step === 0) {
+    step = 1;
+    return "Perfect 👍 What area are you located in?";
+  }
+
+  if (step === 1) {
+    step = 2;
+    return "Nice 👍 How big is the space? (1 bed / 2–3 bed / large home / office)";
+  }
+
+  if (step === 2) {
+    step = 3;
+    return "Great 👍 When would you like the cleaning done?";
+  }
+
+  if (step === 3) {
+    step = 4;
+    return "Last step 👍 What’s the best phone number or email to confirm your booking?";
+  }
+
+  return "What type of cleaning do you need? 🧼";
+}
+
+function add(text, type) {
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+</script>
 
 </body>
 </html>
