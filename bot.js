@@ -5,7 +5,7 @@ import OpenAI from "openai";
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 /* ─────────────────────────────
    AI CLIENT
@@ -16,38 +16,100 @@ const openai = new OpenAI({
 });
 
 /* ─────────────────────────────
-   AGENTS
+   SIMPLE MEMORY STORE (upgradeable to Redis later)
+───────────────────────────── */
+
+const memory = new Map(); // sessionId -> messages
+
+function getMemory(sessionId) {
+  if (!memory.has(sessionId)) memory.set(sessionId, []);
+  return memory.get(sessionId);
+}
+
+/* ─────────────────────────────
+   AGENTS (UPGRADED PROMPTS)
 ───────────────────────────── */
 
 const agents = {
-  router: `Return ONLY one word:
-sales, technical, seo, automation, closer, support`,
+  router: `
+Classify the user intent into ONLY ONE word:
 
-  sales: `You are a sales assistant focused on value and conversion.`,
+sales = buying intent, pricing, conversion, demo, ROI
+technical = bugs, code, integration issues
+seo = ranking, Google, traffic, keywords
+automation = workflows, AI automation, systems
+closer = urgency, ready to buy, "start now", "let's do it"
+support = help, general questions
 
-  technical: `You are a technical support assistant.`,
+Return ONLY the word.
+`,
 
-  seo: `You are an SEO expert.`,
+  sales: `
+You are a high-performance sales engineer.
 
-  automation: `You are an automation expert.`,
+Rules:
+- Focus on ROI, outcomes, and business value
+- Keep responses short and persuasive
+- Always try to move toward a demo or call
+- Never be vague
+`,
 
-  closer: `You are a high-conversion sales closer.`,
+  technical: `
+You are a senior technical engineer.
 
-  support: `You are a helpful support agent.`
+Rules:
+- Be precise and structured
+- Give step-by-step fixes
+- Assume developer-level clarity
+`,
+
+  seo: `
+You are an SEO strategist.
+
+Rules:
+- Focus on ranking, keywords, traffic growth
+- Give actionable SEO steps
+`,
+
+  automation: `
+You are an AI automation architect.
+
+Rules:
+- Suggest workflows, tools, integrations
+- Focus on business automation ROI
+`,
+
+  closer: `
+You are a high-conversion sales closer.
+
+Rules:
+- Create urgency
+- Push toward booking a demo or call
+- Focus on transformation and ROI
+- Be confident but not spammy
+`,
+
+  support: `
+You are a helpful support assistant.
+
+Rules:
+- Keep answers simple
+- Solve the problem quickly
+`
 };
 
 /* ─────────────────────────────
-   STAGE DETECTION
+   INTENT DETECTION (IMPROVED)
 ───────────────────────────── */
 
 function detectStage(message = "") {
   const msg = message.toLowerCase();
 
-  if (msg.includes("buy") || msg.includes("pay") || msg.includes("start")) {
+  if (msg.includes("buy") || msg.includes("start now") || msg.includes("sign up")) {
     return "purchase";
   }
 
-  if (msg.includes("price") || msg.includes("cost")) {
+  if (msg.includes("price") || msg.includes("cost") || msg.includes("pricing")) {
     return "decision";
   }
 
@@ -55,7 +117,7 @@ function detectStage(message = "") {
 }
 
 /* ─────────────────────────────
-   ROUTER
+   SMART ROUTER (MORE RELIABLE)
 ───────────────────────────── */
 
 async function routeAgent(message) {
@@ -63,25 +125,27 @@ async function routeAgent(message) {
     const res = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0,
-      max_tokens: 8,
+      max_tokens: 10,
       messages: [
         { role: "system", content: agents.router },
         { role: "user", content: message }
       ]
     });
 
-    const result = res.choices?.[0]?.message?.content?.trim().toLowerCase();
+    const result = res.choices?.[0]?.message?.content
+      ?.trim()
+      ?.toLowerCase();
 
-    const valid = new Set([
+    const valid = [
       "sales",
       "technical",
       "seo",
       "automation",
       "closer",
       "support"
-    ]);
+    ];
 
-    return valid.has(result) ? result : "sales";
+    return valid.includes(result) ? result : "sales";
 
   } catch (err) {
     console.error("Router error:", err);
@@ -90,7 +154,7 @@ async function routeAgent(message) {
 }
 
 /* ─────────────────────────────
-   STREAM FUNCTION
+   STREAM RESPONSE (FIXED + SAFE)
 ───────────────────────────── */
 
 async function streamResponse({ agent, message, res }) {
@@ -99,35 +163,45 @@ async function streamResponse({ agent, message, res }) {
       model: "gpt-4o-mini",
       stream: true,
       temperature: 0.6,
-      max_tokens: 300,
+      max_tokens: 350,
       messages: [
         { role: "system", content: agents[agent] || agents.sales },
         { role: "user", content: message }
       ]
     });
 
+    let hasOutput = false;
+
     for await (const chunk of completion) {
       const token = chunk.choices?.[0]?.delta?.content;
-      if (token) res.write(token);
+
+      if (token) {
+        hasOutput = true;
+        res.write(token);
+      }
+    }
+
+    if (!hasOutput) {
+      res.write("Let me help you with that.");
     }
 
     res.end();
 
   } catch (err) {
     console.error("Stream error:", err);
-    res.write("AI error occurred.");
+    res.write("AI temporarily unavailable. Please try again.");
     res.end();
   }
 }
 
 /* ─────────────────────────────
-   MAIN CHAT ROUTE
+   MAIN CHAT ROUTE (WITH MEMORY)
 ───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
-  const { message = "" } = req.body;
+  const { message = "", sessionId = "default" } = req.body;
 
-  if (!message) {
+  if (!message.trim()) {
     return res.status(400).json({ error: "No message provided" });
   }
 
@@ -138,15 +212,24 @@ app.post("/chat", async (req, res) => {
     agent = "closer";
   }
 
+  // ── MEMORY CONTEXT ──
+  const history = getMemory(sessionId);
+  history.push({ role: "user", content: message });
+
+  if (history.length > 10) history.shift();
+
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
 
   await streamResponse({
     agent,
     message,
     res
   });
+
+  history.push({ role: "assistant", content: "streamed_response" });
 });
 
 /* ─────────────────────────────
@@ -156,7 +239,9 @@ app.post("/chat", async (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
-    streaming: true
+    version: "2.0-upgraded",
+    streaming: true,
+    memory: true
   });
 });
 
@@ -167,5 +252,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("🚀 Server running on port", PORT);
+  console.log("🚀 Upgraded AI server running on port", PORT);
 });
