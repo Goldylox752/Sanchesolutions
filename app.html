@@ -3,221 +3,749 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Revenue OS</title>
+
+<title>SancheAI · VoiceOS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #050816;
-  --card: rgba(255,255,255,0.05);
-  --blue: #4f8cff;
-  --text: #eaf0ff;
-  --border: rgba(255,255,255,0.08);
+
+:root{
+  --bg:#050816;
+  --panel:#0b1224;
+  --card:rgba(255,255,255,0.05);
+  --card2:rgba(255,255,255,0.03);
+  --border:rgba(255,255,255,0.08);
+  --blue:#4f8cff;
+  --green:#34d399;
+  --red:#ff5f7a;
+  --text:#edf2ff;
+  --muted:#9aa7c7;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: 'DM Sans', sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'DM Sans',sans-serif;
 }
 
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg));
-  color: var(--text);
+body{
+  height:100vh;
+  overflow:hidden;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left,#10224d,#050816 60%);
+}
+
+/* APP */
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:280px;
+  background:rgba(7,10,20,0.96);
+  border-right:1px solid var(--border);
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:28px;
+}
+
+.logo span{
+  color:var(--blue);
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.menu button{
+  background:transparent;
+  border:none;
+  color:white;
+  text-align:left;
+  padding:14px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:0.2s;
+  font-size:14px;
+}
+
+.menu button:hover{
+  background:var(--card);
+}
+
+.active{
+  background:rgba(79,140,255,0.15)!important;
+  border:1px solid rgba(79,140,255,0.25);
+}
+
+.system{
+  margin-top:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+}
+
+.live{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--green);
+  animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+  0%{opacity:1;}
+  50%{opacity:0.4;}
+  100%{opacity:1;}
+}
+
+.metric{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* MAIN */
+
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
 /* HEADER */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+
+.header{
+  height:72px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 24px;
+  backdrop-filter:blur(10px);
 }
 
-.logo {
-  font-weight: 800;
-  font-size: 15px;
+.header h1{
+  font-size:20px;
 }
 
-.logo span {
-  color: var(--blue);
+.header p{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
 }
 
-.btn {
-  background: var(--blue);
-  border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
+.actions{
+  display:flex;
+  gap:12px;
 }
 
-/* CHAT CONTAINER */
-.chat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 18px;
+.btn{
+  border:none;
+  border-radius:12px;
+  padding:12px 16px;
+  cursor:pointer;
+  font-weight:700;
 }
 
-/* MESSAGES */
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 10px;
+.primary{
+  background:var(--blue);
+  color:white;
 }
 
-/* MESSAGE BUBBLES */
-.msg {
-  max-width: 78%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.4;
-  word-break: break-word;
+.secondary{
+  background:var(--card);
+  color:white;
+  border:1px solid var(--border);
 }
 
-.user {
-  background: var(--blue);
-  margin-left: auto;
+/* CONTENT */
+
+.content{
+  flex:1;
+  display:grid;
+  grid-template-columns:350px 1fr;
+  overflow:hidden;
 }
 
-.bot {
-  background: var(--card);
-  border: 1px solid var(--border);
+/* LEFT */
+
+.panel{
+  border-right:1px solid var(--border);
+  padding:22px;
+  overflow-y:auto;
 }
 
-/* INPUT AREA */
-.input-bar {
-  display: flex;
-  gap: 10px;
-  padding-top: 10px;
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
 }
 
-input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
-  color: white;
-  outline: none;
+.card-title{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:14px;
 }
 
-button.send {
-  width: 80px;
-  border-radius: 10px;
-  border: none;
-  background: var(--blue);
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
+.big{
+  font-size:36px;
+  font-weight:800;
 }
 
-/* typing indicator */
-.typing {
-  opacity: 0.7;
-  font-style: italic;
+.agent{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--card2);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
 }
+
+.status{
+  color:var(--green);
+  font-size:12px;
+  font-weight:700;
+}
+
+/* CHAT */
+
+.chat{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.msg{
+  max-width:75%;
+  padding:14px 16px;
+  border-radius:18px;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.user{
+  background:var(--blue);
+  margin-left:auto;
+}
+
+.bot{
+  background:var(--card);
+  border:1px solid var(--border);
+}
+
+.typing{
+  opacity:0.7;
+  font-style:italic;
+}
+
+/* INPUT */
+
+.input-bar{
+  border-top:1px solid var(--border);
+  padding:18px;
+  display:flex;
+  gap:12px;
+}
+
+input{
+  flex:1;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  color:white;
+  outline:none;
+  font-size:14px;
+}
+
+.send{
+  width:100px;
+  border:none;
+  border-radius:14px;
+  background:var(--blue);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.voice{
+  width:60px;
+  border:none;
+  border-radius:14px;
+  background:var(--green);
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .content{
+    grid-template-columns:1fr;
+  }
+
+  .panel{
+    display:none;
+  }
+
+  .msg{
+    max-width:90%;
+  }
+
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">Sanche<span>AI</span></div>
-  <a href="/"><button class="btn">← Back</button></a>
-</header>
+<div class="app">
 
-<div class="chat">
-  <div class="messages" id="messages"></div>
+  <!-- SIDEBAR -->
 
-  <div class="input-bar">
-    <input id="input" placeholder="Ask about automation, SaaS, pricing..." />
-    <button class="send" onclick="send()">Send</button>
-  </div>
+  <aside class="sidebar">
+
+    <div class="logo">
+      Sanche<span>AI</span>
+    </div>
+
+    <div class="menu">
+
+      <button class="active">
+        📞 AI Call Center
+      </button>
+
+      <button>
+        🤖 AI Agents
+      </button>
+
+      <button>
+        💬 Conversations
+      </button>
+
+      <button>
+        📈 Revenue Pipeline
+      </button>
+
+      <button>
+        🧠 AI Analytics
+      </button>
+
+      <button>
+        ⚙ Integrations
+      </button>
+
+    </div>
+
+    <div class="system">
+
+      <div class="live">
+        <div class="dot"></div>
+        <div>Groq AI Online</div>
+      </div>
+
+      <div class="metric">
+        Active Calls: 12
+      </div>
+
+      <div class="metric">
+        AI Agents: 5
+      </div>
+
+      <div class="metric">
+        Response Time: 0.8s
+      </div>
+
+      <div class="metric">
+        Leads Captured Today: 34
+      </div>
+
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+
+  <main class="main">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+      <div>
+        <h1>AI Revenue Operating System</h1>
+        <p>Groq AI · Voice Agents · CRM Automation</p>
+      </div>
+
+      <div class="actions">
+
+        <button class="btn secondary">
+          Dashboard
+        </button>
+
+        <button class="btn primary">
+          Launch Agent
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+      <!-- LEFT PANEL -->
+
+      <div class="panel">
+
+        <div class="card">
+
+          <div class="card-title">
+            AI Performance
+          </div>
+
+          <div class="big">
+            97%
+          </div>
+
+          <div class="metric">
+            Customer Resolution Rate
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            Active AI Agents
+          </div>
+
+          <div class="agent">
+            <div>Sales Agent</div>
+            <div class="status">LIVE</div>
+          </div>
+
+          <div class="agent">
+            <div>Support Agent</div>
+            <div class="status">LIVE</div>
+          </div>
+
+          <div class="agent">
+            <div>Booking Agent</div>
+            <div class="status">LIVE</div>
+          </div>
+
+          <div class="agent">
+            <div>Outbound AI Caller</div>
+            <div class="status">LIVE</div>
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            Connected Systems
+          </div>
+
+          <div class="metric">
+            • Groq Llama Models
+          </div>
+
+          <div class="metric">
+            • Twilio Voice
+          </div>
+
+          <div class="metric">
+            • CRM Sync
+          </div>
+
+          <div class="metric">
+            • AI Lead Qualification
+          </div>
+
+          <div class="metric">
+            • Realtime Transcription
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- CHAT -->
+
+      <div class="chat">
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-bar">
+
+          <button
+            class="voice"
+            onclick="startVoice()"
+          >
+            🎤
+          </button>
+
+          <input
+            id="input"
+            placeholder="Talk to the AI system..."
+          />
+
+          <button
+            class="send"
+            onclick="send()"
+          >
+            Send
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
 </div>
 
 <script>
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
 
-/* ---------------- UI HELPERS ---------------- */
+/* ELEMENTS */
 
-function addMsg(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
+const messages =
+  document.getElementById("messages");
+
+const input =
+  document.getElementById("input");
+
+/* SESSION */
+
+const session =
+  localStorage.getItem("session") ||
+  crypto.randomUUID();
+
+localStorage.setItem(
+  "session",
+  session
+);
+
+/* MESSAGE UI */
+
+function addMsg(text,type){
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    "msg " + type;
+
   div.textContent = text;
+
   messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
   return div;
+
 }
 
-function addTyping() {
-  return addMsg("AI is thinking...", "bot typing");
+/* TYPING */
+
+function addTyping(){
+
+  return addMsg(
+    "Groq AI is thinking...",
+    "bot typing"
+  );
+
 }
 
-/* ---------------- SIMPLE BRAIN (FALLBACK AI) ---------------- */
+/* SPEECH */
 
-function aiReply(msg) {
-  msg = msg.toLowerCase();
+function speak(text){
 
-  if (msg.includes("price") || msg.includes("cost"))
-    return "Plans start at $2,500/month for full AI automation systems.";
+  if(!text) return;
 
-  if (msg.includes("demo"))
-    return "We can book a demo. What industry are you in?";
+  const speech =
+    new SpeechSynthesisUtterance(text);
 
-  if (msg.includes("automation"))
-    return "We build AI systems that automate leads, sales, and CRM workflows.";
+  speech.rate = 1;
 
-  if (msg.includes("saas"))
-    return "This is a YC-style AI SaaS platform for revenue automation.";
+  speech.pitch = 1;
 
-  if (msg.includes("lead"))
-    return "We capture, qualify, and convert leads automatically using AI.";
+  speech.volume = 1;
 
-  return "Tell me more about your business and I’ll map a solution.";
+  speechSynthesis.speak(speech);
+
 }
 
-/* ---------------- SEND FLOW ---------------- */
+/* SEND */
 
-function send() {
-  const text = input.value;
-  if (!text.trim()) return;
+async function send(){
 
-  addMsg(text, "user");
+  const text =
+    input.value.trim();
+
+  if(!text) return;
+
+  addMsg(text,"user");
+
   input.value = "";
 
-  const botMsg = addTyping();
+  const bot =
+    addTyping();
 
-  setTimeout(() => {
-    botMsg.textContent = aiReply(text);
-    messages.scrollTop = messages.scrollHeight;
-  }, 500);
+  try{
+
+    const response =
+      await fetch(
+        "https://YOUR-BACKEND.onrender.com/chat",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            message:text,
+            session
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    bot.textContent =
+      data.reply ||
+      "AI response received.";
+
+    speak(data.reply);
+
+  }catch(error){
+
+    bot.textContent =
+      "Connection failed.";
+
+  }
+
 }
 
-/* ---------------- INIT ---------------- */
+/* ENTER */
 
-window.onload = () => {
+input.addEventListener(
+  "keypress",
+  (e)=>{
+    if(e.key==="Enter"){
+      send();
+    }
+  }
+);
+
+/* VOICE */
+
+function startVoice(){
+
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!Recognition){
+
+    alert(
+      "Voice recognition not supported."
+    );
+
+    return;
+
+  }
+
+  const recognition =
+    new Recognition();
+
+  recognition.lang = "en-US";
+
+  recognition.start();
+
+  recognition.onresult =
+    (event)=>{
+
+      const transcript =
+        event.results[0][0].transcript;
+
+      input.value = transcript;
+
+      send();
+
+    };
+
+}
+
+/* INIT */
+
+window.onload = ()=>{
+
   addMsg(
-    "👋 Welcome to SancheSolutions AI. Ask me about automation, SaaS, or pricing.",
-    "bot"
-  );
+`👋 Welcome to SancheAI VoiceOS.
+
+Capabilities:
+• AI call center
+• AI voice agents
+• inbound/outbound calling
+• CRM automation
+• AI lead qualification
+• realtime transcription
+• Groq-powered AI responses
+• appointment booking
+
+Use voice mode or type below.`,
+  "bot");
+
 };
+
 </script>
 
 </body>
