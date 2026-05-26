@@ -1,8 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // =========================
-  // CREATE WIDGET UI
-  // =========================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CleanFlow AI</title>
+</head>
 
+<body>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
   const button = document.createElement("div");
   button.id = "cleanflow-button";
   button.innerHTML = "🧼";
@@ -19,8 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div id="cleanflow-messages">
       <div class="bot-message">
         Hey 👋 I’m CleanFlow AI.<br><br>
-        I can help you book a cleaning or get a quote.<br><br>
-        What do you need today?
+        What type of cleaning do you need today?
       </div>
     </div>
 
@@ -32,10 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.body.appendChild(button);
   document.body.appendChild(chat);
-
-  // =========================
-  // STYLES
-  // =========================
 
   const style = document.createElement("style");
 
@@ -55,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
       font-size: 30px;
       cursor: pointer;
       z-index: 9999;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
     }
 
     #cleanflow-chat {
@@ -69,8 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
       overflow: hidden;
       display: none;
       flex-direction: column;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.2);
-      font-family: Arial, sans-serif;
       z-index: 9999;
     }
 
@@ -80,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
       padding: 14px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
 
     #cleanflow-messages {
@@ -91,24 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     .bot-message, .user-message {
-      padding: 10px 12px;
+      padding: 10px;
       border-radius: 12px;
       margin-bottom: 10px;
       max-width: 80%;
-      line-height: 1.4;
-      font-size: 14px;
     }
 
-    .bot-message {
-      background: white;
-      color: #111;
-    }
-
-    .user-message {
-      background: #111;
-      color: white;
-      margin-left: auto;
-    }
+    .bot-message { background: white; }
+    .user-message { background: #111; color: white; margin-left: auto; }
 
     #cleanflow-input-area {
       display: flex;
@@ -117,8 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     #cleanflow-input {
       flex: 1;
-      border: none;
       padding: 12px;
+      border: none;
       outline: none;
     }
 
@@ -127,42 +115,26 @@ document.addEventListener("DOMContentLoaded", () => {
       color: white;
       border: none;
       padding: 0 16px;
-      cursor: pointer;
     }
   `;
 
   document.head.appendChild(style);
 
-  // =========================
-  // STATE (IMPORTANT UPGRADE)
-  // =========================
-
   let step = "intro";
 
-  // =========================
-  // TOGGLE CHAT
-  // =========================
-
-  button.addEventListener("click", () => {
+  button.onclick = () => {
     chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-  });
+  };
 
-  document.getElementById("cleanflow-close").addEventListener("click", () => {
+  document.getElementById("cleanflow-close").onclick = () => {
     chat.style.display = "none";
-  });
-
-  // =========================
-  // MESSAGE HANDLING
-  // =========================
+  };
 
   const input = document.getElementById("cleanflow-input");
   const sendBtn = document.getElementById("cleanflow-send");
   const messages = document.getElementById("cleanflow-messages");
 
-  sendBtn.addEventListener("click", handleSend);
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleSend();
-  });
+  sendBtn.onclick = handleSend;
 
   function handleSend() {
     const text = input.value.trim();
@@ -172,59 +144,40 @@ document.addEventListener("DOMContentLoaded", () => {
     input.value = "";
 
     setTimeout(() => {
-      const reply = botLogic(text);
-      addMessage(reply, "bot-message");
+      addMessage(botLogic(text), "bot-message");
     }, 500);
   }
-
-  // =========================
-  // BOT LOGIC (CLEAN + SALES FOCUSED)
-  // =========================
 
   function botLogic(text) {
     const msg = text.toLowerCase();
 
-    // STEP 1: SERVICE DETECTION
     if (step === "intro") {
       step = "service";
-      return "Great 👍 What type of cleaning do you need? (House, Office, Deep, Move-in/out)";
+      return "Great 👍 What type of cleaning do you need?";
     }
 
-    // STEP 2: LOCATION
     if (msg.includes("house") || msg.includes("deep") || msg.includes("move")) {
       step = "location";
-      return "Perfect 👍 What postal code or area are you located in?";
+      return "Perfect 👍 What area are you in?";
     }
 
-    if (msg.includes("office")) {
-      step = "location";
-      return "Got it 👍 What city or area is the office in?";
-    }
-
-    // STEP 3: SIZE / DETAILS
     if (step === "location") {
       step = "size";
-      return "Awesome 👍 Roughly how big is the space? (1 bed, 2–3 bed, large home, office)";
+      return "Awesome 👍 How big is the place?";
     }
 
-    // STEP 4: BOOKING CLOSE
     if (step === "size") {
       step = "booking";
-      return "Perfect 👍 When would you like the cleaning done? (Today / This week / Specific date)";
+      return "When would you like it cleaned?";
     }
 
     if (step === "booking") {
       step = "lead";
-      return "Nice 👍 Last step — what’s the best phone number or email for confirmation?";
+      return "Perfect 👍 What’s your phone or email?";
     }
 
-    // DEFAULT
-    return "What type of cleaning can I help you with today? 🧼";
+    return "What type of cleaning do you need? 🧼";
   }
-
-  // =========================
-  // UTIL
-  // =========================
 
   function addMessage(text, className) {
     const div = document.createElement("div");
@@ -234,3 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     messages.scrollTop = messages.scrollHeight;
   }
 });
+</script>
+
+</body>
+</html>
