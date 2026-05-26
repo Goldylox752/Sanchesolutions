@@ -1,17 +1,20 @@
 {
-  "name": "sanche-bot",
+  "name": "sanche-ai",
   "version": "1.0.0",
+  "description": "SancheAI - AI Voice + Chat Call Center Backend",
   "type": "module",
   "main": "server.js",
   "engines": {
     "node": "18.x"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "groq-sdk": "^0.5.0"
+    "express": "^4.19.2",
+    "groq-sdk": "^0.5.0",
+    "twilio": "^5.3.0"
   }
 }
