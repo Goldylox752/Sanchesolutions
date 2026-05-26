@@ -1,0 +1,236 @@
+document.addEventListener("DOMContentLoaded", () => {
+  // =========================
+  // CREATE WIDGET UI
+  // =========================
+
+  const button = document.createElement("div");
+  button.id = "cleanflow-button";
+  button.innerHTML = "🧼";
+
+  const chat = document.createElement("div");
+  chat.id = "cleanflow-chat";
+
+  chat.innerHTML = `
+    <div id="cleanflow-header">
+      <h3>CleanFlow AI</h3>
+      <span id="cleanflow-close">✕</span>
+    </div>
+
+    <div id="cleanflow-messages">
+      <div class="bot-message">
+        Hey 👋 I’m CleanFlow AI.<br><br>
+        I can help you book a cleaning or get a quote.<br><br>
+        What do you need today?
+      </div>
+    </div>
+
+    <div id="cleanflow-input-area">
+      <input type="text" id="cleanflow-input" placeholder="Type your message..." />
+      <button id="cleanflow-send">Send</button>
+    </div>
+  `;
+
+  document.body.appendChild(button);
+  document.body.appendChild(chat);
+
+  // =========================
+  // STYLES
+  // =========================
+
+  const style = document.createElement("style");
+
+  style.innerHTML = `
+    #cleanflow-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 65px;
+      height: 65px;
+      background: #0f0f0f;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    }
+
+    #cleanflow-chat {
+      position: fixed;
+      bottom: 95px;
+      right: 20px;
+      width: 340px;
+      max-height: 520px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+      font-family: Arial, sans-serif;
+      z-index: 9999;
+    }
+
+    #cleanflow-header {
+      background: #0f0f0f;
+      color: white;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #cleanflow-messages {
+      padding: 15px;
+      height: 360px;
+      overflow-y: auto;
+      background: #f6f6f6;
+    }
+
+    .bot-message, .user-message {
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      max-width: 80%;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    .bot-message {
+      background: white;
+      color: #111;
+    }
+
+    .user-message {
+      background: #111;
+      color: white;
+      margin-left: auto;
+    }
+
+    #cleanflow-input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #cleanflow-input {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      outline: none;
+    }
+
+    #cleanflow-send {
+      background: #111;
+      color: white;
+      border: none;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  // =========================
+  // STATE (IMPORTANT UPGRADE)
+  // =========================
+
+  let step = "intro";
+
+  // =========================
+  // TOGGLE CHAT
+  // =========================
+
+  button.addEventListener("click", () => {
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+  });
+
+  document.getElementById("cleanflow-close").addEventListener("click", () => {
+    chat.style.display = "none";
+  });
+
+  // =========================
+  // MESSAGE HANDLING
+  // =========================
+
+  const input = document.getElementById("cleanflow-input");
+  const sendBtn = document.getElementById("cleanflow-send");
+  const messages = document.getElementById("cleanflow-messages");
+
+  sendBtn.addEventListener("click", handleSend);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleSend();
+  });
+
+  function handleSend() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user-message");
+    input.value = "";
+
+    setTimeout(() => {
+      const reply = botLogic(text);
+      addMessage(reply, "bot-message");
+    }, 500);
+  }
+
+  // =========================
+  // BOT LOGIC (CLEAN + SALES FOCUSED)
+  // =========================
+
+  function botLogic(text) {
+    const msg = text.toLowerCase();
+
+    // STEP 1: SERVICE DETECTION
+    if (step === "intro") {
+      step = "service";
+      return "Great 👍 What type of cleaning do you need? (House, Office, Deep, Move-in/out)";
+    }
+
+    // STEP 2: LOCATION
+    if (msg.includes("house") || msg.includes("deep") || msg.includes("move")) {
+      step = "location";
+      return "Perfect 👍 What postal code or area are you located in?";
+    }
+
+    if (msg.includes("office")) {
+      step = "location";
+      return "Got it 👍 What city or area is the office in?";
+    }
+
+    // STEP 3: SIZE / DETAILS
+    if (step === "location") {
+      step = "size";
+      return "Awesome 👍 Roughly how big is the space? (1 bed, 2–3 bed, large home, office)";
+    }
+
+    // STEP 4: BOOKING CLOSE
+    if (step === "size") {
+      step = "booking";
+      return "Perfect 👍 When would you like the cleaning done? (Today / This week / Specific date)";
+    }
+
+    if (step === "booking") {
+      step = "lead";
+      return "Nice 👍 Last step — what’s the best phone number or email for confirmation?";
+    }
+
+    // DEFAULT
+    return "What type of cleaning can I help you with today? 🧼";
+  }
+
+  // =========================
+  // UTIL
+  // =========================
+
+  function addMessage(text, className) {
+    const div = document.createElement("div");
+    div.className = className;
+    div.innerHTML = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+});
