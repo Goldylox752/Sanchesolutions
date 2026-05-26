@@ -4,44 +4,48 @@ import fs from "fs";
 
 const query = "cleaning services Edmonton Alberta";
 
-function cleanText(text = "") {
+function clean(text = "") {
   return text.replace(/\s+/g, " ").trim();
 }
 
-function extractDomain(url) {
+function getDomain(url) {
   try {
     return new URL(url).hostname.replace("www.", "");
   } catch {
-    return "";
+    return null;
   }
 }
 
 async function scrape() {
   try {
-    const url = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=20`;
+    console.log("🔎 Searching leads...");
 
-    const { data } = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    const { data } = await axios.get(
+      `https://www.google.com/search?q=${encodeURIComponent(query)}&num=20`,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+        }
       }
-    });
+    );
 
     const $ = cheerio.load(data);
 
     let leads = [];
 
     $(".tF2Cxc").each((i, el) => {
-      const name = cleanText($(el).find("h3").text());
+      const name = clean($(el).find("h3").text());
       const link = $(el).find("a").attr("href");
-      const snippet = cleanText($(el).find(".VwiC3b").text());
+      const snippet = clean($(el).find(".VwiC3b").text());
 
       if (!name || !link) return;
 
-      const domain = extractDomain(link);
+      const domain = getDomain(link);
 
-      // filter junk / irrelevant results
-      if (!domain || domain.includes("google")) return;
+      // filter junk results
+      if (!domain) return;
+      if (domain.includes("google") || domain.includes("youtube")) return;
 
       leads.push({
         name,
@@ -49,26 +53,43 @@ async function scrape() {
         domain,
         snippet,
         source: "google",
-        status: "new",
+        stage: "cold",
         createdAt: new Date().toISOString()
       });
     });
 
-    // remove duplicates
-    const unique = Array.from(
+    // remove duplicates by domain
+    const uniqueLeads = Array.from(
       new Map(leads.map(l => [l.domain, l])).values()
     );
 
-    // sort best results first (simple heuristic)
-    unique.sort((a, b) => b.snippet.length - a.snippet.length);
+    // rank leads (simple quality score)
+    const scored = uniqueLeads.map(l => ({
+      ...l,
+      score: scoreLead(l)
+    }));
 
-    fs.writeFileSync("leads.json", JSON.stringify(unique, null, 2));
+    scored.sort((a, b) => b.score - a.score);
 
-    console.log(`✅ Leads saved: ${unique.length}`);
-    console.log("📦 Sample lead:", unique[0]);
+    fs.writeFileSync("leads.json", JSON.stringify(scored, null, 2));
+
+    console.log(`✅ Leads saved: ${scored.length}`);
+    console.log("🔥 Top lead:", scored[0]);
   } catch (err) {
-    console.error("Scraper error:", err.message);
+    console.error("❌ Error:", err.message);
   }
+}
+
+// simple scoring system (important upgrade)
+function scoreLead(lead) {
+  let score = 0;
+
+  if (lead.snippet?.toLowerCase().includes("clean")) score += 3;
+  if (lead.snippet?.toLowerCase().includes("service")) score += 2;
+  if (lead.domain?.includes(".ca")) score += 2;
+  if (lead.website?.includes("contact")) score += 1;
+
+  return score;
 }
 
 scrape();
