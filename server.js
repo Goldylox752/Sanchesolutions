@@ -22,13 +22,13 @@ app.get("/", (req, res) => {
 });
 
 /* =========================================
-   GROQ STREAM ENGINE (ROBUST PRODUCTION)
+   GROQ STREAM ENGINE (FIXED + STABLE)
 ========================================= */
 
 async function streamGroq(message, res) {
   if (!GROQ_API_KEY) {
-    res.write("Missing GROQ_API_KEY");
-    return res.end();
+    res.status(500).send("Missing GROQ_API_KEY");
+    return;
   }
 
   try {
@@ -49,7 +49,7 @@ async function streamGroq(message, res) {
             {
               role: "system",
               content:
-                "You are a high-performance AI assistant for a SaaS automation and sales company. Be concise, practical, and conversion-focused.",
+                "You are a high-performance SaaS automation assistant. Be concise, practical, and sales-focused.",
             },
             { role: "user", content: message },
           ],
@@ -60,14 +60,17 @@ async function streamGroq(message, res) {
     if (!response.ok || !response.body) {
       const err = await response.text();
       console.error("Groq API error:", err);
-      res.write("AI temporarily unavailable.");
-      return res.end();
+      res.status(500).send("AI temporarily unavailable.");
+      return;
     }
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
     let buffer = "";
+
+    // IMPORTANT: force headers flush (fixes Render buffering)
+    res.flushHeaders?.();
 
     while (true) {
       const { value, done } = await reader.read();
@@ -76,7 +79,7 @@ async function streamGroq(message, res) {
       buffer += decoder.decode(value, { stream: true });
 
       const lines = buffer.split("\n");
-      buffer = lines.pop(); // keep incomplete chunk
+      buffer = lines.pop();
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -95,7 +98,7 @@ async function streamGroq(message, res) {
             res.write(token);
           }
         } catch (e) {
-          // ignore malformed JSON chunks (Groq SSE noise)
+          // ignore malformed chunks from Groq stream
         }
       }
     }
@@ -103,8 +106,7 @@ async function streamGroq(message, res) {
     res.end();
   } catch (err) {
     console.error("Stream crash:", err);
-    res.write("Stream error occurred.");
-    res.end();
+    res.status(500).send("Stream error occurred.");
   }
 }
 
@@ -113,19 +115,24 @@ async function streamGroq(message, res) {
 ========================================= */
 
 app.post("/chat", async (req, res) => {
-  const { message } = req.body;
+  try {
+    const { message } = req.body;
 
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "Invalid message" });
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Invalid message" });
+    }
+
+    // FIX: streaming-safe headers for Render + proxies
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+
+    await streamGroq(message, res);
+  } catch (err) {
+    console.error("Route error:", err);
+    res.status(500).send("Server error");
   }
-
-  // IMPORTANT: streaming headers (Render + proxies)
-  res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.setHeader("Cache-Control", "no-cache, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-
-  await streamGroq(message, res);
 });
 
 /* =========================================
