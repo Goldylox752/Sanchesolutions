@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Revenue Assistant</title>
+<title>SancheSolutions · AI Revenue OS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -13,6 +13,7 @@
   --card: rgba(255,255,255,0.05);
   --blue: #4f8cff;
   --text: #eaf0ff;
+  --border: rgba(255,255,255,0.08);
 }
 
 * {
@@ -22,11 +23,11 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg));
-  color: var(--text);
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg));
+  color: var(--text);
 }
 
 /* HEADER */
@@ -34,14 +35,14 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
 }
 
 .logo {
   font-weight: 800;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .logo span {
@@ -58,7 +59,7 @@ header {
   font-weight: 600;
 }
 
-/* CHAT WRAPPER */
+/* CHAT CONTAINER */
 .chat {
   flex: 1;
   display: flex;
@@ -66,7 +67,7 @@ header {
   max-width: 900px;
   width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 18px;
 }
 
 /* MESSAGES */
@@ -79,8 +80,9 @@ header {
   padding-bottom: 10px;
 }
 
+/* MESSAGE BUBBLES */
 .msg {
-  max-width: 75%;
+  max-width: 78%;
   padding: 10px 14px;
   border-radius: 14px;
   font-size: 14px;
@@ -95,10 +97,10 @@ header {
 
 .bot {
   background: var(--card);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
 }
 
-/* INPUT */
+/* INPUT AREA */
 .input-bar {
   display: flex;
   gap: 10px;
@@ -109,7 +111,7 @@ input {
   flex: 1;
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);
   color: white;
   outline: none;
@@ -124,13 +126,19 @@ button.send {
   cursor: pointer;
   font-weight: 600;
 }
+
+/* typing indicator */
+.typing {
+  opacity: 0.7;
+  font-style: italic;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">Sanche<span>App</span></div>
+  <div class="logo">Sanche<span>AI</span></div>
   <a href="/"><button class="btn">← Back</button></a>
 </header>
 
@@ -138,7 +146,7 @@ button.send {
   <div class="messages" id="messages"></div>
 
   <div class="input-bar">
-    <input id="input" placeholder="Ask about automation, pricing, SaaS..." />
+    <input id="input" placeholder="Ask about automation, SaaS, pricing..." />
     <button class="send" onclick="send()">Send</button>
   </div>
 </div>
@@ -147,7 +155,7 @@ button.send {
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 
-/* ---------------- UI ---------------- */
+/* ---------------- UI HELPERS ---------------- */
 
 function addMsg(text, type) {
   const div = document.createElement("div");
@@ -155,33 +163,37 @@ function addMsg(text, type) {
   div.textContent = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  return div;
 }
 
-/* ---------------- SIMPLE AI FALLBACK ---------------- */
+function addTyping() {
+  return addMsg("AI is thinking...", "bot typing");
+}
+
+/* ---------------- SIMPLE BRAIN (FALLBACK AI) ---------------- */
 
 function aiReply(msg) {
   msg = msg.toLowerCase();
 
-  if (msg.includes("price") || msg.includes("cost")) {
+  if (msg.includes("price") || msg.includes("cost"))
     return "Plans start at $2,500/month for full AI automation systems.";
-  }
 
-  if (msg.includes("demo")) {
-    return "We can book a demo — what does your business do?";
-  }
+  if (msg.includes("demo"))
+    return "We can book a demo. What industry are you in?";
 
-  if (msg.includes("automation")) {
+  if (msg.includes("automation"))
     return "We build AI systems that automate leads, sales, and CRM workflows.";
-  }
 
-  if (msg.includes("saas")) {
-    return "This platform is a YC-style AI SaaS system for revenue automation.";
-  }
+  if (msg.includes("saas"))
+    return "This is a YC-style AI SaaS platform for revenue automation.";
 
-  return "Tell me more about your business and I’ll map a solution for you.";
+  if (msg.includes("lead"))
+    return "We capture, qualify, and convert leads automatically using AI.";
+
+  return "Tell me more about your business and I’ll map a solution.";
 }
 
-/* ---------------- SEND ---------------- */
+/* ---------------- SEND FLOW ---------------- */
 
 function send() {
   const text = input.value;
@@ -190,15 +202,21 @@ function send() {
   addMsg(text, "user");
   input.value = "";
 
+  const botMsg = addTyping();
+
   setTimeout(() => {
-    addMsg(aiReply(text), "bot");
-  }, 400);
+    botMsg.textContent = aiReply(text);
+    messages.scrollTop = messages.scrollHeight;
+  }, 500);
 }
 
 /* ---------------- INIT ---------------- */
 
 window.onload = () => {
-  addMsg("👋 Welcome to SancheSolutions AI. Ask me about automation, SaaS, or pricing.", "bot");
+  addMsg(
+    "👋 Welcome to SancheSolutions AI. Ask me about automation, SaaS, or pricing.",
+    "bot"
+  );
 };
 </script>
 
