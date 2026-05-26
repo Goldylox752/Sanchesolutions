@@ -30,7 +30,6 @@ nav {
 
 .logo {
   font-weight:800;
-  letter-spacing:0.5px;
 }
 
 .logo span { color:#4f8cff; }
@@ -74,7 +73,7 @@ nav {
   font-size:18px;
 }
 
-/* CTA ROW */
+/* CTA */
 .cta {
   display:flex;
   justify-content:center;
@@ -85,16 +84,6 @@ nav {
 .secondary {
   background:transparent;
   border:1px solid rgba(255,255,255,0.2);
-}
-
-/* METRICS */
-.metrics {
-  display:flex;
-  justify-content:center;
-  gap:40px;
-  margin-top:40px;
-  opacity:0.8;
-  font-size:14px;
 }
 
 /* FEATURES */
@@ -120,23 +109,25 @@ nav {
   border-color: rgba(79,140,255,0.3);
 }
 
-.card h3 {
-  margin-top:0;
+/* PRICING */
+.pricing {
+  text-align:center;
+  padding:60px 20px;
 }
 
-/* HOW IT WORKS */
-.steps {
-  max-width:900px;
+.price-box {
+  max-width:320px;
   margin:0 auto;
-  padding:40px 24px 80px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px;
+  padding:30px;
 }
 
-.step {
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);
-  padding:18px;
-  border-radius:14px;
-  margin-bottom:12px;
+.price {
+  font-size:42px;
+  font-weight:800;
+  margin:10px 0;
 }
 
 /* FOOTER */
@@ -153,9 +144,10 @@ footer {
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <a href="/app.html"><button class="btn">Launch AI VoiceOS</button></a>
+  <button class="btn" onclick="goApp()">Launch App</button>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
 
   <h1>
@@ -163,59 +155,53 @@ footer {
   </h1>
 
   <p>
-    Build a 24/7 AI call center that answers phone calls, qualifies customers,
-    books appointments, and syncs directly into your CRM — powered by Groq + Twilio.
+    A 24/7 AI call center that answers phone calls, qualifies leads,
+    books appointments, and syncs to your CRM — powered by Groq + Twilio.
   </p>
 
   <div class="cta">
-    <a href="/app.html"><button class="btn">Launch Platform</button></a>
-    <button class="btn secondary">Watch Demo</button>
-  </div>
-
-  <div class="metrics">
-    <div>⚡ Instant Response AI</div>
-    <div>📞 Voice + Chat System</div>
-    <div>💰 Revenue Automation</div>
+    <button class="btn" onclick="startFree()">Start Free</button>
+    <button class="btn secondary" onclick="goApp()">Launch Platform</button>
   </div>
 
 </section>
 
+<!-- FEATURES -->
 <section class="features">
 
   <div class="card">
     <h3>📞 AI Call Center</h3>
-    <p>Answer inbound calls automatically with human-like AI voice agents.</p>
+    <p>Answer inbound calls automatically using AI voice agents.</p>
   </div>
 
   <div class="card">
     <h3>🎯 Lead Qualification</h3>
-    <p>Filter, score, and prioritize high-intent customers instantly.</p>
+    <p>Filter and prioritize high-intent customers instantly.</p>
   </div>
 
   <div class="card">
     <h3>📅 Appointment Booking</h3>
-    <p>AI schedules meetings directly into your calendar.</p>
+    <p>AI schedules meetings directly into calendars.</p>
   </div>
 
   <div class="card">
     <h3>🔗 CRM Integration</h3>
-    <p>Sync leads into HubSpot, Pipedrive, or custom pipelines.</p>
+    <p>Sync leads into HubSpot, Pipedrive, or custom systems.</p>
   </div>
 
 </section>
 
-<section class="steps">
+<!-- PRICING -->
+<section class="pricing">
 
-  <div class="step">
-    <b>Step 1:</b> Customer calls your AI number
-  </div>
+  <div class="price-box">
+    <h2>Pro Plan</h2>
+    <div class="price">$29/mo</div>
+    <p>Full AI voice + chat + CRM automation</p>
 
-  <div class="step">
-    <b>Step 2:</b> AI answers, qualifies, and responds instantly
-  </div>
-
-  <div class="step">
-    <b>Step 3:</b> Leads are booked or routed to your team
+    <button class="btn" onclick="upgrade()">
+      Upgrade to Pro
+    </button>
   </div>
 
 </section>
@@ -223,6 +209,71 @@ footer {
 <footer>
   © 2026 SancheSolutions — AI Voice Revenue Systems
 </footer>
+
+<script>
+
+/* ─────────────────────────────
+   CONFIG
+───────────────────────────── */
+
+const API_URL = "https://YOUR-BACKEND.onrender.com";
+
+/* ─────────────────────────────
+   NAV HELPERS
+───────────────────────────── */
+
+function goApp(){
+  window.location.href = "/app.html";
+}
+
+/* ─────────────────────────────
+   START FREE (STORE USER)
+───────────────────────────── */
+
+function startFree(){
+
+  const user_id = crypto.randomUUID();
+
+  localStorage.setItem("user_id", user_id);
+  localStorage.setItem("plan", "free");
+
+  alert("Free account created. Launching app.");
+
+  goApp();
+}
+
+/* ─────────────────────────────
+   STRIPE CHECKOUT
+───────────────────────────── */
+
+async function upgrade(){
+
+  const user_id = localStorage.getItem("user_id");
+  const email = prompt("Enter email for billing:");
+
+  if(!email) return;
+
+  const res = await fetch(API_URL + "/create-checkout", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      user_id,
+      email
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.url){
+    window.location.href = data.url;
+  } else {
+    alert("Payment error");
+  }
+}
+
+</script>
 
 </body>
 </html>
