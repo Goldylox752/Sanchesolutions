@@ -3,15 +3,35 @@ import cors from "cors";
 import Groq from "groq-sdk";
 import dotenv from "dotenv";
 
-import { stripe } from "./stripe.js";
-import { supabase } from "./supabase.js";
-
 dotenv.config();
 
 const app = express();
 
 /* ─────────────────────────────
-   STRIPE WEBHOOK (MUST BE FIRST)
+   ENV VALIDATION (FAIL FAST)
+───────────────────────────── */
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`❌ Missing environment variable: ${name}`);
+  }
+  return value;
+}
+
+/* ─────────────────────────────
+   SAFE IMPORTS (AFTER ENV CHECK)
+───────────────────────────── */
+const { stripe } = await import("./stripe.js");
+const { supabase } = await import("./supabase.js");
+
+/* ─────────────────────────────
+   MIDDLEWARE
+───────────────────────────── */
+app.use(cors());
+app.use(express.json());
+
+/* ─────────────────────────────
+   STRIPE WEBHOOK (RAW BODY MUST BE FIRST)
 ───────────────────────────── */
 app.post(
   "/stripe-webhook",
@@ -25,7 +45,7 @@ app.post(
       event = stripe.webhooks.constructEvent(
         req.body,
         sig,
-        process.env.STRIPE_WEBHOOK_SECRET
+        requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
       console.error("Webhook error:", err.message);
@@ -33,30 +53,28 @@ app.post(
     }
 
     try {
-      switch (event.type) {
-        case "checkout.session.completed": {
-          const session = event.data.object;
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object;
+        const userId = session?.metadata?.user_id;
 
-          const userId = session?.metadata?.user_id;
+        console.log("💰 PAYMENT SUCCESS:", userId);
 
-          console.log("💰 PAYMENT SUCCESS:", userId);
+        if (userId) {
+          const { error } = await supabase.from("users").upsert({
+            id: userId,
+            plan: "pro",
+            stripe_customer_id: session.customer,
+            updated_at: new Date().toISOString(),
+          });
 
-          if (userId) {
-            await supabase.from("users").upsert({
-              id: userId,
-              plan: "pro",
-              stripe_customer_id: session.customer,
-              updated_at: new Date().toISOString()
-            });
+          if (error) {
+            console.error("Supabase update error:", error.message);
           }
-
-          break;
         }
+      }
 
-        case "invoice.payment_failed": {
-          console.log("❌ Payment failed");
-          break;
-        }
+      if (event.type === "invoice.payment_failed") {
+        console.log("❌ Payment failed");
       }
 
       res.json({ received: true });
@@ -68,16 +86,10 @@ app.post(
 );
 
 /* ─────────────────────────────
-   MIDDLEWARE
-───────────────────────────── */
-app.use(cors());
-app.use(express.json());
-
-/* ─────────────────────────────
    AI CLIENT
 ───────────────────────────── */
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+  apiKey: requireEnv("GROQ_API_KEY"),
 });
 
 /* ─────────────────────────────
@@ -97,26 +109,30 @@ app.post("/chat", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, a SaaS AI assistant that converts leads into customers."
+            "You are SancheAI, a SaaS AI assistant that converts leads into customers.",
         },
-        { role: "user", content: message }
-      ]
+        { role: "user", content: message },
+      ],
     });
 
     const reply =
       ai?.choices?.[0]?.message?.content || "No response generated";
 
     if (user_id) {
-      await supabase.from("chat_logs").insert({
+      const { error } = await supabase.from("chat_logs").insert({
         user_id,
         message,
-        reply
+        reply,
       });
+
+      if (error) {
+        console.error("Chat log error:", error.message);
+      }
     }
 
     res.json({ reply });
   } catch (err) {
-    console.error(err);
+    console.error("AI error:", err);
     res.status(500).json({ error: "AI failed" });
   }
 });
@@ -142,28 +158,28 @@ app.post("/create-checkout-session", async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "SancheAI Pro"
+              name: "SancheAI Pro",
             },
             unit_amount: 2900,
             recurring: {
-              interval: "month"
-            }
+              interval: "month",
+            },
           },
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ],
 
       success_url: "https://yourdomain.com/app.html?success=1",
       cancel_url: "https://yourdomain.com/app.html?cancel=1",
 
       metadata: {
-        user_id
-      }
+        user_id,
+      },
     });
 
     res.json({ url: session.url });
   } catch (err) {
-    console.error(err);
+    console.error("Checkout error:", err);
     res.status(500).json({ error: "Checkout failed" });
   }
 });
@@ -175,7 +191,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "ok",
     service: "SancheAI SaaS",
-    features: ["chat", "stripe", "webhook", "supabase"]
+    features: ["chat", "stripe", "webhook", "supabase"],
   });
 });
 
