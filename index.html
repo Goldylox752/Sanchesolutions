@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions · Revenue AI SaaS Platform</title>
+<title>SancheSolutions · AI Revenue SaaS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
   --bg: #050816;
-  --card: rgba(255,255,255,0.05);
-  --border: rgba(120,160,255,0.2);
+  --panel: rgba(255,255,255,0.05);
+  --border: rgba(120,160,255,0.18);
   --blue: #4f8cff;
   --text: #eaf0ff;
 }
@@ -27,81 +27,95 @@
 body {
   background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg) 60%);
   color: var(--text);
-  overflow-x: hidden;
+  display: flex;
+  min-height: 100vh;
 }
 
-/* NAV */
-nav {
-  display: flex;
-  justify-content: space-between;
-  padding: 18px 28px;
-  position: sticky;
-  top: 0;
-  backdrop-filter: blur(14px);
-  background: rgba(5,8,22,0.6);
-  border-bottom: 1px solid var(--border);
+/* ───────── SIDEBAR (SAAS FEEL) ───────── */
+.sidebar {
+  width: 240px;
+  background: rgba(5,8,22,0.7);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  backdrop-filter: blur(16px);
 }
 
 .logo {
+  font-size: 18px;
   font-weight: 800;
-  font-size: 20px;
+  margin-bottom: 30px;
 }
 
-.logo span {
-  color: var(--blue);
-}
+.logo span { color: var(--blue); }
 
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 90px 20px 60px;
-}
-
-.hero h1 {
-  font-size: 48px;
-  font-weight: 800;
-}
-
-.hero h1 span {
-  color: var(--blue);
-}
-
-.hero p {
-  margin-top: 16px;
+.nav-item {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
   opacity: 0.8;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
 }
 
-/* BUTTON */
+.nav-item:hover {
+  background: var(--panel);
+  opacity: 1;
+}
+
+/* ───────── MAIN AREA ───────── */
+.main {
+  flex: 1;
+  padding: 24px;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .btn {
-  margin-top: 22px;
-  padding: 12px 22px;
+  padding: 10px 14px;
   background: linear-gradient(135deg, var(--blue), #2a57cf);
   border: none;
   color: white;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
 }
 
-/* GRID */
+/* KPI CARDS */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.kpi h2 {
+  color: var(--blue);
+}
+
+/* PROJECT GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 18px;
-  padding: 50px 24px;
-  max-width: 1100px;
-  margin: auto;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
 }
 
 .card {
-  background: var(--card);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 16px;
+  padding: 16px;
   transition: 0.2s;
 }
 
@@ -110,13 +124,8 @@ nav {
   border-color: var(--blue);
 }
 
-.card h3 {
-  margin-bottom: 8px;
-}
-
-/* PROJECT TAG */
 .tag {
-  font-size: 12px;
+  font-size: 11px;
   padding: 4px 8px;
   background: rgba(79,140,255,0.15);
   border-radius: 6px;
@@ -124,41 +133,40 @@ nav {
   margin-bottom: 8px;
 }
 
-/* CHAT */
+/* CHAT WIDGET (INTERCOM STYLE) */
 .fab {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--blue);
   border: none;
   color: white;
-  font-size: 22px;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .chat {
   position: fixed;
   bottom: 90px;
   right: 20px;
-  width: 340px;
-  height: 480px;
+  width: 360px;
+  height: 520px;
   background: rgba(10,14,25,0.95);
   border: 1px solid var(--border);
   border-radius: 16px;
   display: none;
   flex-direction: column;
+  backdrop-filter: blur(20px);
 }
 
-.chat.open {
-  display: flex;
-}
+.chat.open { display: flex; }
 
 .messages {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   overflow-y: auto;
 }
 
@@ -186,8 +194,8 @@ nav {
 .input input {
   flex: 1;
   padding: 10px;
-  border: none;
   background: transparent;
+  border: none;
   color: white;
   outline: none;
 }
@@ -204,47 +212,73 @@ nav {
 
 <body>
 
-<nav>
+<!-- SIDEBAR -->
+<div class="sidebar">
   <div class="logo">Sanche<span>Solutions</span></div>
-  <button class="btn">Book Demo</button>
-</nav>
 
-<section class="hero">
-  <h1>Build Revenue With <span>AI Automation</span></h1>
-  <p>
-    We build YC-style SaaS systems that automate sales, qualify leads, and turn conversations into revenue.
-    Think Intercom + HubSpot + AI agents combined.
-  </p>
-  <button class="btn">Start Free Consultation</button>
-</section>
+  <div class="nav-item">📊 Dashboard</div>
+  <div class="nav-item">🚀 Projects</div>
+  <div class="nav-item">🤖 AI Agents</div>
+  <div class="nav-item">💰 Revenue</div>
+  <div class="nav-item">⚙️ Settings</div>
+</div>
 
-<section class="grid">
+<!-- MAIN -->
+<div class="main">
 
-  <div class="card">
-    <div class="tag">PROJECT</div>
-    <h3>AI Sales Agent System</h3>
-    <p>Automates inbound leads, qualifies prospects, and books demos automatically.</p>
+  <div class="topbar">
+    <h2>Revenue AI SaaS Dashboard</h2>
+    <button class="btn">Book Demo</button>
   </div>
 
-  <div class="card">
-    <div class="tag">PROJECT</div>
-    <h3>CRM Automation Engine</h3>
-    <p>Syncs HubSpot / Pipedrive workflows with AI decision-making logic.</p>
+  <!-- KPI -->
+  <div class="kpis">
+    <div class="kpi">
+      <h2>+34%</h2>
+      <p>Conversion Increase</p>
+    </div>
+
+    <div class="kpi">
+      <h2>24/7</h2>
+      <p>AI Agent Uptime</p>
+    </div>
+
+    <div class="kpi">
+      <h2>120+</h2>
+      <p>Leads Automated</p>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="tag">PROJECT</div>
-    <h3>AI Chat Funnel</h3>
-    <p>Turns website visitors into qualified leads with conversational AI.</p>
+  <!-- PROJECTS -->
+  <div class="grid">
+
+    <div class="card">
+      <div class="tag">AI SYSTEM</div>
+      <h3>Sales Automation Engine</h3>
+      <p>Automates inbound leads & books calls automatically.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">CRM</div>
+      <h3>HubSpot AI Sync</h3>
+      <p>Smart CRM updates + workflow automation.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">CHAT AI</div>
+      <h3>Lead Qualification Bot</h3>
+      <p>Converts visitors into qualified prospects.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">ANALYTICS</div>
+      <h3>Revenue Dashboard</h3>
+      <p>Tracks pipeline, conversions, and AI performance.</p>
+    </div>
+
   </div>
 
-  <div class="card">
-    <div class="tag">PROJECT</div>
-    <h3>Revenue Tracking Dashboard</h3>
-    <p>Real-time analytics on conversions, pipeline, and AI performance.</p>
-  </div>
-
-</section>
+</div>
 
 <!-- CHAT -->
 <button class="fab" id="fab">💬</button>
@@ -253,7 +287,7 @@ nav {
   <div class="messages" id="messages"></div>
 
   <div class="input">
-    <input id="input" placeholder="Ask about pricing, SaaS, automation..." />
+    <input id="input" placeholder="Ask about automation, pricing..." />
     <button id="send">➤</button>
   </div>
 </div>
@@ -272,14 +306,14 @@ function add(text, type) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-function botReply(msg) {
+function reply(msg) {
   const m = msg.toLowerCase();
 
-  if (m.includes("price")) return "Plans start at $2,500/month for full AI automation systems.";
-  if (m.includes("demo")) return "We can book a demo — what industry are you in?";
-  if (m.includes("saas")) return "We build YC-style SaaS systems with AI agents + automation pipelines.";
-  if (m.includes("lead")) return "We automate lead capture, scoring, and conversion using AI.";
-  return "Tell me more about your business so I can map an automation system for you.";
+  if (m.includes("price")) return "Plans start at $2,500/month for AI automation systems.";
+  if (m.includes("demo")) return "Let’s book a demo — what industry are you in?";
+  if (m.includes("saas")) return "We build YC-style SaaS systems with AI agents + automation.";
+  if (m.includes("lead")) return "We automate lead capture, scoring, and conversion.";
+  return "Tell me about your business and I’ll design a system for you.";
 }
 
 function send() {
@@ -289,15 +323,13 @@ function send() {
   add(text, "user");
   input.value = "";
 
-  setTimeout(() => {
-    add(botReply(text), "bot");
-  }, 600);
+  setTimeout(() => add(reply(text), "bot"), 500);
 }
 
 fab.onclick = () => {
   chat.classList.toggle("open");
   if (messages.children.length === 0) {
-    add("Hi 👋 I'm your Revenue AI assistant. Ask me anything.", "bot");
+    add("👋 I'm your Revenue AI assistant.", "bot");
   }
 };
 
