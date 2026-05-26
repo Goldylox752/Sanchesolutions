@@ -1,35 +1,11 @@
-app.post("/create-checkout", async (req, res) => {
-  const { email, user_id } = req.body;
+import Stripe from "stripe";
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    payment_method_types: ["card"],
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
-    customer_email: email,
+if (!stripeSecret) {
+  throw new Error("❌ Missing STRIPE_SECRET_KEY");
+}
 
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "SancheAI Pro"
-          },
-          unit_amount: 2900,
-          recurring: {
-            interval: "month"
-          }
-        },
-        quantity: 1
-      }
-    ],
-
-    success_url: `${process.env.APP_URL}/success.html`,
-    cancel_url: `${process.env.APP_URL}/cancel.html`,
-
-    metadata: {
-      user_id
-    }
-  });
-
-  res.json({ url: session.url });
+export const stripe = new Stripe(stripeSecret, {
+  apiVersion: "2024-06-20",
 });
