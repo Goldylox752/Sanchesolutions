@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanFlow AI - Get More Cleaning Bookings</title>
+  <title>CleanFlow AI - AI Receptionist for Cleaning Businesses</title>
 
   <style>
     body {
@@ -26,12 +26,12 @@
     /* HERO */
     .hero {
       text-align: center;
-      padding: 110px 20px 80px;
+      padding: 120px 20px 90px;
       background: white;
     }
 
     .hero h1 {
-      font-size: 54px;
+      font-size: 56px;
       margin-bottom: 14px;
       line-height: 1.1;
     }
@@ -47,7 +47,7 @@
     .btn {
       margin-top: 28px;
       display: inline-block;
-      padding: 15px 26px;
+      padding: 16px 28px;
       background: #111;
       color: white;
       border-radius: 12px;
@@ -99,15 +99,16 @@
     /* CTA */
     .cta {
       text-align: center;
-      padding: 80px 20px;
+      padding: 90px 20px;
       background: white;
       margin-top: 40px;
     }
 
     .price {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
-      margin: 10px 0;
+      margin: 12px 0;
+      color: #111;
     }
 
     /* CHAT BUTTON */
@@ -196,15 +197,14 @@
 
 <div class="nav">
   <span>🧼 CleanFlow AI</span>
-  <span>AI Receptionist for Cleaning Businesses</span>
+  <span>AI Receptionist That Books Cleaning Jobs</span>
 </div>
 
 <div class="hero">
-  <h1>Turn Website Visitors Into Booked Cleaning Jobs</h1>
+  <h1>Turn Website Visitors Into Paying Customers</h1>
 
   <p>
-    CleanFlow AI answers leads instantly, qualifies customers, and pushes them into booking —
-    so you stop losing jobs to slow replies.
+    CleanFlow AI is a 24/7 AI receptionist that responds instantly, qualifies leads, and pushes customers to book your cleaning service automatically.
   </p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
@@ -213,46 +213,51 @@
 </div>
 
 <div class="features">
+
   <div class="card">
     <h3>💰 More Bookings</h3>
-    <p>Convert visitors into paying clients automatically</p>
+    <p>Turn traffic into paying customers automatically</p>
   </div>
 
   <div class="card">
     <h3>⚡ Instant Replies</h3>
-    <p>No missed leads or slow responses</p>
+    <p>Never miss a lead again — reply instantly</p>
   </div>
 
   <div class="card">
     <h3>📅 Lead Qualification</h3>
-    <p>Only serious customers get passed to you</p>
+    <p>We filter serious customers before you respond</p>
   </div>
 
   <div class="card">
     <h3>📲 24/7 AI Worker</h3>
-    <p>Your business never stops capturing leads</p>
+    <p>Your business never stops generating leads</p>
   </div>
+
 </div>
 
 <div class="section">
-  <h2>Why Cleaning Businesses Lose Money</h2>
+  <h2>Why Cleaning Businesses Lose Revenue</h2>
   <p>
-    Most cleaners lose 40–70% of leads because they reply too slow or miss messages.
-    CleanFlow AI fixes that instantly by responding in seconds.
+    Most cleaning companies lose 40–70% of leads due to slow response times.
+    CleanFlow AI fixes this instantly by replying in seconds and guiding users to booking.
   </p>
 </div>
 
 <div class="cta">
-  <h2>Start Getting More Jobs This Week</h2>
+  <h2>Start Getting More Cleaning Jobs Today</h2>
   <p class="price">$49/month — Cancel Anytime</p>
 
-  <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
-    Activate Demo Bot
+  <!-- STRIPE HOOK BUTTON -->
+  <div class="btn" onclick="startCheckout()">
+    Start Free Trial
   </div>
 </div>
 
+<!-- CHAT BUTTON -->
 <div id="bot-btn">🧼</div>
 
+<!-- CHAT -->
 <div id="chat">
   <div id="header">
     <span>CleanFlow AI</span>
@@ -261,7 +266,7 @@
 
   <div id="messages">
     <div class="msg bot">
-      👋 Hey! I can help you get more cleaning jobs.<br><br>
+      👋 Hey! I help cleaning businesses get more booked jobs.<br><br>
       What type of cleaning do you offer?
     </div>
   </div>
@@ -297,38 +302,17 @@ function handle() {
   add(text, "user");
   input.value = "";
 
-  setTimeout(() => {
-    add(bot(text), "bot");
-  }, 500);
+  setTimeout(() => add(bot(text), "bot"), 400);
 }
 
 function bot(msg) {
   msg = msg.toLowerCase();
 
-  if (step === 0) {
-    step = 1;
-    return "Perfect 👍 What area do you serve?";
-  }
-
-  if (step === 1) {
-    step = 2;
-    return "Nice 👍 What type of properties do you clean?";
-  }
-
-  if (step === 2) {
-    step = 3;
-    return "Great 👍 How soon can you take new bookings?";
-  }
-
-  if (step === 3) {
-    step = 4;
-    return "Almost done 🔥 What’s your phone or email?";
-  }
-
-  if (step === 4) {
-    step = 5;
-    return "Perfect 🎉 Your AI receptionist is now ready to start capturing leads.";
-  }
+  if (step === 0) { step = 1; return "Perfect 👍 What area do you serve?"; }
+  if (step === 1) { step = 2; return "Nice 👍 What type of properties do you clean?"; }
+  if (step === 2) { step = 3; return "Great 👍 How soon can you take new bookings?"; }
+  if (step === 3) { step = 4; return "Almost done 🔥 What’s your phone or email?"; }
+  if (step === 4) { step = 5; return "Perfect 🎉 You're ready to start getting more cleaning jobs."; }
 
   return "What type of cleaning do you offer? 🧼";
 }
@@ -339,6 +323,11 @@ function add(text, type) {
   div.innerHTML = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+}
+
+/* STRIPE HOOK (connect your backend here) */
+async function startCheckout() {
+  alert("Connect Stripe backend endpoint here");
 }
 </script>
 
