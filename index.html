@@ -15,7 +15,6 @@ body {
   color: white;
 }
 
-/* NAV */
 nav {
   display:flex;
   justify-content:space-between;
@@ -23,14 +22,13 @@ nav {
   padding:20px 30px;
   position:sticky;
   top:0;
-  background:rgba(10,15,30,0.8);
+  background:rgba(10,15,30,0.85);
   backdrop-filter: blur(10px);
   border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo {
   font-weight:800;
-  letter-spacing:0.5px;
 }
 
 .logo span { color:#4f8cff; }
@@ -45,7 +43,6 @@ nav {
   font-weight:600;
 }
 
-/* HERO */
 .hero {
   text-align:center;
   padding:120px 20px 70px;
@@ -65,11 +62,10 @@ nav {
   max-width:750px;
   margin:20px auto;
   opacity:0.85;
-  line-height:1.6;
   font-size:18px;
+  line-height:1.6;
 }
 
-/* SECTIONS */
 .section {
   max-width:1000px;
   margin:auto;
@@ -80,7 +76,6 @@ nav {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:18px;
-  margin-top:20px;
 }
 
 .card {
@@ -90,7 +85,6 @@ nav {
   padding:18px;
 }
 
-/* CTA */
 .cta {
   text-align:center;
   padding:80px 20px;
@@ -100,8 +94,8 @@ nav {
   max-width:600px;
   margin:auto;
   padding:30px;
-  border:1px solid rgba(255,255,255,0.1);
   border-radius:16px;
+  border:1px solid rgba(255,255,255,0.1);
   background:rgba(255,255,255,0.03);
 }
 
@@ -110,6 +104,11 @@ footer {
   padding:40px;
   opacity:0.6;
 }
+
+a {
+  color:#4f8cff;
+  text-decoration:none;
+}
 </style>
 </head>
 
@@ -117,7 +116,7 @@ footer {
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <button class="btn" onclick="contact()">Contact</button>
+  <button class="btn" onclick="openInquiry()">Project Inquiry</button>
 </nav>
 
 <!-- HERO -->
@@ -130,34 +129,34 @@ footer {
   </p>
 
   <p style="opacity:0.6">
-    Based in Canada · Available for freelance, contract, and consulting work
+    Based in Canada · Available for freelance & contract work
   </p>
 </section>
 
-<!-- SKILLS -->
+<!-- SERVICES -->
 <section class="section">
-  <h2>What I Do</h2>
+  <h2>Services</h2>
 
   <div class="grid">
 
     <div class="card">
       <h3>Web Development</h3>
-      <p>Responsive websites, SaaS platforms, and full-stack applications using modern frameworks.</p>
+      <p>Modern websites, SaaS platforms, and full-stack applications.</p>
     </div>
 
     <div class="card">
       <h3>AI Automation</h3>
-      <p>AI agents, voice systems, and workflow automation for sales and operations.</p>
+      <p>AI agents, voice systems, and workflow automation for businesses.</p>
     </div>
 
     <div class="card">
-      <h3>CRM Systems</h3>
-      <p>HubSpot, Pipedrive, GoHighLevel integrations and custom pipeline automation.</p>
+      <h3>CRM Integration</h3>
+      <p>HubSpot, Pipedrive, GoHighLevel and custom CRM pipelines.</p>
     </div>
 
     <div class="card">
-      <h3>API Integration</h3>
-      <p>Stripe, Twilio, OpenAI, and custom backend integrations for scalable systems.</p>
+      <h3>API Development</h3>
+      <p>Stripe, Twilio, OpenAI, and backend system integrations.</p>
     </div>
 
   </div>
@@ -170,18 +169,18 @@ footer {
   <div class="grid">
 
     <div class="card">
-      <h3>AI Voice Revenue System</h3>
-      <p>AI voice agent that answers calls, qualifies leads, and books appointments.</p>
+      <h3>AI Voice System</h3>
+      <p>Automated call handling, lead qualification, and appointment booking system.</p>
     </div>
 
     <div class="card">
-      <h3>CRM Automation Platform</h3>
-      <p>Automated lead tracking, follow-up sequences, and pipeline management system.</p>
+      <h3>CRM Automation Engine</h3>
+      <p>Lead tracking, follow-up sequences, and pipeline automation system.</p>
     </div>
 
     <div class="card">
       <h3>AI Sales Assistant</h3>
-      <p>AI-driven follow-up system that converts inbound leads into booked calls.</p>
+      <p>Automated lead conversion system with follow-up intelligence.</p>
     </div>
 
   </div>
@@ -190,12 +189,14 @@ footer {
 <!-- CTA -->
 <section class="cta">
   <div class="cta-box">
-    <h2>Let’s Work Together</h2>
+    <h2>Project Inquiry</h2>
     <p>
-      Open to freelance development, AI automation projects, and system builds for businesses.
+      For freelance work, contract builds, or automation systems.
     </p>
 
-    <button class="btn" onclick="contact()">Get In Touch</button>
+    <button class="btn" onclick="openInquiry()">
+      Contact Me
+    </button>
   </div>
 </section>
 
@@ -204,9 +205,29 @@ footer {
 </footer>
 
 <script>
-function contact(){
-  window.location.href = "mailto:youremail@example.com?subject=Project%20Inquiry";
+
+/* SAFE CONTACT HANDLING (HIDDEN DETAILS) */
+
+const EMAIL = "Byronsanche@zohomailcloud.ca";
+const WHATSAPP = "7802679673";
+
+function openInquiry(){
+
+  const choice = confirm(
+    "Click OK to email inquiry or Cancel for WhatsApp"
+  );
+
+  if(choice){
+    window.location.href =
+      "mailto:" + EMAIL + "?subject=Project%20Inquiry%20-%20SancheSolutions";
+  } else {
+    window.open(
+      "https://wa.me/1" + WHATSAPP,
+      "_blank"
+    );
+  }
 }
+
 </script>
 
 </body>
