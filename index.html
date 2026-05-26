@@ -27,7 +27,16 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:var(--font-body);
-  overflow-x:hidden;
+  transition:all 0.3s ease;
+}
+
+/* LIGHT MODE */
+body.light{
+  --bg:#f5f7ff;
+  --surface:#ffffff;
+  --border:rgba(0,0,0,0.08);
+  --text:#0b0f1a;
+  --muted:rgba(0,0,0,0.6);
 }
 
 /* NAV */
@@ -43,6 +52,10 @@ nav{
   border-bottom:1px solid var(--border);
 }
 
+body.light nav{
+  background:rgba(255,255,255,0.8);
+}
+
 .logo{
   font-family:var(--font-head);
   font-weight:800;
@@ -50,19 +63,25 @@ nav{
 .logo span{color:var(--accent)}
 
 .btn{
-  padding:10px 18px;
+  padding:10px 14px;
   border-radius:10px;
   border:1px solid var(--border);
   cursor:pointer;
   font-weight:500;
   color:var(--text);
   background:transparent;
+  font-size:13px;
 }
 
 .btn-primary{
   background:var(--accent);
   color:#fff;
   border:none;
+}
+
+.small{
+  font-size:12px;
+  padding:6px 10px;
 }
 
 /* HERO */
@@ -90,14 +109,6 @@ nav{
   font-size:17px;
 }
 
-.cta{
-  margin-top:30px;
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-
 /* TRUST */
 .trust{
   text-align:center;
@@ -107,7 +118,7 @@ nav{
   border-bottom:1px solid var(--border);
 }
 
-/* SECTION */
+/* SECTIONS */
 section{
   padding:90px 20px;
   max-width:1100px;
@@ -165,7 +176,7 @@ h2{
   border-radius:14px;
 }
 
-/* CTA BOX */
+/* CTA */
 .cta-box{
   text-align:center;
   background:var(--surface);
@@ -174,14 +185,7 @@ h2{
   border:1px solid var(--border);
 }
 
-footer{
-  text-align:center;
-  padding:40px;
-  color:var(--muted);
-  border-top:1px solid var(--border);
-}
-
-/* LINKS AS BUTTONS */
+/* LINKS */
 a.btn{
   text-decoration:none;
   display:inline-block;
@@ -194,33 +198,19 @@ a.btn{
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
 
-  <div style="display:flex; gap:10px;">
-    <button class="btn btn-primary" onclick="book()">Book Call</button>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <button class="btn small" onclick="toggleTheme()">🌓 Theme</button>
 
-    <!-- OPEN APP BUTTON -->
-    <a href="./app.html" class="btn btn-primary">
-      ⚡ Open App
-    </a>
+    <a href="./app.html" class="btn btn-primary small">⚡ Open App</a>
   </div>
 </nav>
 
 <div class="hero">
   <h1>We Build <span>AI Revenue Systems</span> That Run Your Business</h1>
-
   <p>
     We design automation systems that generate leads, qualify customers,
     and streamline sales so your business runs with less manual work.
   </p>
-
-  <div class="cta">
-    <button class="btn btn-primary" onclick="book()">🚀 Book Strategy Call</button>
-    <button class="btn" onclick="email()">✉️ Contact</button>
-
-    <!-- OPEN APP BUTTON (HERO) -->
-    <a href="./app.html" class="btn btn-primary">
-      ⚡ Open App
-    </a>
-  </div>
 </div>
 
 <div class="trust">
@@ -275,29 +265,28 @@ a.btn{
 <section>
   <div class="cta-box">
     <h2>Want This Built for Your Business?</h2>
-    <p>We only take a limited number of clients per month to ensure quality builds.</p>
-
-    <div class="cta">
-      <button class="btn btn-primary" onclick="book()">Book Strategy Call</button>
-      <a href="./app.html" class="btn btn-primary">⚡ Open App</a>
-    </div>
+    <p>We only take a limited number of clients per month.</p>
   </div>
 </section>
 
-<footer>
+<footer style="text-align:center; padding:40px; color:var(--muted); border-top:1px solid var(--border);">
   © 2026 SancheSolutions · AI Automation & Web Systems · Alberta, Canada
 </footer>
 
 <script>
-const EMAIL = "Byronsanche@zohomailcloud.ca";
-
-function book(){
-  window.open("https://calendly.com", "_blank");
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
 }
 
-function email(){
-  window.location.href = "mailto:" + EMAIL + "?subject=Project%20Inquiry";
-}
+window.onload = () => {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+  }
+};
 </script>
 
 </body>
