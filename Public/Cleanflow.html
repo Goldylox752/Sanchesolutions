@@ -1,13 +1,12 @@
-// CleanFlow AI Chat Widget
-// bot.js
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Create widget button
-  const button = document.createElement("div");
-  button.innerHTML = "🧼";
-  button.id = "cleanflow-button";
+  // =========================
+  // CREATE WIDGET UI
+  // =========================
 
-  // Create chat container
+  const button = document.createElement("div");
+  button.id = "cleanflow-button";
+  button.innerHTML = "🧼";
+
   const chat = document.createElement("div");
   chat.id = "cleanflow-chat";
 
@@ -19,8 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <div id="cleanflow-messages">
       <div class="bot-message">
-        Hey 👋 Welcome to CleanFlow AI.<br><br>
-        What type of cleaning do you need today?
+        Hey 👋 I’m CleanFlow AI.<br><br>
+        I can help you book a cleaning or get a quote.<br><br>
+        What do you need today?
       </div>
     </div>
 
@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.appendChild(button);
   document.body.appendChild(chat);
 
-  // Styles
+  // =========================
+  // STYLES
+  // =========================
+
   const style = document.createElement("style");
 
   style.innerHTML = `
@@ -43,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       right: 20px;
       width: 65px;
       height: 65px;
-      background: #111;
+      background: #0f0f0f;
       color: white;
       border-radius: 50%;
       display: flex;
@@ -60,50 +63,40 @@ document.addEventListener("DOMContentLoaded", () => {
       bottom: 95px;
       right: 20px;
       width: 340px;
-      max-height: 500px;
+      max-height: 520px;
       background: white;
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
       display: none;
       flex-direction: column;
       box-shadow: 0 10px 35px rgba(0,0,0,0.2);
-      z-index: 9999;
       font-family: Arial, sans-serif;
+      z-index: 9999;
     }
 
     #cleanflow-header {
-      background: #111;
+      background: #0f0f0f;
       color: white;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    #cleanflow-header h3 {
-      margin: 0;
-      font-size: 18px;
-    }
-
-    #cleanflow-close {
-      cursor: pointer;
-      font-size: 18px;
-    }
-
     #cleanflow-messages {
       padding: 15px;
-      height: 350px;
+      height: 360px;
       overflow-y: auto;
-      background: #f7f7f7;
+      background: #f6f6f6;
     }
 
-    .bot-message,
-    .user-message {
-      padding: 12px;
+    .bot-message, .user-message {
+      padding: 10px 12px;
       border-radius: 12px;
       margin-bottom: 10px;
       max-width: 80%;
       line-height: 1.4;
+      font-size: 14px;
     }
 
     .bot-message {
@@ -125,8 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     #cleanflow-input {
       flex: 1;
       border: none;
-      padding: 14px;
-      font-size: 14px;
+      padding: 12px;
       outline: none;
     }
 
@@ -134,91 +126,111 @@ document.addEventListener("DOMContentLoaded", () => {
       background: #111;
       color: white;
       border: none;
-      padding: 0 18px;
+      padding: 0 16px;
       cursor: pointer;
     }
   `;
 
   document.head.appendChild(style);
 
-  // Toggle chat
+  // =========================
+  // STATE (IMPORTANT UPGRADE)
+  // =========================
+
+  let step = "intro";
+
+  // =========================
+  // TOGGLE CHAT
+  // =========================
+
   button.addEventListener("click", () => {
-    chat.style.display =
-      chat.style.display === "flex" ? "none" : "flex";
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
   });
 
-  // Close chat
-  document
-    .getElementById("cleanflow-close")
-    .addEventListener("click", () => {
-      chat.style.display = "none";
-    });
+  document.getElementById("cleanflow-close").addEventListener("click", () => {
+    chat.style.display = "none";
+  });
 
-  // Send message
-  const sendButton = document.getElementById("cleanflow-send");
+  // =========================
+  // MESSAGE HANDLING
+  // =========================
+
   const input = document.getElementById("cleanflow-input");
+  const sendBtn = document.getElementById("cleanflow-send");
   const messages = document.getElementById("cleanflow-messages");
 
-  sendButton.addEventListener("click", sendMessage);
+  sendBtn.addEventListener("click", handleSend);
   input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
+    if (e.key === "Enter") handleSend();
   });
 
-  function sendMessage() {
+  function handleSend() {
     const text = input.value.trim();
-
     if (!text) return;
 
     addMessage(text, "user-message");
-
     input.value = "";
 
     setTimeout(() => {
-      const reply = getBotReply(text);
+      const reply = botLogic(text);
       addMessage(reply, "bot-message");
-    }, 700);
+    }, 500);
   }
+
+  // =========================
+  // BOT LOGIC (CLEAN + SALES FOCUSED)
+  // =========================
+
+  function botLogic(text) {
+    const msg = text.toLowerCase();
+
+    // STEP 1: SERVICE DETECTION
+    if (step === "intro") {
+      step = "service";
+      return "Great 👍 What type of cleaning do you need? (House, Office, Deep, Move-in/out)";
+    }
+
+    // STEP 2: LOCATION
+    if (msg.includes("house") || msg.includes("deep") || msg.includes("move")) {
+      step = "location";
+      return "Perfect 👍 What postal code or area are you located in?";
+    }
+
+    if (msg.includes("office")) {
+      step = "location";
+      return "Got it 👍 What city or area is the office in?";
+    }
+
+    // STEP 3: SIZE / DETAILS
+    if (step === "location") {
+      step = "size";
+      return "Awesome 👍 Roughly how big is the space? (1 bed, 2–3 bed, large home, office)";
+    }
+
+    // STEP 4: BOOKING CLOSE
+    if (step === "size") {
+      step = "booking";
+      return "Perfect 👍 When would you like the cleaning done? (Today / This week / Specific date)";
+    }
+
+    if (step === "booking") {
+      step = "lead";
+      return "Nice 👍 Last step — what’s the best phone number or email for confirmation?";
+    }
+
+    // DEFAULT
+    return "What type of cleaning can I help you with today? 🧼";
+  }
+
+  // =========================
+  // UTIL
+  // =========================
 
   function addMessage(text, className) {
     const div = document.createElement("div");
     div.className = className;
     div.innerHTML = text;
-
     messages.appendChild(div);
-
     messages.scrollTop = messages.scrollHeight;
-  }
-
-  function getBotReply(text) {
-    const msg = text.toLowerCase();
-
-    if (
-      msg.includes("deep") ||
-      msg.includes("move") ||
-      msg.includes("house")
-    ) {
-      return "Perfect 👍 What postal code or area are you located in?";
-    }
-
-    if (
-      msg.includes("quote") ||
-      msg.includes("price")
-    ) {
-      return "Absolutely 👍 What type of cleaning are you looking for?";
-    }
-
-    if (
-      msg.includes("office")
-    ) {
-      return "Got it 👍 Roughly how large is the office space?";
-    }
-
-    if (
-      msg.match(/[a-z]\d[a-z]/i)
-    ) {
-      return "Awesome. Roughly how large is the property?";
-    }
-
-    return "Perfect 👍 What day works best for your cleaning?";
   }
 });
