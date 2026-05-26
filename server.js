@@ -10,12 +10,12 @@ dotenv.config();
 const app = express();
 
 /* ─────────────────────────────
-   ENV
+   ENV SAFETY
 ───────────────────────────── */
 
 function requireEnv(key) {
   const val = process.env[key];
-  if (!val) throw new Error(`Missing env: ${key}`);
+  if (!val) throw new Error(`❌ Missing env: ${key}`);
   return val;
 }
 
@@ -23,15 +23,25 @@ function requireEnv(key) {
    CLIENTS
 ───────────────────────────── */
 
-const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"));
+const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
+  apiVersion: "2024-06-20",
+});
 
 const groq = new Groq({
   apiKey: requireEnv("GROQ_API_KEY"),
 });
 
+/**
+ * FIX: use SERVICE ROLE for backend writes
+ */
 const supabase = createClient(
   requireEnv("SUPABASE_URL"),
-  requireEnv("SUPABASE_ANON_KEY")
+  requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
+  {
+    auth: {
+      persistSession: false,
+    },
+  }
 );
 
 /* ─────────────────────────────
@@ -47,7 +57,9 @@ app.use(
   })
 );
 
-/* Stripe webhook MUST be raw */
+/**
+ * Stripe webhook MUST be BEFORE express.json()
+ */
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
@@ -61,7 +73,8 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      return res.status(400).send(err.message);
+      console.error("Webhook error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     try {
@@ -81,45 +94,54 @@ app.post(
 
       return res.json({ received: true });
     } catch (err) {
-      return res.status(500).json({ error: "Webhook failed" });
+      console.error("Webhook handling error:", err);
+      return res.status(500).json({ error: "Webhook processing failed" });
     }
   }
 );
 
-/* JSON AFTER WEBHOOK */
+/* JSON parser AFTER webhook */
 app.use(express.json());
 
 /* ─────────────────────────────
-   AUTH MIDDLEWARE
-───────────────────────────── */
-
-async function requireUser(req, res, next) {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.status(401).json({ error: "No token" });
-  }
-
-  const { data, error } = await supabase.auth.getUser(token);
-
-  if (error || !data?.user) {
-    return res.status(401).json({ error: "Invalid user" });
-  }
-
-  req.user = data.user;
-  next();
-}
-
-/* ─────────────────────────────
-   HEALTH
+   HEALTH CHECK
 ───────────────────────────── */
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    service: "CleanFlow AI Backend",
+    time: new Date().toISOString(),
+  });
 });
 
 /* ─────────────────────────────
-   CHAT (PROTECTED)
+   AUTH MIDDLEWARE (SUPABASE JWT)
+───────────────────────────── */
+
+async function requireUser(req, res, next) {
+  try {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({ error: "Missing auth token" });
+    }
+
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data?.user) {
+      return res.status(401).json({ error: "Invalid user" });
+    }
+
+    req.user = data.user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Auth failed" });
+  }
+}
+
+/* ─────────────────────────────
+   AI CHAT (PROTECTED)
 ───────────────────────────── */
 
 app.post("/api/chat", requireUser, async (req, res) => {
@@ -136,22 +158,22 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, an AI SaaS automation assistant.",
+            "You are CleanFlow AI, a SaaS assistant that helps cleaning businesses get more bookings and automate leads.",
         },
         { role: "user", content: message },
       ],
     });
 
     const reply =
-      completion?.choices?.[0]?.message?.content ||
-      "No response";
+      completion?.choices?.[0]?.message?.content || "No response";
 
     return res.json({
       success: true,
       reply,
     });
   } catch (err) {
-    return res.status(500).json({ error: "AI failed" });
+    console.error(err);
+    return res.status(500).json({ error: "AI request failed" });
   }
 });
 
@@ -164,7 +186,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     const { user_id, email } = req.body;
 
     if (!user_id || !email) {
-      return res.status(400).json({ error: "Missing data" });
+      return res.status(400).json({ error: "Missing user_id or email" });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -176,9 +198,11 @@ app.post("/api/create-checkout-session", async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "SancheAI Pro",
+              name: "CleanFlow AI Pro",
+              description:
+                "AI receptionist that books cleaning jobs automatically",
             },
-            unit_amount: 2900,
+            unit_amount: 4900,
             recurring: {
               interval: "month",
             },
@@ -191,15 +215,22 @@ app.post("/api/create-checkout-session", async (req, res) => {
         "https://sanchesolutions.vercel.app/app.html?success=1",
 
       cancel_url:
-        "https://sanchesolutions.vercel.app/app.html?cancel=1",
+        "https://sanchesolutions.vercel.app/app.html?canceled=1",
 
       metadata: {
         user_id,
       },
     });
 
+    if (!session.url) {
+      return res
+        .status(500)
+        .json({ error: "Stripe did not return checkout URL" });
+    }
+
     return res.json({ url: session.url });
   } catch (err) {
+    console.error("Checkout error:", err);
     return res.status(500).json({ error: "Checkout failed" });
   }
 });
@@ -211,5 +242,5 @@ app.post("/api/create-checkout-session", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT}`);
+  console.log(`🚀 CleanFlow AI running on port ${PORT}`);
 });
