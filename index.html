@@ -3,668 +3,278 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · Web Dev & AI Automation</title>
+<title>SancheSolutions · AI Revenue Systems & Automation</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
 <style>
-
-/* ── RESET & TOKENS ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:       #060810;
-  --surface:  #0d1123;
-  --border:   rgba(255,255,255,0.07);
-  --accent:   #3d7fff;
-  --accent2:  #00d4ff;
-  --text:     #e8eaf0;
-  --muted:    rgba(232,234,240,0.5);
-  --radius:   14px;
+  --bg:#060810;
+  --surface:#0d1123;
+  --border:rgba(255,255,255,0.08);
+  --accent:#3d7fff;
+  --accent2:#00d4ff;
+  --text:#e8eaf0;
+  --muted:rgba(232,234,240,0.6);
   --font-head:'Syne', sans-serif;
   --font-body:'Instrument Sans', sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+*{margin:0;padding:0;box-sizing:border-box}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  overflow-x:hidden;
 }
 
-/* ── NOISE OVERLAY ── */
-body::before {
-  content:'';
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity: 0.4;
+/* NAV */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 40px;
+  position:sticky;top:0;
+  background:rgba(6,8,16,0.75);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
 }
 
-/* ── MESH GLOW ── */
-.glow-orb {
-  position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0;
+.logo{
+  font-family:var(--font-head);
+  font-weight:800;
 }
-.glow-orb.a {
-  width:600px; height:600px;
-  background: radial-gradient(circle, rgba(61,127,255,0.15), transparent 70%);
-  top:-100px; left:-100px;
-  animation: driftA 18s ease-in-out infinite alternate;
-}
-.glow-orb.b {
-  width:500px; height:500px;
-  background: radial-gradient(circle, rgba(0,212,255,0.10), transparent 70%);
-  bottom:-80px; right:-80px;
-  animation: driftB 22s ease-in-out infinite alternate;
+.logo span{color:var(--accent)}
+
+.btn{
+  padding:10px 18px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  font-weight:500;
 }
 
-@keyframes driftA { to { transform: translate(80px, 60px); } }
-@keyframes driftB { to { transform: translate(-60px, -80px); } }
-
-/* ── NAV ── */
-nav {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 18px 40px;
-  background: rgba(6,8,16,0.75);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--border);
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  border:none;
 }
 
-.logo {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: -0.5px;
-}
-.logo span { color: var(--accent); }
-
-.nav-links {
-  display: flex; gap: 32px; list-style: none;
-}
-.nav-links a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--text); }
-
-.nav-ctas { display: flex; gap: 10px; }
-
-.btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  font-family: var(--font-body);
-  font-weight: 500; font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none; cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+/* HERO */
+.hero{
+  text-align:center;
+  padding:120px 20px 80px;
 }
 
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-.btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 24px rgba(61,127,255,0.3);
-}
-.btn-primary:hover {
-  background: #5a94ff;
-  transform: translateY(-1px);
-  box-shadow: 0 0 32px rgba(61,127,255,0.45);
+.hero h1{
+  font-family:var(--font-head);
+  font-size:clamp(40px,6vw,72px);
+  line-height:1.05;
 }
 
-/* ── HERO ── */
-.hero {
-  position: relative; z-index: 1;
-  min-height: 92vh;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  text-align: center;
-  padding: 80px 24px 60px;
+.hero h1 span{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(61,127,255,0.1);
-  border: 1px solid rgba(61,127,255,0.25);
-  color: var(--accent2);
-  font-size: 12px; font-weight: 500; letter-spacing: 1px;
-  padding: 6px 14px;
-  border-radius: 99px;
-  margin-bottom: 28px;
-  text-transform: uppercase;
-  animation: fadeUp 0.6s ease both;
+.hero p{
+  max-width:650px;
+  margin:20px auto;
+  color:var(--muted);
+  font-size:17px;
 }
 
-.badge-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent2);
-  animation: pulse 2s ease infinite;
+.cta{
+  margin-top:30px;
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
 }
 
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:0.5; transform:scale(1.4); }
+/* TRUST BAR */
+.trust{
+  text-align:center;
+  padding:20px;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
 }
 
-.hero h1 {
-  font-family: var(--font-head);
-  font-size: clamp(42px, 7vw, 82px);
-  font-weight: 800;
-  line-height: 1.04;
-  letter-spacing: -2px;
-  max-width: 900px;
-  animation: fadeUp 0.7s 0.1s ease both;
+/* SECTION */
+section{
+  padding:90px 20px;
+  max-width:1100px;
+  margin:auto;
 }
 
-.hero h1 em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+h2{
+  font-family:var(--font-head);
+  font-size:36px;
+  margin-bottom:40px;
 }
 
-.hero-sub {
-  max-width: 600px;
-  margin: 24px auto 0;
-  color: var(--muted);
-  font-size: 17px;
-  line-height: 1.7;
-  animation: fadeUp 0.7s 0.2s ease both;
+/* OFFER GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
 }
 
-.hero-location {
-  margin-top: 12px;
-  font-size: 13px;
-  color: rgba(232,234,240,0.35);
-  letter-spacing: 0.5px;
-  animation: fadeUp 0.7s 0.25s ease both;
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:24px;
+  border-radius:14px;
 }
 
-.hero-ctas {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 36px;
-  animation: fadeUp 0.7s 0.3s ease both;
+.card h3{
+  font-family:var(--font-head);
+  margin-bottom:10px;
 }
 
-.btn-xl {
-  font-size: 15px;
-  padding: 14px 28px;
-  border-radius: 12px;
+.card p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
 }
 
-/* divider line */
-.hero-line {
-  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 1px; height: 60px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15));
+.price{
+  margin-top:12px;
+  color:var(--accent2);
+  font-weight:600;
 }
 
-/* ── SECTIONS ── */
-section.wrap {
-  position: relative; z-index: 1;
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 90px 24px;
+/* PROCESS */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
 }
 
-.section-label {
-  display: inline-block;
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 14px;
+.step{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:24px;
+  border-radius:14px;
 }
 
-.section-title {
-  font-family: var(--font-head);
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 800;
-  letter-spacing: -1px;
-  line-height: 1.1;
-  margin-bottom: 48px;
+/* CTA BOX */
+.cta-box{
+  text-align:center;
+  background:var(--surface);
+  padding:60px 30px;
+  border-radius:20px;
+  border:1px solid var(--border);
 }
 
-/* ── SERVICES GRID ── */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 16px;
+footer{
+  text-align:center;
+  padding:40px;
+  color:var(--muted);
+  border-top:1px solid var(--border);
 }
-
-.service-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-  transition: border-color 0.25s, transform 0.25s;
-  position: relative;
-  overflow: hidden;
-}
-.service-card::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0; height:2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  opacity:0;
-  transition: opacity 0.25s;
-}
-.service-card:hover { border-color: rgba(61,127,255,0.3); transform: translateY(-3px); }
-.service-card:hover::before { opacity: 1; }
-
-.service-icon {
-  font-size: 28px;
-  margin-bottom: 14px;
-  display: block;
-}
-
-.service-card h3 {
-  font-family: var(--font-head);
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.service-card p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* ── PROJECTS ── */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.project-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 30px 26px;
-  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-}
-.project-card:hover {
-  border-color: rgba(61,127,255,0.25);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-}
-
-.project-tag {
-  display: inline-block;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--accent2);
-  background: rgba(0,212,255,0.08);
-  border: 1px solid rgba(0,212,255,0.15);
-  padding: 4px 10px; border-radius: 99px;
-  margin-bottom: 16px;
-}
-
-.project-card h3 {
-  font-family: var(--font-head);
-  font-size: 20px; font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: -0.4px;
-}
-
-.project-card p {
-  color: var(--muted);
-  font-size: 14px; line-height: 1.65;
-}
-
-/* ── STATS BAR ── */
-.stats-bar {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  padding: 48px 24px;
-}
-
-.stats-inner {
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex; flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 36px;
-  text-align: center;
-}
-
-.stat-num {
-  font-family: var(--font-head);
-  font-size: 44px; font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -2px;
-}
-
-.stat-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-  letter-spacing: 0.3px;
-}
-
-/* ── CTA SECTION ── */
-.cta-section {
-  position: relative; z-index: 1;
-  padding: 100px 24px;
-  text-align: center;
-}
-
-.cta-box {
-  max-width: 640px;
-  margin: 0 auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 52px 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-box::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(61,127,255,0.12), transparent 70%);
-  pointer-events: none;
-}
-
-.cta-box h2 {
-  font-family: var(--font-head);
-  font-size: 34px; font-weight: 800;
-  letter-spacing: -1px;
-  margin-bottom: 14px;
-}
-
-.cta-box p {
-  color: var(--muted);
-  margin-bottom: 28px;
-  font-size: 16px;
-}
-
-.cta-buttons {
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-}
-
-/* ── FOOTER ── */
-footer {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border);
-  padding: 32px 40px;
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 12px;
-}
-
-.footer-logo {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 16px;
-}
-.footer-logo span { color: var(--accent); }
-
-footer p {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.reveal {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.reveal.visible { opacity: 1; transform: none; }
-
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  nav { padding: 14px 20px; }
-  .nav-links { display: none; }
-
-  .hero h1 { letter-spacing: -1.5px; }
-
-  .hero-ctas { flex-direction: column; align-items: center; }
-  .btn-xl { width: 100%; max-width: 320px; justify-content: center; }
-
-  section.wrap { padding: 60px 20px; }
-
-  .services-grid { grid-template-columns: 1fr; }
-  .projects-grid { grid-template-columns: 1fr; }
-
-  .stats-inner { gap: 24px; }
-  .stat-num { font-size: 36px; }
-
-  .cta-box { padding: 36px 24px; }
-  .cta-buttons { flex-direction: column; align-items: center; }
-  .cta-buttons .btn { width: 100%; max-width: 300px; justify-content: center; }
-
-  footer { flex-direction: column; text-align: center; padding: 28px 20px; }
-}
-
 </style>
 </head>
+
 <body>
 
-<!-- GLOWS -->
-<div class="glow-orb a"></div>
-<div class="glow-orb b"></div>
-
-<!-- NAV -->
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-
-  <ul class="nav-links">
-    <li><a href="#services">Services</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-
-  <div class="nav-ctas">
-    <button class="btn btn-ghost" onclick="openWhatsApp()">WhatsApp</button>
-    <button class="btn btn-primary" onclick="launchBot()">🤖 AI Bot</button>
-  </div>
+  <button class="btn btn-primary" onclick="book()">Book Call</button>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
-  <div class="badge">
-    <span class="badge-dot"></span>
-    Available for freelance & contract work
-  </div>
-
-  <h1>Web Dev &amp;<br><em>AI Automation</em><br>Engineer</h1>
-
-  <p class="hero-sub">
-    I build modern web apps, AI automation systems, and CRM integrations
-    that help businesses convert more leads into revenue.
+  <h1>We Build <span>AI Revenue Systems</span> That Run Your Business</h1>
+  <p>
+    We design automation systems that generate leads, qualify customers,
+    and streamline sales so your business runs with less manual work.
   </p>
 
-  <p class="hero-location">📍 Based in Canada</p>
-
-  <div class="hero-ctas">
-    <button class="btn btn-primary btn-xl" onclick="launchBot()">
-      🚀 Try My AI Bot
-    </button>
-    <button class="btn btn-ghost btn-xl" onclick="openEmail()">
-      Project Inquiry
-    </button>
-  </div>
-
-  <div class="hero-line"></div>
-</div>
-
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div>
-      <div class="stat-num">20+</div>
-      <div class="stat-label">Projects Delivered</div>
-    </div>
-    <div>
-      <div class="stat-num">4</div>
-      <div class="stat-label">Service Areas</div>
-    </div>
-    <div>
-      <div class="stat-num">100%</div>
-      <div class="stat-label">Remote-Ready</div>
-    </div>
-    <div>
-      <div class="stat-num">24h</div>
-      <div class="stat-label">Avg. Response Time</div>
-    </div>
+  <div class="cta">
+    <button class="btn btn-primary" onclick="book()">🚀 Book Strategy Call</button>
+    <button class="btn" onclick="email()">✉️ Contact</button>
   </div>
 </div>
 
-<!-- SERVICES -->
-<section class="wrap" id="services">
-  <div class="reveal">
-    <span class="section-label">What I do</span>
-    <h2 class="section-title">Services</h2>
-  </div>
+<div class="trust">
+  AI Automation · CRM Systems · Lead Generation · Web Apps · Canada-Based
+</div>
 
-  <div class="services-grid">
+<section>
+  <h2>High-Impact Systems We Build</h2>
 
-    <div class="service-card reveal">
-      <span class="service-icon">⚡</span>
-      <h3>Web Development</h3>
-      <p>Modern websites, SaaS platforms, and full-stack applications built for performance and scale.</p>
+  <div class="grid">
+
+    <div class="card">
+      <h3>AI Lead Generation System</h3>
+      <p>Captures and qualifies leads automatically using AI chat + CRM integration.</p>
+      <div class="price">Starting at $999</div>
     </div>
 
-    <div class="service-card reveal">
-      <span class="service-icon">🤖</span>
-      <h3>AI Automation</h3>
-      <p>AI agents, voice systems, and workflow automation that run your business on autopilot.</p>
+    <div class="card">
+      <h3>Business Automation Engine</h3>
+      <p>Eliminates manual admin work with workflows, APIs, and smart routing systems.</p>
+      <div class="price">Starting at $1,999</div>
     </div>
 
-    <div class="service-card reveal">
-      <span class="service-icon">🔗</span>
-      <h3>CRM Integration</h3>
-      <p>HubSpot, Pipedrive, GoHighLevel and custom CRM pipelines that close more deals.</p>
-    </div>
-
-    <div class="service-card reveal">
-      <span class="service-icon">🛠</span>
-      <h3>API Development</h3>
-      <p>Stripe, Twilio, OpenAI, and backend system integrations wired together seamlessly.</p>
+    <div class="card">
+      <h3>AI Sales System (Flagship)</h3>
+      <p>Full AI-powered funnel that replaces manual sales handling and follow-ups.</p>
+      <div class="price">Starting at $3,000+</div>
     </div>
 
   </div>
 </section>
 
-<!-- PROJECTS -->
-<section class="wrap" id="projects">
-  <div class="reveal">
-    <span class="section-label">Selected work</span>
-    <h2 class="section-title">Projects</h2>
-  </div>
+<section>
+  <h2>How It Works</h2>
 
-  <div class="projects-grid">
-
-    <div class="project-card reveal">
-      <span class="project-tag">AI · Voice</span>
-      <h3>AI Voice System</h3>
-      <p>Automated call handling, lead qualification, and appointment booking — 24/7, zero human overhead.</p>
+  <div class="steps">
+    <div class="step">
+      <h3>1. Diagnose</h3>
+      <p>We analyze your business flow and find where leads are being lost.</p>
     </div>
 
-    <div class="project-card reveal">
-      <span class="project-tag">CRM · Automation</span>
-      <h3>CRM Automation Engine</h3>
-      <p>Lead tracking, multi-step follow-up sequences, and full pipeline automation across HubSpot and GHL.</p>
+    <div class="step">
+      <h3>2. Build</h3>
+      <p>We design and deploy your AI automation system and integrations.</p>
     </div>
 
-    <div class="project-card reveal">
-      <span class="project-tag">AI · Sales</span>
-      <h3>AI Sales Assistant</h3>
-      <p>Automated lead conversion system with intelligent follow-up that nurtures prospects until they're ready to buy.</p>
+    <div class="step">
+      <h3>3. Scale</h3>
+      <p>Your system runs 24/7 generating and managing leads automatically.</p>
     </div>
-
   </div>
 </section>
 
-<!-- CTA -->
-<div class="cta-section" id="contact">
-  <div class="cta-box reveal">
-    <h2>Let's Build Something</h2>
-    <p>Got a project in mind? I'm available for freelance work, contract builds, and automation systems.</p>
-
-    <div class="cta-buttons">
-      <button class="btn btn-primary btn-xl" onclick="openEmail()">
-        ✉️ Send an Email
-      </button>
-      <button class="btn btn-ghost btn-xl" onclick="openWhatsApp()">
-        💬 WhatsApp Me
-      </button>
+<section>
+  <div class="cta-box">
+    <h2>Want This Built for Your Business?</h2>
+    <p>We only take a limited number of clients per month to ensure quality builds.</p>
+    <div class="cta">
+      <button class="btn btn-primary" onclick="book()">Book Strategy Call</button>
+      <button class="btn" onclick="email()">Email Us</button>
     </div>
   </div>
-</div>
+</section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Sanche<span>Solutions</span></div>
-  <p>© 2026 SancheSolutions · Web Development & AI Automation</p>
+  © 2026 SancheSolutions · AI Automation & Web Systems · Alberta, Canada
 </footer>
 
 <script>
-const EMAIL    = "Byronsanche@zohomailcloud.ca";
-const WHATSAPP = "17802679673";
+const EMAIL = "Byronsanche@zohomailcloud.ca";
 
-/* ── AI BOT ── */
-function launchBot() {
-  // Try app.html first; change to "/app" if using Next.js routing
-  const botUrl = "app.html";
-  const win = window.open(botUrl, "_blank");
-  // Fallback: if popup blocked or page not found, alert user
-  if (!win) {
-    alert("Couldn't open the AI Bot.\nMake sure app.html exists in the same folder, then try again.");
-  }
+function book(){
+  window.open("https://calendly.com", "_blank");
 }
 
-/* ── CONTACT ── */
-function openEmail() {
-  window.location.href =
-    "mailto:" + EMAIL + "?subject=Project%20Inquiry%20-%20SancheSolutions";
+function email(){
+  window.location.href = "mailto:" + EMAIL + "?subject=Project%20Inquiry";
 }
-
-function openWhatsApp() {
-  window.open("https://wa.me/" + WHATSAPP, "_blank");
-}
-
-/* ── SCROLL REVEAL ── */
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      // stagger cards within same parent
-      const siblings = [...e.target.parentElement.querySelectorAll('.reveal')];
-      const idx = siblings.indexOf(e.target);
-      e.target.style.transitionDelay = (idx * 80) + "ms";
-      e.target.classList.add("visible");
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 </script>
+
 </body>
 </html>
