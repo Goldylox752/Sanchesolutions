@@ -1,222 +1,194 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>SancheAI · VoiceOS</title>
-
-<style>
-:root{
-  --bg:#050816;
-  --card:rgba(255,255,255,0.05);
-  --border:rgba(255,255,255,0.08);
-  --blue:#4f8cff;
-  --green:#34d399;
-  --text:#edf2ff;
-}
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
-}
-
-body{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  background:var(--bg);
-  color:var(--text);
-}
-
-/* HEADER */
-header{
-  padding:14px;
-  text-align:center;
-  background:#0b1224;
-  font-weight:700;
-  border-bottom:1px solid var(--border);
-}
-
-/* CHAT */
-.chat{
-  flex:1;
-  overflow-y:auto;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.msg{
-  max-width:75%;
-  padding:12px 14px;
-  border-radius:14px;
-  font-size:14px;
-  line-height:1.4;
-}
-
-.user{
-  background:var(--blue);
-  margin-left:auto;
-}
-
-.bot{
-  background:var(--card);
-  border:1px solid var(--border);
-}
-
-.typing{
-  opacity:0.7;
-  font-style:italic;
-}
-
-/* INPUT */
-.input-bar{
-  display:flex;
-  gap:10px;
-  padding:12px;
-  border-top:1px solid var(--border);
-  background:#0b1224;
-}
-
-input{
-  flex:1;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:rgba(255,255,255,0.03);
-  color:white;
-}
-
-button{
-  border:none;
-  border-radius:10px;
-  padding:12px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-.send{
-  background:var(--blue);
-  color:white;
-}
-
-.voice{
-  background:var(--green);
-  color:black;
-}
-</style>
-</head>
-
-<body>
-
-<header>SancheAI VoiceOS</header>
-
-<div class="chat" id="chat"></div>
-
-<div class="input-bar">
-  <button class="voice" onclick="startVoice()">🎤</button>
-  <input id="input" placeholder="Talk to AI..." />
-  <button class="send" onclick="send()">Send</button>
-</div>
-
 <script>
 
 /* ─────────────────────────────
    CONFIG
 ───────────────────────────── */
 
-const API_URL = "https://YOUR-BACKEND.onrender.com/chat";
+/* LOCAL DEV + PRODUCTION AUTO SWITCH */
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://YOURBACKEND.onrender.com";
 
-/* stable session (SaaS ready) */
-const session =
-  localStorage.getItem("session") ||
+/* API ROUTES */
+const CHAT_ENDPOINT = `${API_URL}/api/chat`;
+const HEALTH_ENDPOINT = `${API_URL}/api/health`;
+
+/* SESSION */
+const sessionId =
+  localStorage.getItem("sanche_session") ||
   crypto.randomUUID();
 
-localStorage.setItem("session", session);
+localStorage.setItem(
+  "sanche_session",
+  sessionId
+);
 
 /* ─────────────────────────────
-   STATE CONTROL
+   STATE
 ───────────────────────────── */
 
 let isLoading = false;
 
 /* ─────────────────────────────
-   UI HELPERS
+   ELEMENTS
 ───────────────────────────── */
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-function scrollBottom(){
+/* ─────────────────────────────
+   UI HELPERS
+───────────────────────────── */
+
+function scrollBottom() {
   chat.scrollTop = chat.scrollHeight;
 }
 
-function addMsg(text, type){
+function addMsg(text, type = "bot") {
+
   const div = document.createElement("div");
-  div.className = "msg " + type;
+
+  div.className = `msg ${type}`;
+
   div.textContent = text;
+
   chat.appendChild(div);
+
   scrollBottom();
+
   return div;
 }
 
-function addTyping(){
-  return addMsg("AI is thinking...","bot typing");
+function addTyping() {
+  return addMsg(
+    "AI is thinking...",
+    "bot typing"
+  );
+}
+
+/* ─────────────────────────────
+   API HEALTH CHECK
+───────────────────────────── */
+
+async function checkBackend() {
+
+  try {
+
+    const res = await fetch(
+      HEALTH_ENDPOINT
+    );
+
+    if (!res.ok) {
+      throw new Error();
+    }
+
+    console.log(
+      "✅ Backend online"
+    );
+
+  } catch (err) {
+
+    addMsg(
+      "⚠️ Backend waking up... please wait a moment.",
+      "bot"
+    );
+
+    console.error(err);
+  }
 }
 
 /* ─────────────────────────────
    SEND MESSAGE
 ───────────────────────────── */
 
-async function send(){
+async function send() {
 
-  if(isLoading) return;
+  if (isLoading) return;
 
   const text = input.value.trim();
-  if(!text) return;
 
-  addMsg(text,"user");
+  if (!text) return;
+
+  /* USER MESSAGE */
+
+  addMsg(text, "user");
+
   input.value = "";
+
+  input.focus();
 
   isLoading = true;
 
   const loading = addTyping();
 
-  try{
+  try {
 
-    const res = await fetch(API_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        message:text,
-        sessionId:session
-      })
-    });
+    const controller =
+      new AbortController();
 
-    if(!res.ok){
-      throw new Error("Network error");
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 45000);
+
+    const res = await fetch(
+      CHAT_ENDPOINT,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          message: text,
+          sessionId
+        }),
+
+        signal: controller.signal
+      }
+    );
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+
+      const errorText =
+        await res.text();
+
+      throw new Error(
+        errorText ||
+        `HTTP ${res.status}`
+      );
     }
 
     const data = await res.json();
 
-    loading.textContent =
-      data.reply || "No response from AI.";
+    console.log(data);
 
-  }catch(err){
+    loading.textContent =
+      data.reply ||
+      data.message ||
+      "No AI response received.";
+
+  } catch (err) {
 
     console.error(err);
 
-    loading.textContent =
-      "⚠️ Connection failed. Backend offline.";
+    if (err.name === "AbortError") {
 
-  }finally{
+      loading.textContent =
+        "⏳ Request timed out. Backend may be waking up.";
+
+    } else {
+
+      loading.textContent =
+        "⚠️ Failed to connect to AI server.";
+    }
+
+  } finally {
+
     isLoading = false;
   }
 }
@@ -225,56 +197,94 @@ async function send(){
    ENTER KEY SUPPORT
 ───────────────────────────── */
 
-input.addEventListener("keypress",(e)=>{
-  if(e.key === "Enter"){
-    send();
+input.addEventListener(
+  "keydown",
+  (e) => {
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      send();
+    }
   }
-});
+);
 
 /* ─────────────────────────────
    VOICE INPUT
 ───────────────────────────── */
 
-function startVoice(){
+function startVoice() {
 
-  const Speech =
+  const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-  if(!Speech){
-    alert("Voice not supported in this browser");
+  if (!SpeechRecognition) {
+
+    addMsg(
+      "⚠️ Voice recognition not supported.",
+      "bot"
+    );
+
     return;
   }
 
-  const rec = new Speech();
-  rec.lang = "en-US";
+  const recognition =
+    new SpeechRecognition();
 
-  rec.onstart = () => {
-    addMsg("🎤 Listening...","bot");
+  recognition.lang = "en-US";
+
+  recognition.interimResults = false;
+
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+
+    addMsg(
+      "🎤 Listening...",
+      "bot"
+    );
   };
 
-  rec.onresult = (e)=>{
-    const text = e.results[0][0].transcript;
+  recognition.onresult = (event) => {
+
+    const text =
+      event.results[0][0]
+        .transcript;
+
     input.value = text;
+
     send();
   };
 
-  rec.onerror = () => {
-    addMsg("Voice error occurred","bot");
+  recognition.onerror = (
+    event
+  ) => {
+
+    console.error(event);
+
+    addMsg(
+      "⚠️ Voice input failed.",
+      "bot"
+    );
   };
 
-  rec.start();
+  recognition.start();
 }
 
 /* ─────────────────────────────
    INIT
 ───────────────────────────── */
 
-window.onload = () => {
-  addMsg("👋 VoiceOS ready. Ask anything.","bot");
+window.onload = async () => {
+
+  addMsg(
+    "👋 SancheAI VoiceOS online.",
+    "bot"
+  );
+
+  input.focus();
+
+  await checkBackend();
 };
 
 </script>
-
-</body>
-</html>
