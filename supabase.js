@@ -2,22 +2,20 @@ import { createClient } from "@supabase/supabase-js";
 
 /* ─────────────────────────
    SUPABASE CLIENT
-   (server-side secure setup)
+   PRODUCTION SAFE SETUP
 ───────────────────────── */
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn("⚠️ Missing Supabase environment variables");
+  throw new Error(
+    "❌ Missing Supabase environment variables: SUPABASE_URL and/or SUPABASE_SERVICE_ROLE_KEY"
+  );
 }
 
-export const supabase = createClient(
-  supabaseUrl || "",
-  supabaseServiceKey || "",
-  {
-    auth: {
-      persistSession: false
-    }
-  }
-);
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    persistSession: false,
+  },
+});
