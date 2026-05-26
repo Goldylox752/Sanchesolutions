@@ -1,233 +1,230 @@
-import express from "express";
-import cors from "cors";
-import Groq from "groq-sdk";
-import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SancheAI · Live Bot</title>
 
-const app = express();
+<style>
+:root{
+  --bg:#050816;
+  --panel:#0b1224;
+  --border:rgba(255,255,255,0.08);
+  --blue:#4f8cff;
+  --text:#edf2ff;
+}
 
-/* ─────────────────────────────
-   ENV
-───────────────────────────── */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
 
-const {
-  GROQ_API_KEY,
-  SUPABASE_URL,
-  SUPABASE_KEY,
-  STRIPE_SECRET_KEY
-} = process.env;
+body{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg);
+  color:var(--text);
+}
 
-/* ─────────────────────────────
-   CLIENTS
-───────────────────────────── */
+/* HEADER */
+header{
+  padding:14px 16px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-const groq = new Groq({
-  apiKey: GROQ_API_KEY
+header h1{
+  font-size:15px;
+}
+
+.badge{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:20px;
+  background:rgba(79,140,255,0.15);
+  color:var(--blue);
+}
+
+/* CHAT */
+.chat{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.msg{
+  max-width:75%;
+  padding:12px 14px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.4;
+  white-space:pre-wrap;
+}
+
+.user{
+  background:var(--blue);
+  align-self:flex-end;
+}
+
+.ai{
+  background:var(--panel);
+  border:1px solid var(--border);
+  align-self:flex-start;
+}
+
+/* INPUT */
+.input-bar{
+  display:flex;
+  gap:10px;
+  padding:12px;
+  background:var(--panel);
+  border-top:1px solid var(--border);
+}
+
+input{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.03);
+  color:white;
+  outline:none;
+}
+
+button{
+  padding:12px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.send{
+  background:var(--blue);
+  color:white;
+}
+
+.small{
+  text-align:center;
+  font-size:12px;
+  opacity:0.6;
+  padding:6px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>SancheAI Bot</h1>
+  <div class="badge">Groq · SaaS AI</div>
+</header>
+
+<div class="chat" id="chat"></div>
+
+<div class="small">
+  AI Sales + Automation Bot · Powered by your Groq backend
+</div>
+
+<div class="input-bar">
+  <input id="input" placeholder="Ask your AI bot..." />
+  <button class="send" onclick="send()">Send</button>
+</div>
+
+<script>
+
+/* 🔗 YOUR BACKEND */
+const API_URL = "https://sanchesolutions.onrender.com/chat";
+
+/* 🧠 USER ID (matches your Supabase + Stripe system) */
+const user_id =
+  localStorage.getItem("user_id") ||
+  crypto.randomUUID();
+
+localStorage.setItem("user_id", user_id);
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+/* UI */
+function addMsg(text, type){
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function typing(){
+  const div = document.createElement("div");
+  div.className = "msg ai";
+  div.textContent = "Thinking...";
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+/* 🚀 SEND MESSAGE TO YOUR GROQ BOT */
+async function send(){
+
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMsg(text,"user");
+  input.value = "";
+
+  const load = typing();
+
+  try {
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: text,
+        user_id: user_id
+      })
+    });
+
+    const data = await res.json();
+
+    /* 🔒 PAYWALL HANDLING */
+    if(data.error){
+      load.textContent = "🔒 " + data.error;
+      return;
+    }
+
+    load.textContent =
+      data.reply || "No response from AI.";
+
+  } catch(err) {
+    console.error(err);
+    load.textContent = "⚠️ Bot offline or server error";
+  }
+}
+
+/* ENTER KEY SUPPORT */
+input.addEventListener("keypress",(e)=>{
+  if(e.key === "Enter") send();
 });
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const stripe = new Stripe(STRIPE_SECRET_KEY);
-
-/* ─────────────────────────────
-   MIDDLEWARE
-───────────────────────────── */
-
-app.use(cors());
-app.use(express.json({ limit: "1mb" }));
-
-/* ─────────────────────────────
-   ACCESS CHECK (SaaS GATE)
-───────────────────────────── */
-
-async function hasAccess(user_id) {
-  if (!user_id) return false;
-
-  const { data } = await supabase
-    .from("users")
-    .select("plan")
-    .eq("id", user_id)
-    .single();
-
-  return data?.plan === "pro" || data?.plan === "active";
-}
-
-/* ─────────────────────────────
-   SIMPLE ROUTER (FAST + LIGHT)
-───────────────────────────── */
-
-function route(message = "") {
-  const m = message.toLowerCase();
-
-  if (m.includes("bug") || m.includes("error")) return "technical";
-  if (m.includes("automate")) return "automation";
-  if (m.includes("price") || m.includes("buy")) return "sales";
-
-  return "support";
-}
-
-/* ─────────────────────────────
-   AGENTS (GROQ PROMPTS)
-───────────────────────────── */
-
-const agents = {
-  sales:
-    "You are a SaaS sales assistant focused on ROI, conversions, and closing deals quickly.",
-
-  technical:
-    "You are a senior software engineer. Give clear, step-by-step debugging help.",
-
-  automation:
-    "You design AI automation systems and workflows for businesses.",
-
-  support:
-    "You are a helpful SaaS support assistant. Be short and clear."
+/* INIT MESSAGE */
+window.onload = () => {
+  addMsg("👋 SancheAI Bot is live. Ask me anything.", "ai");
 };
 
-/* ─────────────────────────────
-   CHAT (GROQ CORE)
-───────────────────────────── */
+</script>
 
-app.post("/chat", async (req, res) => {
-  try {
-    const { message, user_id } = req.body;
-
-    if (!message) {
-      return res.status(400).json({ error: "Missing message" });
-    }
-
-    /* ── SAAS ACCESS CONTROL ── */
-    const access = await hasAccess(user_id);
-
-    if (!access) {
-      return res.status(403).json({
-        error: "No active subscription",
-        upgrade: "/pricing"
-      });
-    }
-
-    const agent = route(message);
-
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content: agents[agent]
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
-
-    const reply =
-      completion?.choices?.[0]?.message?.content ||
-      "No response generated.";
-
-    /* ── SAVE CHAT LOG ── */
-    await supabase.from("chat_logs").insert({
-      user_id,
-      message,
-      reply,
-      agent
-    });
-
-    res.json({
-      reply,
-      agent
-    });
-
-  } catch (err) {
-    console.error("CHAT ERROR:", err);
-    res.status(500).json({ error: "Groq AI failed" });
-  }
-});
-
-/* ─────────────────────────────
-   STRIPE CHECKOUT
-───────────────────────────── */
-
-app.post("/create-checkout", async (req, res) => {
-  try {
-    const { user_id } = req.body;
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: process.env.STRIPE_PRICE_ID,
-          quantity: 1
-        }
-      ],
-      success_url: "https://your-domain.com/success",
-      cancel_url: "https://your-domain.com/cancel",
-      metadata: {
-        user_id
-      }
-    });
-
-    res.json({ url: session.url });
-
-  } catch (err) {
-    console.error("STRIPE ERROR:", err);
-    res.status(500).json({ error: "Stripe failed" });
-  }
-});
-
-/* ─────────────────────────────
-   STRIPE WEBHOOK
-───────────────────────────── */
-
-app.post(
-  "/stripe-webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
-    try {
-      const event = JSON.parse(req.body);
-
-      if (event.type === "checkout.session.completed") {
-        const user_id = event.data.object.metadata.user_id;
-
-        await supabase
-          .from("users")
-          .update({ plan: "pro" })
-          .eq("id", user_id);
-      }
-
-      res.json({ received: true });
-
-    } catch (err) {
-      console.error("WEBHOOK ERROR:", err);
-      res.status(400).send("Webhook error");
-    }
-  }
-);
-
-/* ─────────────────────────────
-   HEALTH
-───────────────────────────── */
-
-app.get("/", (req, res) => {
-  res.json({
-    status: "online",
-    ai: "groq-llama-3.3",
-    billing: "stripe",
-    db: "supabase",
-    version: "5.0-groq-saas"
-  });
-});
-
-/* ─────────────────────────────
-   START
-───────────────────────────── */
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("🚀 Groq SaaS running on", PORT);
-});
+</body>
+</html>
