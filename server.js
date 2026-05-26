@@ -2,7 +2,12 @@ import express from "express";
 import cors from "cors";
 import Groq from "groq-sdk";
 import twilio from "twilio";
+import dotenv from "dotenv";
+
 import { supabase } from "./supabase.js";
+import { stripe } from "./stripe.js";
+
+dotenv.config();
 
 const app = express();
 
@@ -23,16 +28,14 @@ const groq = new Groq({
 });
 
 /* ─────────────────────────────
-   CHAT ROUTE
+   CHAT API (SAAS CORE)
 ───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
   try {
     const { message, user_id } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Missing message" });
-    }
+    if (!message) return res.status(400).json({ error: "No message" });
 
     const ai = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
@@ -40,22 +43,16 @@ app.post("/chat", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, a SaaS sales assistant that helps convert leads into booked calls."
+            "You are SancheAI, a SaaS AI sales assistant that converts leads into customers."
         },
-        {
-          role: "user",
-          content: message
-        }
+        { role: "user", content: message }
       ]
     });
 
-    const reply =
-      ai?.choices?.[0]?.message?.content ??
-      "No response generated.";
+    const reply = ai.choices?.[0]?.message?.content || "No response";
 
-    /* ───── SUPABASE LOGGING (SAFE) ───── */
-
-    if (user_id && supabase) {
+    /* SAVE CHAT */
+    if (user_id) {
       await supabase.from("chat_logs").insert({
         user_id,
         message,
@@ -63,76 +60,10 @@ app.post("/chat", async (req, res) => {
       });
     }
 
-    return res.json({ reply });
+    res.json({ reply });
 
   } catch (err) {
-    console.error("CHAT ERROR:", err);
-    return res.status(500).json({ error: "AI service failed" });
+    console.error(err);
+    res.status(500).json({ error: "AI failed" });
   }
-});
-
-/* ─────────────────────────────
-   TWILIO VOICE WEBHOOK
-───────────────────────────── */
-
-app.post("/voice", async (req, res) => {
-  const VoiceResponse = twilio.twiml.VoiceResponse;
-  const response = new VoiceResponse();
-
-  try {
-    const speech =
-      req.body?.SpeechResult ||
-      req.body?.Speech ||
-      "Hello";
-
-    const ai = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a professional AI phone receptionist. Keep responses under 2 sentences."
-        },
-        {
-          role: "user",
-          content: speech
-        }
-      ]
-    });
-
-    const reply =
-      ai?.choices?.[0]?.message?.content ??
-      "Sorry, I didn't understand that.";
-
-    response.say(reply);
-
-  } catch (err) {
-    console.error("VOICE ERROR:", err);
-    response.say("System error. Please try again later.");
-  }
-
-  res.type("text/xml");
-  res.send(response.toString());
-});
-
-/* ─────────────────────────────
-   HEALTH CHECK
-───────────────────────────── */
-
-app.get("/", (req, res) => {
-  res.json({
-    status: "online",
-    service: "SancheAI MVP",
-    features: ["chat", "voice", "groq", "supabase"]
-  });
-});
-
-/* ─────────────────────────────
-   START SERVER
-───────────────────────────── */
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`SancheAI running on port ${PORT}`);
 });
