@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Revenue Systems</title>
+<title>SancheSolutions · AI Voice Revenue OS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -15,9 +15,11 @@ body {
   color: white;
 }
 
+/* NAV */
 nav {
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:20px 30px;
   position:sticky;
   top:0;
@@ -28,6 +30,7 @@ nav {
 
 .logo {
   font-weight:800;
+  letter-spacing:0.5px;
 }
 
 .logo span { color:#4f8cff; }
@@ -40,16 +43,23 @@ nav {
   border-radius:10px;
   cursor:pointer;
   font-weight:600;
+  transition:0.2s;
 }
 
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* HERO */
 .hero {
   text-align:center;
-  padding:100px 20px;
+  padding:110px 20px 80px;
 }
 
 .hero h1 {
-  font-size:52px;
+  font-size:54px;
   margin:0;
+  line-height:1.1;
 }
 
 .hero h1 span {
@@ -57,17 +67,42 @@ nav {
 }
 
 .hero p {
-  max-width:700px;
+  max-width:720px;
   margin:20px auto;
-  opacity:0.8;
+  opacity:0.85;
   line-height:1.6;
+  font-size:18px;
 }
 
+/* CTA ROW */
+.cta {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:25px;
+}
+
+.secondary {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+/* METRICS */
+.metrics {
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  margin-top:40px;
+  opacity:0.8;
+  font-size:14px;
+}
+
+/* FEATURES */
 .features {
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:16px;
-  padding:60px 24px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:18px;
+  padding:70px 24px;
   max-width:1100px;
   margin:auto;
 }
@@ -76,13 +111,40 @@ nav {
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
   border-radius:16px;
-  padding:18px;
+  padding:20px;
+  transition:0.2s;
 }
 
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(79,140,255,0.3);
+}
+
+.card h3 {
+  margin-top:0;
+}
+
+/* HOW IT WORKS */
+.steps {
+  max-width:900px;
+  margin:0 auto;
+  padding:40px 24px 80px;
+}
+
+.step {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+/* FOOTER */
 footer {
   text-align:center;
   padding:50px;
   opacity:0.6;
+  border-top:1px solid rgba(255,255,255,0.08);
 }
 </style>
 </head>
@@ -91,38 +153,75 @@ footer {
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <a href="/app.html"><button class="btn">Launch App</button></a>
+  <a href="/app.html"><button class="btn">Launch AI VoiceOS</button></a>
 </nav>
 
 <section class="hero">
-  <h1>Turn Conversations Into <span>Revenue</span></h1>
+
+  <h1>
+    AI Voice Agents That <span>Answer Calls & Close Leads</span>
+  </h1>
+
   <p>
-    We build AI revenue systems that automate sales, qualify leads, and convert website traffic into paying customers.
+    Build a 24/7 AI call center that answers phone calls, qualifies customers,
+    books appointments, and syncs directly into your CRM — powered by Groq + Twilio.
   </p>
-  <a href="/app.html"><button class="btn">Get Started</button></a>
+
+  <div class="cta">
+    <a href="/app.html"><button class="btn">Launch Platform</button></a>
+    <button class="btn secondary">Watch Demo</button>
+  </div>
+
+  <div class="metrics">
+    <div>⚡ Instant Response AI</div>
+    <div>📞 Voice + Chat System</div>
+    <div>💰 Revenue Automation</div>
+  </div>
+
 </section>
 
 <section class="features">
 
   <div class="card">
-    <h3>AI Sales Automation</h3>
-    <p>Automatically qualify leads and book high-intent customers.</p>
+    <h3>📞 AI Call Center</h3>
+    <p>Answer inbound calls automatically with human-like AI voice agents.</p>
   </div>
 
   <div class="card">
-    <h3>CRM Integration</h3>
-    <p>Sync HubSpot, Pipedrive, and pipelines with AI logic.</p>
+    <h3>🎯 Lead Qualification</h3>
+    <p>Filter, score, and prioritize high-intent customers instantly.</p>
   </div>
 
   <div class="card">
-    <h3>Conversion Chat</h3>
-    <p>Turn website visitors into booked calls instantly.</p>
+    <h3>📅 Appointment Booking</h3>
+    <p>AI schedules meetings directly into your calendar.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔗 CRM Integration</h3>
+    <p>Sync leads into HubSpot, Pipedrive, or custom pipelines.</p>
+  </div>
+
+</section>
+
+<section class="steps">
+
+  <div class="step">
+    <b>Step 1:</b> Customer calls your AI number
+  </div>
+
+  <div class="step">
+    <b>Step 2:</b> AI answers, qualifies, and responds instantly
+  </div>
+
+  <div class="step">
+    <b>Step 3:</b> Leads are booked or routed to your team
   </div>
 
 </section>
 
 <footer>
-  © 2026 SancheSolutions — AI Revenue Systems
+  © 2026 SancheSolutions — AI Voice Revenue Systems
 </footer>
 
 </body>
