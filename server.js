@@ -6,78 +6,135 @@ import { supabase } from "./supabase.js";
 
 const app = express();
 
+/* ─────────────────────────────
+   MIDDLEWARE
+───────────────────────────── */
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-/* ───────── AI ───────── */
+/* ─────────────────────────────
+   AI CLIENT
+───────────────────────────── */
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-/* ───────── CHAT ───────── */
+/* ─────────────────────────────
+   CHAT ROUTE (SAFETY + LOGGING)
+───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
-  const { message, user_id } = req.body;
+  try {
+    const { message, user_id } = req.body;
 
-  const ai = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: "You are SancheAI, a SaaS sales assistant."
-      },
-      { role: "user", content: message }
-    ]
-  });
-
-  const reply = ai.choices[0].message.content;
-
-  // SAVE TO SUPABASE
-  await supabase.from("chat_logs").insert([
-    {
-      user_id,
-      message,
-      reply
+    if (!message) {
+      return res.status(400).json({ error: "Missing message" });
     }
-  ]);
 
-  res.json({ reply });
+    const ai = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are SancheAI, a SaaS sales assistant that helps convert leads."
+        },
+        { role: "user", content: message }
+      ]
+    });
+
+    const reply =
+      ai?.choices?.[0]?.message?.content ||
+      "Sorry, no response generated.";
+
+    /* ───── SAVE TO SUPABASE (SAFE) ───── */
+
+    if (user_id) {
+      await supabase.from("chat_logs").insert([
+        {
+          user_id,
+          message,
+          reply
+        }
+      ]);
+    }
+
+    res.json({ reply });
+
+  } catch (err) {
+    console.error("CHAT ERROR:", err);
+    res.status(500).json({ error: "AI service failed" });
+  }
 });
 
-/* ───────── CALL (TWILIO) ───────── */
+/* ─────────────────────────────
+   TWILIO VOICE WEBHOOK
+───────────────────────────── */
 
 app.post("/voice", async (req, res) => {
-  const VoiceResponse = twilio.twiml.VoiceResponse;
-  const response = new VoiceResponse();
+  try {
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const response = new VoiceResponse();
 
-  const speech = req.body.SpeechResult || "Hello";
+    const speech =
+      req.body?.SpeechResult ||
+      req.body?.Speech ||
+      "Hello";
 
-  const ai = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: "You are a phone receptionist. Keep responses short."
-      },
-      { role: "user", content: speech }
-    ]
-  });
+    const ai = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a professional phone receptionist. Keep responses under 2 sentences."
+        },
+        { role: "user", content: speech }
+      ]
+    });
 
-  const reply = ai.choices[0].message.content;
+    const reply =
+      ai?.choices?.[0]?.message?.content ||
+      "Sorry, I didn't catch that.";
 
-  response.say(reply);
+    response.say(reply);
 
-  res.type("text/xml");
-  res.send(response.toString());
+    res.type("text/xml");
+    res.send(response.toString());
+
+  } catch (err) {
+    console.error("VOICE ERROR:", err);
+
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const response = new VoiceResponse();
+
+    response.say("System error. Please try again later.");
+
+    res.type("text/xml");
+    res.send(response.toString());
+  }
 });
 
-/* ───────── HEALTH ───────── */
+/* ─────────────────────────────
+   HEALTH CHECK
+───────────────────────────── */
 
 app.get("/", (req, res) => {
-  res.send("SancheAI Supabase MVP Running");
+  res.json({
+    status: "online",
+    service: "SancheAI Supabase MVP"
+  });
 });
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+/* ─────────────────────────────
+   START SERVER
+───────────────────────────── */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`SancheAI running on port ${PORT}`);
 });
