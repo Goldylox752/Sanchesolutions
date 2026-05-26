@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SancheSolutions · AI Revenue Assistant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #050816;
+  --card: rgba(255,255,255,0.05);
+  --blue: #4f8cff;
+  --text: #eaf0ff;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'DM Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg));
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.logo span {
+  color: var(--blue);
+}
+
+.btn {
+  background: var(--blue);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* CHAT WRAPPER */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* MESSAGES */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.msg {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.user {
+  background: var(--blue);
+  margin-left: auto;
+}
+
+.bot {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* INPUT */
+.input-bar {
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: white;
+  outline: none;
+}
+
+button.send {
+  width: 80px;
+  border-radius: 10px;
+  border: none;
+  background: var(--blue);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Sanche<span>App</span></div>
+  <a href="/"><button class="btn">← Back</button></a>
+</header>
+
+<div class="chat">
+  <div class="messages" id="messages"></div>
+
+  <div class="input-bar">
+    <input id="input" placeholder="Ask about automation, pricing, SaaS..." />
+    <button class="send" onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+/* ---------------- UI ---------------- */
+
+function addMsg(text, type) {
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* ---------------- SIMPLE AI FALLBACK ---------------- */
+
+function aiReply(msg) {
+  msg = msg.toLowerCase();
+
+  if (msg.includes("price") || msg.includes("cost")) {
+    return "Plans start at $2,500/month for full AI automation systems.";
+  }
+
+  if (msg.includes("demo")) {
+    return "We can book a demo — what does your business do?";
+  }
+
+  if (msg.includes("automation")) {
+    return "We build AI systems that automate leads, sales, and CRM workflows.";
+  }
+
+  if (msg.includes("saas")) {
+    return "This platform is a YC-style AI SaaS system for revenue automation.";
+  }
+
+  return "Tell me more about your business and I’ll map a solution for you.";
+}
+
+/* ---------------- SEND ---------------- */
+
+function send() {
+  const text = input.value;
+  if (!text.trim()) return;
+
+  addMsg(text, "user");
+  input.value = "";
+
+  setTimeout(() => {
+    addMsg(aiReply(text), "bot");
+  }, 400);
+}
+
+/* ---------------- INIT ---------------- */
+
+window.onload = () => {
+  addMsg("👋 Welcome to SancheSolutions AI. Ask me about automation, SaaS, or pricing.", "bot");
+};
+</script>
+
+</body>
+</html>
