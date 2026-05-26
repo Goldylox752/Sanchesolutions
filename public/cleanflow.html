@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanFlow AI</title>
+  <title>CleanFlow AI - Get More Cleaning Jobs</title>
 
   <style>
     body {
@@ -23,10 +23,6 @@
       font-weight: bold;
     }
 
-    .nav span {
-      color: #111;
-    }
-
     /* HERO */
     .hero {
       text-align: center;
@@ -35,14 +31,14 @@
     }
 
     .hero h1 {
-      font-size: 48px;
+      font-size: 46px;
       margin-bottom: 12px;
     }
 
     .hero p {
       font-size: 18px;
       color: #555;
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
@@ -69,9 +65,9 @@
 
     .card {
       background: white;
-      padding: 20px;
+      padding: 22px;
       border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
       text-align: center;
     }
 
@@ -79,10 +75,12 @@
       margin-bottom: 8px;
     }
 
-    /* SOCIAL PROOF */
+    /* SECTION */
     .section {
       text-align: center;
       padding: 60px 20px;
+      max-width: 800px;
+      margin: auto;
     }
 
     .section h2 {
@@ -92,11 +90,24 @@
 
     .section p {
       color: #555;
-      max-width: 600px;
-      margin: auto;
+      line-height: 1.6;
     }
 
-    /* BOT BUTTON */
+    /* CTA BLOCK */
+    .cta {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      margin-top: 40px;
+    }
+
+    .price {
+      font-size: 22px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    /* BOT */
     #bot-btn {
       position: fixed;
       bottom: 20px;
@@ -114,7 +125,6 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
-    /* CHAT */
     #chat {
       position: fixed;
       bottom: 95px;
@@ -183,50 +193,63 @@
 <!-- NAV -->
 <div class="nav">
   <span>🧼 CleanFlow AI</span>
-  <span>Automate Your Cleaning Business</span>
+  <span>AI Booking System for Cleaners</span>
 </div>
 
 <!-- HERO -->
 <div class="hero">
   <h1>Get More Cleaning Jobs Automatically</h1>
   <p>
-    CleanFlow AI turns website visitors into booked cleaning jobs using automated AI chat, 24/7 lead capture, and instant qualification.
+    CleanFlow AI is a 24/7 AI receptionist that turns your website visitors into booked cleaning jobs — without you replying manually.
   </p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
-    Get Instant Quote
+    Try Live Demo
   </div>
 </div>
 
 <!-- FEATURES -->
 <div class="features">
+
+  <div class="card">
+    <h3>💰 More Booked Jobs</h3>
+    <p>Convert visitors into paying customers automatically</p>
+  </div>
+
   <div class="card">
     <h3>⚡ Instant Replies</h3>
-    <p>Respond to customers instantly 24/7</p>
+    <p>No more missed messages or slow responses</p>
   </div>
 
   <div class="card">
-    <h3>📅 Auto Booking Flow</h3>
-    <p>Turn chats into scheduled jobs</p>
+    <h3>📅 Auto Qualification</h3>
+    <p>We pre-screen customers before you speak to them</p>
   </div>
 
   <div class="card">
-    <h3>💰 More Leads</h3>
-    <p>Never miss a customer again</p>
+    <h3>📲 Works 24/7</h3>
+    <p>Even while you’re sleeping, you’re getting leads</p>
   </div>
 
-  <div class="card">
-    <h3>📲 WhatsApp Ready</h3>
-    <p>Connect directly to real customers</p>
-  </div>
 </div>
 
-<!-- SOCIAL PROOF -->
+<!-- PROBLEM SECTION -->
 <div class="section">
-  <h2>Built for Cleaning Businesses</h2>
+  <h2>Stop Losing Cleaning Jobs</h2>
   <p>
-    CleanFlow AI helps cleaning companies automate customer conversations and increase bookings without extra staff.
+    Most cleaning businesses lose 40–70% of leads because they reply too slow or miss messages completely.
+    CleanFlow AI fixes that instantly.
   </p>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>Start Getting More Jobs This Week</h2>
+  <p class="price">$49/month — Cancel anytime</p>
+
+  <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
+    Activate Demo Bot
+  </div>
 </div>
 
 <!-- BOT BUTTON -->
@@ -241,8 +264,8 @@
 
   <div id="messages">
     <div class="msg bot">
-      👋 Hey! I can help you get a cleaning quote in under 60 seconds.<br><br>
-      What type of cleaning do you need?
+      👋 Hey! I can help you get more cleaning jobs.<br><br>
+      What type of cleaning do you offer? (House, Office, Deep, Move-out)
     </div>
   </div>
 
@@ -287,30 +310,30 @@ function bot(msg) {
 
   if (step === 0) {
     step = 1;
-    return "Perfect 👍 What area are you located in?";
+    return "Perfect 👍 What area do you serve?";
   }
 
   if (step === 1) {
     step = 2;
-    return "Nice 👍 How big is the space?";
+    return "Nice 👍 What size homes do you usually clean?";
   }
 
   if (step === 2) {
     step = 3;
-    return "Great 👍 When would you like it cleaned?";
+    return "Great 👍 How soon can you take new bookings?";
   }
 
   if (step === 3) {
     step = 4;
-    return "Almost done 🔥 What’s your phone or email?";
+    return "Almost done 🔥 What’s your phone or email for leads?";
   }
 
   if (step === 4) {
     step = 5;
-    return "Perfect 🎉 A cleaning specialist will contact you shortly with pricing & availability.";
+    return "Perfect 🎉 You’re ready to start getting more cleaning jobs.";
   }
 
-  return "What type of cleaning do you need? 🧼";
+  return "What type of cleaning do you offer? 🧼";
 }
 
 function add(text, type) {
