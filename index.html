@@ -3,341 +3,127 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>SancheSolutions · AI Revenue SaaS</title>
+<title>SancheSolutions · AI Revenue Systems</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #050816;
-  --panel: rgba(255,255,255,0.05);
-  --border: rgba(120,160,255,0.18);
-  --blue: #4f8cff;
-  --text: #eaf0ff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'DM Sans', sans-serif;
-}
-
 body {
-  background: radial-gradient(circle at 20% 20%, #0b1a3a, var(--bg) 60%);
-  color: var(--text);
-  display: flex;
-  min-height: 100vh;
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: radial-gradient(circle at 20% 20%, #0b1a3a, #050816);
+  color: white;
 }
 
-/* ───────── SIDEBAR (SAAS FEEL) ───────── */
-.sidebar {
-  width: 240px;
-  background: rgba(5,8,22,0.7);
-  border-right: 1px solid var(--border);
-  padding: 20px;
-  backdrop-filter: blur(16px);
+nav {
+  display:flex;
+  justify-content:space-between;
+  padding:20px 30px;
+  position:sticky;
+  top:0;
+  background:rgba(5,8,22,0.7);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 30px;
+  font-weight:800;
 }
 
-.logo span { color: var(--blue); }
-
-.nav-item {
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-.nav-item:hover {
-  background: var(--panel);
-  opacity: 1;
-}
-
-/* ───────── MAIN AREA ───────── */
-.main {
-  flex: 1;
-  padding: 24px;
-}
-
-/* TOP BAR */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
+.logo span { color:#4f8cff; }
 
 .btn {
-  padding: 10px 14px;
-  background: linear-gradient(135deg, var(--blue), #2a57cf);
-  border: none;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
+  background:#4f8cff;
+  border:none;
+  padding:10px 16px;
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
 }
 
-/* KPI CARDS */
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
+.hero {
+  text-align:center;
+  padding:100px 20px;
 }
 
-.kpi {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 14px;
+.hero h1 {
+  font-size:52px;
+  margin:0;
 }
 
-.kpi h2 {
-  color: var(--blue);
+.hero h1 span {
+  color:#4f8cff;
 }
 
-/* PROJECT GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 14px;
+.hero p {
+  max-width:700px;
+  margin:20px auto;
+  opacity:0.8;
+  line-height:1.6;
+}
+
+.features {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
+  padding:60px 24px;
+  max-width:1100px;
+  margin:auto;
 }
 
 .card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  transition: 0.2s;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:18px;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  border-color: var(--blue);
-}
-
-.tag {
-  font-size: 11px;
-  padding: 4px 8px;
-  background: rgba(79,140,255,0.15);
-  border-radius: 6px;
-  display: inline-block;
-  margin-bottom: 8px;
-}
-
-/* CHAT WIDGET (INTERCOM STYLE) */
-.fab {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--blue);
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 20px;
-}
-
-.chat {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 360px;
-  height: 520px;
-  background: rgba(10,14,25,0.95);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  display: none;
-  flex-direction: column;
-  backdrop-filter: blur(20px);
-}
-
-.chat.open { display: flex; }
-
-.messages {
-  flex: 1;
-  padding: 12px;
-  overflow-y: auto;
-}
-
-.msg {
-  padding: 10px;
-  margin: 6px 0;
-  border-radius: 12px;
-  font-size: 13px;
-}
-
-.user {
-  background: var(--blue);
-  margin-left: auto;
-}
-
-.bot {
-  background: rgba(255,255,255,0.05);
-}
-
-.input {
-  display: flex;
-  border-top: 1px solid var(--border);
-}
-
-.input input {
-  flex: 1;
-  padding: 10px;
-  background: transparent;
-  border: none;
-  color: white;
-  outline: none;
-}
-
-.input button {
-  width: 50px;
-  background: var(--blue);
-  border: none;
-  color: white;
-  cursor: pointer;
+footer {
+  text-align:center;
+  padding:50px;
+  opacity:0.6;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<nav>
   <div class="logo">Sanche<span>Solutions</span></div>
+  <a href="/app.html"><button class="btn">Launch App</button></a>
+</nav>
 
-  <div class="nav-item">📊 Dashboard</div>
-  <div class="nav-item">🚀 Projects</div>
-  <div class="nav-item">🤖 AI Agents</div>
-  <div class="nav-item">💰 Revenue</div>
-  <div class="nav-item">⚙️ Settings</div>
-</div>
+<section class="hero">
+  <h1>Turn Conversations Into <span>Revenue</span></h1>
+  <p>
+    We build AI revenue systems that automate sales, qualify leads, and convert website traffic into paying customers.
+  </p>
+  <a href="/app.html"><button class="btn">Get Started</button></a>
+</section>
 
-<!-- MAIN -->
-<div class="main">
+<section class="features">
 
-  <div class="topbar">
-    <h2>Revenue AI SaaS Dashboard</h2>
-    <button class="btn">Book Demo</button>
+  <div class="card">
+    <h3>AI Sales Automation</h3>
+    <p>Automatically qualify leads and book high-intent customers.</p>
   </div>
 
-  <!-- KPI -->
-  <div class="kpis">
-    <div class="kpi">
-      <h2>+34%</h2>
-      <p>Conversion Increase</p>
-    </div>
-
-    <div class="kpi">
-      <h2>24/7</h2>
-      <p>AI Agent Uptime</p>
-    </div>
-
-    <div class="kpi">
-      <h2>120+</h2>
-      <p>Leads Automated</p>
-    </div>
+  <div class="card">
+    <h3>CRM Integration</h3>
+    <p>Sync HubSpot, Pipedrive, and pipelines with AI logic.</p>
   </div>
 
-  <!-- PROJECTS -->
-  <div class="grid">
-
-    <div class="card">
-      <div class="tag">AI SYSTEM</div>
-      <h3>Sales Automation Engine</h3>
-      <p>Automates inbound leads & books calls automatically.</p>
-    </div>
-
-    <div class="card">
-      <div class="tag">CRM</div>
-      <h3>HubSpot AI Sync</h3>
-      <p>Smart CRM updates + workflow automation.</p>
-    </div>
-
-    <div class="card">
-      <div class="tag">CHAT AI</div>
-      <h3>Lead Qualification Bot</h3>
-      <p>Converts visitors into qualified prospects.</p>
-    </div>
-
-    <div class="card">
-      <div class="tag">ANALYTICS</div>
-      <h3>Revenue Dashboard</h3>
-      <p>Tracks pipeline, conversions, and AI performance.</p>
-    </div>
-
+  <div class="card">
+    <h3>Conversion Chat</h3>
+    <p>Turn website visitors into booked calls instantly.</p>
   </div>
 
-</div>
+</section>
 
-<!-- CHAT -->
-<button class="fab" id="fab">💬</button>
-
-<div class="chat" id="chat">
-  <div class="messages" id="messages"></div>
-
-  <div class="input">
-    <input id="input" placeholder="Ask about automation, pricing..." />
-    <button id="send">➤</button>
-  </div>
-</div>
-
-<script>
-const fab = document.getElementById("fab");
-const chat = document.getElementById("chat");
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
-
-function add(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function reply(msg) {
-  const m = msg.toLowerCase();
-
-  if (m.includes("price")) return "Plans start at $2,500/month for AI automation systems.";
-  if (m.includes("demo")) return "Let’s book a demo — what industry are you in?";
-  if (m.includes("saas")) return "We build YC-style SaaS systems with AI agents + automation.";
-  if (m.includes("lead")) return "We automate lead capture, scoring, and conversion.";
-  return "Tell me about your business and I’ll design a system for you.";
-}
-
-function send() {
-  const text = input.value;
-  if (!text) return;
-
-  add(text, "user");
-  input.value = "";
-
-  setTimeout(() => add(reply(text), "bot"), 500);
-}
-
-fab.onclick = () => {
-  chat.classList.toggle("open");
-  if (messages.children.length === 0) {
-    add("👋 I'm your Revenue AI assistant.", "bot");
-  }
-};
-
-document.getElementById("send").onclick = send;
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") send();
-});
-</script>
+<footer>
+  © 2026 SancheSolutions — AI Revenue Systems
+</footer>
 
 </body>
 </html>
