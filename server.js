@@ -23,7 +23,7 @@ const groq = new Groq({
 });
 
 /* ─────────────────────────────
-   CHAT ROUTE (SAFETY + LOGGING)
+   CHAT ROUTE
 ───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
@@ -40,33 +40,31 @@ app.post("/chat", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, a SaaS sales assistant that helps convert leads."
+            "You are SancheAI, a SaaS sales assistant that converts leads into booked calls."
         },
         { role: "user", content: message }
       ]
     });
 
     const reply =
-      ai?.choices?.[0]?.message?.content ||
-      "Sorry, no response generated.";
+      ai?.choices?.[0]?.message?.content ??
+      "No response generated.";
 
-    /* ───── SAVE TO SUPABASE (SAFE) ───── */
+    /* ───── SUPABASE LOGGING (SAFE GUARD) ───── */
 
-    if (user_id) {
-      await supabase.from("chat_logs").insert([
-        {
-          user_id,
-          message,
-          reply
-        }
-      ]);
+    if (user_id && supabase) {
+      await supabase.from("chat_logs").insert({
+        user_id,
+        message,
+        reply
+      });
     }
 
-    res.json({ reply });
+    return res.json({ reply });
 
   } catch (err) {
     console.error("CHAT ERROR:", err);
-    res.status(500).json({ error: "AI service failed" });
+    return res.status(500).json({ error: "AI service failed" });
   }
 });
 
@@ -75,10 +73,10 @@ app.post("/chat", async (req, res) => {
 ───────────────────────────── */
 
 app.post("/voice", async (req, res) => {
-  try {
-    const VoiceResponse = twilio.twiml.VoiceResponse;
-    const response = new VoiceResponse();
+  const VoiceResponse = twilio.twiml.VoiceResponse;
+  const response = new VoiceResponse();
 
+  try {
     const speech =
       req.body?.SpeechResult ||
       req.body?.Speech ||
@@ -90,32 +88,25 @@ app.post("/voice", async (req, res) => {
         {
           role: "system",
           content:
-            "You are a professional phone receptionist. Keep responses under 2 sentences."
+            "You are a professional AI phone receptionist. Be short, clear, and helpful (max 2 sentences)."
         },
         { role: "user", content: speech }
       ]
     });
 
     const reply =
-      ai?.choices?.[0]?.message?.content ||
-      "Sorry, I didn't catch that.";
+      ai?.choices?.[0]?.message?.content ??
+      "Sorry, I didn't understand that.";
 
     response.say(reply);
 
-    res.type("text/xml");
-    res.send(response.toString());
-
   } catch (err) {
     console.error("VOICE ERROR:", err);
-
-    const VoiceResponse = twilio.twiml.VoiceResponse;
-    const response = new VoiceResponse();
-
     response.say("System error. Please try again later.");
-
-    res.type("text/xml");
-    res.send(response.toString());
   }
+
+  res.type("text/xml");
+  res.send(response.toString());
 });
 
 /* ─────────────────────────────
@@ -125,7 +116,8 @@ app.post("/voice", async (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     status: "online",
-    service: "SancheAI Supabase MVP"
+    service: "SancheAI MVP",
+    features: ["chat", "voice", "groq", "supabase"]
   });
 });
 
