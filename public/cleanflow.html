@@ -13,7 +13,6 @@
       color: #111;
     }
 
-    /* NAV */
     .nav {
       display: flex;
       justify-content: space-between;
@@ -23,7 +22,6 @@
       font-weight: bold;
     }
 
-    /* HERO */
     .hero {
       text-align: center;
       padding: 90px 20px 60px;
@@ -38,7 +36,7 @@
     .hero p {
       font-size: 18px;
       color: #555;
-      max-width: 650px;
+      max-width: 700px;
       margin: 0 auto;
     }
 
@@ -53,7 +51,6 @@
       font-weight: bold;
     }
 
-    /* FEATURES */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -71,11 +68,6 @@
       text-align: center;
     }
 
-    .card h3 {
-      margin-bottom: 8px;
-    }
-
-    /* SECTION */
     .section {
       text-align: center;
       padding: 60px 20px;
@@ -93,7 +85,6 @@
       line-height: 1.6;
     }
 
-    /* CTA BLOCK */
     .cta {
       text-align: center;
       padding: 60px 20px;
@@ -103,11 +94,10 @@
 
     .price {
       font-size: 22px;
-      margin: 10px 0;
       font-weight: bold;
+      margin: 10px 0;
     }
 
-    /* BOT */
     #bot-btn {
       position: fixed;
       bottom: 20px;
@@ -190,17 +180,15 @@
 
 <body>
 
-<!-- NAV -->
 <div class="nav">
   <span>🧼 CleanFlow AI</span>
-  <span>AI Booking System for Cleaners</span>
+  <span>AI Booking System for Cleaning Businesses</span>
 </div>
 
-<!-- HERO -->
 <div class="hero">
-  <h1>Get More Cleaning Jobs Automatically</h1>
+  <h1>Get More Cleaning Jobs Without Paying for Ads</h1>
   <p>
-    CleanFlow AI is a 24/7 AI receptionist that turns your website visitors into booked cleaning jobs — without you replying manually.
+    CleanFlow AI is a 24/7 AI receptionist that automatically turns your website visitors into booked cleaning customers — even while you sleep.
   </p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
@@ -208,54 +196,49 @@
   </div>
 </div>
 
-<!-- FEATURES -->
 <div class="features">
 
   <div class="card">
     <h3>💰 More Booked Jobs</h3>
-    <p>Convert visitors into paying customers automatically</p>
+    <p>Turn website visitors into paying customers automatically</p>
   </div>
 
   <div class="card">
-    <h3>⚡ Instant Replies</h3>
-    <p>No more missed messages or slow responses</p>
+    <h3>⚡ Instant Response</h3>
+    <p>No more lost leads from slow replies or missed messages</p>
   </div>
 
   <div class="card">
-    <h3>📅 Auto Qualification</h3>
-    <p>We pre-screen customers before you speak to them</p>
+    <h3>📅 Smart Qualification</h3>
+    <p>We filter and pre-qualify customers before you talk to them</p>
   </div>
 
   <div class="card">
     <h3>📲 Works 24/7</h3>
-    <p>Even while you’re sleeping, you’re getting leads</p>
+    <p>Your business keeps getting leads even when you're offline</p>
   </div>
 
 </div>
 
-<!-- PROBLEM SECTION -->
 <div class="section">
-  <h2>Stop Losing Cleaning Jobs</h2>
+  <h2>Most Cleaning Businesses Lose 50% of Leads</h2>
   <p>
-    Most cleaning businesses lose 40–70% of leads because they reply too slow or miss messages completely.
-    CleanFlow AI fixes that instantly.
+    Customers don’t wait. If you don’t respond fast, they move on.
+    CleanFlow AI makes sure every visitor gets answered instantly and guided toward booking.
   </p>
 </div>
 
-<!-- CTA -->
 <div class="cta">
-  <h2>Start Getting More Jobs This Week</h2>
-  <p class="price">$49/month — Cancel anytime</p>
+  <h2>Start Getting More Cleaning Jobs This Week</h2>
+  <p class="price">$49/month — Cancel Anytime</p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
     Activate Demo Bot
   </div>
 </div>
 
-<!-- BOT BUTTON -->
 <div id="bot-btn">🧼</div>
 
-<!-- CHAT -->
 <div id="chat">
   <div id="header">
     <span>CleanFlow AI</span>
@@ -265,7 +248,7 @@
   <div id="messages">
     <div class="msg bot">
       👋 Hey! I can help you get more cleaning jobs.<br><br>
-      What type of cleaning do you offer? (House, Office, Deep, Move-out)
+      What type of cleaning do you offer?
     </div>
   </div>
 
@@ -315,7 +298,7 @@ function bot(msg) {
 
   if (step === 1) {
     step = 2;
-    return "Nice 👍 What size homes do you usually clean?";
+    return "Nice 👍 What type of properties do you clean?";
   }
 
   if (step === 2) {
@@ -330,7 +313,7 @@ function bot(msg) {
 
   if (step === 4) {
     step = 5;
-    return "Perfect 🎉 You’re ready to start getting more cleaning jobs.";
+    return "Perfect 🎉 You’re ready to start getting more cleaning jobs automatically.";
   }
 
   return "What type of cleaning do you offer? 🧼";
