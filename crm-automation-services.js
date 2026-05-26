@@ -1,10 +1,30 @@
+"use client";
+
 export default function CRMPage() {
+
+  const startCheckout = async (plan) => {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ plan }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  };
+
   return (
     <main style={styles.page}>
 
       {/* HERO */}
       <section style={styles.hero}>
         <h1>AI CRM Revenue Automation System</h1>
+
         <p style={styles.subheading}>
           Turn your CRM into a predictable revenue engine that follows up,
           qualifies, and books customers automatically.
@@ -15,8 +35,8 @@ export default function CRMPage() {
           Leads come in… then go cold.
         </p>
 
-        <a href="#apply" style={styles.button}>
-          Apply for CRM Audit
+        <a href="#pricing" style={styles.button}>
+          View Pricing
         </a>
       </section>
 
@@ -87,18 +107,45 @@ export default function CRMPage() {
         </ol>
       </section>
 
-      {/* INVESTMENT */}
-      <section style={styles.section}>
+      {/* PRICING + STRIPE */}
+      <section id="pricing" style={styles.section}>
         <h2>Investment</h2>
-        <p style={styles.price}>$2,000 – $10,000+</p>
-        <p>
-          One-time done-for-you CRM revenue system installation.
-          One closed deal can often cover the entire system.
-        </p>
+        <p>Choose the level of automation your business needs.</p>
+
+        <div style={styles.grid}>
+
+          <div style={styles.card}>
+            <h3>Starter</h3>
+            <p style={styles.price}>$2,000</p>
+            <p>CRM automation foundation system</p>
+            <button style={styles.buttonDark} onClick={() => startCheckout("starter")}>
+              Get Starter
+            </button>
+          </div>
+
+          <div style={styles.card}>
+            <h3>Growth</h3>
+            <p style={styles.price}>$5,000</p>
+            <p>Advanced AI follow-up + booking system</p>
+            <button style={styles.buttonDark} onClick={() => startCheckout("growth")}>
+              Most Popular
+            </button>
+          </div>
+
+          <div style={styles.card}>
+            <h3>Scale</h3>
+            <p style={styles.price}>$10,000</p>
+            <p>Full AI revenue automation system</p>
+            <button style={styles.buttonDark} onClick={() => startCheckout("scale")}>
+              Full System
+            </button>
+          </div>
+
+        </div>
       </section>
 
       {/* CTA */}
-      <section id="apply" style={styles.cta}>
+      <section style={styles.cta}>
         <h2>Apply for a CRM Revenue System Audit</h2>
         <p>
           We’ll review your current system and show exactly where revenue is being lost.
@@ -113,6 +160,7 @@ export default function CRMPage() {
   );
 }
 
+/* STYLES */
 const styles = {
   page: {
     fontFamily: "Arial, sans-serif",
@@ -167,8 +215,32 @@ const styles = {
     fontWeight: "bold",
   },
 
+  buttonDark: {
+    marginTop: "15px",
+    padding: "12px 18px",
+    background: "#111",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "20px",
+    marginTop: "30px",
+  },
+
+  card: {
+    padding: "20px",
+    border: "1px solid #ddd",
+    borderRadius: "12px",
+    textAlign: "center",
+  },
+
   price: {
-    fontSize: "32px",
+    fontSize: "28px",
     fontWeight: "bold",
   },
 };
