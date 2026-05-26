@@ -71,6 +71,8 @@ body.light nav{
   color:var(--text);
   background:transparent;
   font-size:13px;
+  text-decoration:none;
+  display:inline-block;
 }
 
 .btn-primary{
@@ -179,10 +181,12 @@ h2{
   border:1px solid var(--border);
 }
 
-/* LINKS */
-a.btn{
-  text-decoration:none;
-  display:inline-block;
+.cta-buttons{
+  margin-top:20px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
 }
 </style>
 </head>
@@ -254,8 +258,26 @@ a.btn{
 
 <section>
   <div class="cta-box">
-    <h2>Want This Built for Your Business?</h2>
-    <p>We only take a limited number of clients per month.</p>
+    <h2>Let’s Build Your System</h2>
+    <p>Book a call or message directly on WhatsApp.</p>
+
+    <div class="cta-buttons">
+
+      <!-- WHATSAPP (hidden number via link) -->
+      <a class="btn btn-primary"
+         href="https://wa.me/17802679673"
+         target="_blank">
+         💬 WhatsApp Me
+      </a>
+
+      <!-- CALENDLY -->
+      <a class="btn"
+         href="https://calendly.com"
+         target="_blank">
+         📅 Book on Calendly
+      </a>
+
+    </div>
   </div>
 </section>
 
