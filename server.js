@@ -12,35 +12,34 @@ const app = express();
    ENV VALIDATION
 ───────────────────────────── */
 
-function requireEnv(name) {
-  const value = process.env[name];
-  if (!value) throw new Error(`❌ Missing environment variable: ${name}`);
+function requireEnv(key) {
+  const value = process.env[key];
+  if (!value) throw new Error(`❌ Missing env: ${key}`);
   return value;
 }
 
 /* ─────────────────────────────
-   EXTERNAL CLIENTS
+   CLIENTS
 ───────────────────────────── */
 
 const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"));
-
 const groq = new Groq({
   apiKey: requireEnv("GROQ_API_KEY"),
 });
 
-/* Lazy imports (safe for ESM deploys) */
-let supabase;
+/* Lazy Supabase (prevents cold-start crashes) */
+let supabaseClient;
 
-async function getSupabase() {
-  if (!supabase) {
+async function db() {
+  if (!supabaseClient) {
     const mod = await import("./supabase.js");
-    supabase = mod.supabase;
+    supabaseClient = mod.supabase;
   }
-  return supabase;
+  return supabaseClient;
 }
 
 /* ─────────────────────────────
-   CORS
+   GLOBAL MIDDLEWARE
 ───────────────────────────── */
 
 app.use(
@@ -56,33 +55,31 @@ app.use(
   })
 );
 
-/* ─────────────────────────────
-   STRIPE WEBHOOK (RAW BODY ONLY)
-───────────────────────────── */
-
+/* IMPORTANT: Stripe needs RAW body FIRST */
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
   async (req, res) => {
-    const signature = req.headers["stripe-signature"];
+    const sig = req.headers["stripe-signature"];
 
     let event;
 
     try {
       event = stripe.webhooks.constructEvent(
         req.body,
-        signature,
+        sig,
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("❌ Stripe webhook failed:", err.message);
+      console.error("❌ Webhook signature failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     try {
-      const db = await getSupabase();
+      const supabase = await db();
 
       switch (event.type) {
+        /* ── PAYMENT SUCCESS ── */
         case "checkout.session.completed": {
           const session = event.data.object;
           const userId = session?.metadata?.user_id;
@@ -90,7 +87,7 @@ app.post(
           console.log("💰 Payment success:", userId);
 
           if (userId) {
-            const { error } = await db.from("users").upsert({
+            const { error } = await supabase.from("users").upsert({
               id: userId,
               plan: "pro",
               stripe_customer_id: session.customer,
@@ -98,12 +95,14 @@ app.post(
             });
 
             if (error) {
-              console.error("Supabase error:", error.message);
+              console.error("DB error:", error.message);
             }
           }
+
           break;
         }
 
+        /* ── FAILED PAYMENT ── */
         case "invoice.payment_failed":
           console.log("❌ Payment failed");
           break;
@@ -114,14 +113,14 @@ app.post(
 
       return res.json({ received: true });
     } catch (err) {
-      console.error("Webhook processing error:", err);
-      return res.status(500).json({ error: "Webhook processing failed" });
+      console.error("Webhook error:", err);
+      return res.status(500).json({ error: "Webhook failed" });
     }
   }
 );
 
 /* ─────────────────────────────
-   JSON MIDDLEWARE (AFTER WEBHOOK)
+   JSON BODY (AFTER WEBHOOK ONLY)
 ───────────────────────────── */
 
 app.use(express.json());
@@ -134,6 +133,7 @@ app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
     service: "SancheAI SaaS",
+    version: "1.0.0",
   });
 });
 
@@ -142,7 +142,7 @@ app.get("/", (req, res) => {
 });
 
 /* ─────────────────────────────
-   CHAT ROUTE (GROQ)
+   AI CHAT ROUTE
 ───────────────────────────── */
 
 app.post("/api/chat", async (req, res) => {
@@ -150,7 +150,7 @@ app.post("/api/chat", async (req, res) => {
     const { message, sessionId, user_id } = req.body;
 
     if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+      return res.status(400).json({ error: "Message required" });
     }
 
     const completion = await groq.chat.completions.create({
@@ -159,7 +159,7 @@ app.post("/api/chat", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SancheAI, an AI business assistant for automation, SaaS growth, and customer support.",
+            "You are SancheAI, an AI business automation assistant specializing in SaaS, CRM systems, and revenue automation.",
         },
         { role: "user", content: message },
       ],
@@ -169,10 +169,11 @@ app.post("/api/chat", async (req, res) => {
       completion?.choices?.[0]?.message?.content ||
       "No response generated.";
 
-    const db = await getSupabase();
+    const supabase = await db();
 
+    /* optional logging */
     if (user_id) {
-      const { error } = await db.from("chat_logs").insert({
+      const { error } = await supabase.from("chat_logs").insert({
         user_id,
         session_id: sessionId,
         message,
@@ -180,12 +181,13 @@ app.post("/api/chat", async (req, res) => {
         created_at: new Date().toISOString(),
       });
 
-      if (error) {
-        console.error("Chat log error:", error.message);
-      }
+      if (error) console.error("Chat log error:", error.message);
     }
 
-    return res.json({ success: true, reply });
+    return res.json({
+      success: true,
+      reply,
+    });
   } catch (err) {
     console.error("❌ AI ERROR:", err);
     return res.status(500).json({ error: "AI request failed" });
@@ -201,7 +203,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     const { user_id, email } = req.body;
 
     if (!user_id || !email) {
-      return res.status(400).json({ error: "Missing user_id or email" });
+      return res.status(400).json({ error: "Missing user_id/email" });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -212,9 +214,13 @@ app.post("/api/create-checkout-session", async (req, res) => {
         {
           price_data: {
             currency: "usd",
-            product_data: { name: "SancheAI Pro" },
+            product_data: {
+              name: "SancheAI Pro",
+            },
             unit_amount: 2900,
-            recurring: { interval: "month" },
+            recurring: {
+              interval: "month",
+            },
           },
           quantity: 1,
         },
@@ -226,7 +232,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
       cancel_url:
         "https://sanchesolutions.vercel.app/app.html?cancel=1",
 
-      metadata: { user_id },
+      metadata: {
+        user_id,
+      },
     });
 
     return res.json({ url: session.url });
