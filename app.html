@@ -68,6 +68,11 @@ header{
   border:1px solid var(--border);
 }
 
+.typing{
+  opacity:0.7;
+  font-style:italic;
+}
+
 /* INPUT */
 .input-bar{
   display:flex;
@@ -104,12 +109,6 @@ button{
   background:var(--green);
   color:black;
 }
-
-/* typing pulse */
-.typing{
-  opacity:0.7;
-  font-style:italic;
-}
 </style>
 </head>
 
@@ -133,7 +132,7 @@ button{
 
 const API_URL = "https://YOUR-BACKEND.onrender.com/chat";
 
-/* session (for Supabase + Stripe later) */
+/* stable session (SaaS ready) */
 const session =
   localStorage.getItem("session") ||
   crypto.randomUUID();
@@ -141,18 +140,28 @@ const session =
 localStorage.setItem("session", session);
 
 /* ─────────────────────────────
-   UI
+   STATE CONTROL
+───────────────────────────── */
+
+let isLoading = false;
+
+/* ─────────────────────────────
+   UI HELPERS
 ───────────────────────────── */
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-function addMsg(text,type){
+function scrollBottom(){
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addMsg(text, type){
   const div = document.createElement("div");
   div.className = "msg " + type;
   div.textContent = text;
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  scrollBottom();
   return div;
 }
 
@@ -166,11 +175,15 @@ function addTyping(){
 
 async function send(){
 
+  if(isLoading) return;
+
   const text = input.value.trim();
   if(!text) return;
 
   addMsg(text,"user");
   input.value = "";
+
+  isLoading = true;
 
   const loading = addTyping();
 
@@ -183,7 +196,7 @@ async function send(){
       },
       body:JSON.stringify({
         message:text,
-        session
+        sessionId:session
       })
     });
 
@@ -194,17 +207,29 @@ async function send(){
     const data = await res.json();
 
     loading.textContent =
-      data.reply || "No response";
+      data.reply || "No response from AI.";
 
   }catch(err){
 
     console.error(err);
 
     loading.textContent =
-      "Connection failed. Check backend.";
+      "⚠️ Connection failed. Backend offline.";
 
+  }finally{
+    isLoading = false;
   }
 }
+
+/* ─────────────────────────────
+   ENTER KEY SUPPORT
+───────────────────────────── */
+
+input.addEventListener("keypress",(e)=>{
+  if(e.key === "Enter"){
+    send();
+  }
+});
 
 /* ─────────────────────────────
    VOICE INPUT
@@ -223,19 +248,22 @@ function startVoice(){
 
   const rec = new Speech();
   rec.lang = "en-US";
-  rec.start();
+
+  rec.onstart = () => {
+    addMsg("🎤 Listening...","bot");
+  };
 
   rec.onresult = (e)=>{
-    const text =
-      e.results[0][0].transcript;
-
+    const text = e.results[0][0].transcript;
     input.value = text;
     send();
   };
 
   rec.onerror = () => {
-    alert("Voice recognition error");
+    addMsg("Voice error occurred","bot");
   };
+
+  rec.start();
 }
 
 /* ─────────────────────────────
