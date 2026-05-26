@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SancheSolutions · AI Automation & Revenue Systems</title>
+<title>SancheSolutions · AI SaaS & Automation Studio</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -17,230 +17,229 @@ body {
   overflow-x: hidden;
 }
 
-/* FAB */
-.fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4f8cff, #2a57cf);
+/* NAV */
+nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 40px;
+  align-items: center;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+}
+
+.logo span {
+  color: #4f8cff;
+}
+
+.btn {
+  background: linear-gradient(135deg,#4f8cff,#2a57cf);
   border: none;
-  font-size: 24px;
+  padding: 10px 18px;
+  border-radius: 30px;
   color: white;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 100px 20px 60px;
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  max-width: 700px;
+  margin: auto;
+  opacity: 0.8;
+}
+
+/* SECTIONS */
+.section {
+  padding: 80px 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+/* PROJECTS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(79,140,255,0.2);
+  padding: 20px;
+  border-radius: 18px;
   transition: 0.2s;
 }
-.fab:hover { transform: scale(1.05); }
 
-/* Chat */
-.chat-panel {
-  position: fixed;
-  bottom: 100px;
-  right: 24px;
-  width: 380px;
-  height: 580px;
-  background: rgba(10,14,25,0.95);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(79,140,255,0.3);
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #4f8cff;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgba(79,140,255,0.2);
+  display: inline-block;
   border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(20px);
-  pointer-events: none;
-  transition: 0.25s ease;
+  margin-bottom: 10px;
 }
 
-.chat-panel.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+/* SERVICES */
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 20px;
 }
 
-/* Messages */
-.messages-area {
-  flex: 1;
-  padding: 14px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.msg {
-  max-width: 85%;
-  padding: 10px 14px;
+.service {
+  background: rgba(255,255,255,0.04);
+  padding: 20px;
   border-radius: 16px;
-  font-size: 14px;
-  line-height: 1.4;
-  word-break: break-word;
+  border: 1px solid rgba(79,140,255,0.15);
 }
 
-.user {
-  background: linear-gradient(135deg, #4f8cff, #2a57cf);
-  margin-left: auto;
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 40px;
+  opacity: 0.6;
 }
 
-.bot {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(79,140,255,0.25);
+/* CTA */
+.cta {
+  text-align: center;
+  padding: 80px 20px;
 }
 
-/* Input */
-.input-area {
-  display: flex;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.input-area input {
-  flex: 1;
-  padding: 14px;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: white;
-}
-
-.input-area button {
-  width: 60px;
+.cta button {
+  padding: 14px 26px;
+  border-radius: 30px;
   border: none;
   background: #4f8cff;
   color: white;
   cursor: pointer;
   font-weight: bold;
 }
-
-/* Typing */
-.typing {
-  font-size: 12px;
-  opacity: 0.7;
-  font-style: italic;
-}
 </style>
 </head>
 
 <body>
 
-<button class="fab" id="fab">💬</button>
+<nav>
+  <div class="logo">Sanche<span>Solutions</span></div>
+  <button class="btn">Book Demo</button>
+</nav>
 
-<div class="chat-panel" id="panel">
-  <div class="messages-area" id="messages"></div>
+<section class="hero">
+  <h1>AI SaaS & Automation That Builds Revenue Systems</h1>
+  <p>
+    We design AI chat systems, automation pipelines, and SaaS tools that turn businesses into self-scaling revenue machines.
+  </p>
+</section>
 
-  <div class="input-area">
-    <input id="input" placeholder="Ask about pricing, demos, automation..." />
-    <button id="send">➤</button>
+<section class="section">
+  <h2 class="title">🚀 Featured Projects</h2>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="tag">AI Chat System</div>
+      <h3>Revenue AI Chatbot</h3>
+      <p>AI assistant that qualifies leads, answers pricing, and books demos automatically.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">Automation</div>
+      <h3>Lead Capture Engine</h3>
+      <p>System that scores, tags, and routes leads into CRM pipelines in real time.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">SaaS Tool</div>
+      <h3>Client Dashboard</h3>
+      <p>Internal dashboard for tracking automation workflows and revenue metrics.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">Integration</div>
+      <h3>CRM Sync System</h3>
+      <p>HubSpot / Salesforce / custom API integrations for automated sales flow.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">AI Workflow</div>
+      <h3>Sales Funnel Automation</h3>
+      <p>Email + SMS + AI follow-up sequences that convert cold leads into bookings.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">Custom Build</div>
+      <h3>Business Automation Stack</h3>
+      <p>End-to-end automation system replacing manual sales and admin tasks.</p>
+    </div>
+
   </div>
-</div>
+</section>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+<section class="section">
+  <h2 class="title">⚙️ Services</h2>
 
-  const API = "https://sanchesolutions.onrender.com/chat";
+  <div class="services">
 
-  const panel = document.getElementById("panel");
-  const fab = document.getElementById("fab");
-  const messages = document.getElementById("messages");
-  const input = document.getElementById("input");
-  const send = document.getElementById("send");
+    <div class="service">
+      <h3>AI Chatbots</h3>
+      <p>Convert website visitors into qualified leads 24/7.</p>
+    </div>
 
-  let isSending = false;
+    <div class="service">
+      <h3>Automation Systems</h3>
+      <p>Replace manual workflows with intelligent automation.</p>
+    </div>
 
-  function addMsg(text, type) {
-    const div = document.createElement("div");
-    div.className = "msg " + type;
-    div.textContent = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-    return div;
-  }
+    <div class="service">
+      <h3>SaaS Development</h3>
+      <p>Build scalable internal tools & platforms.</p>
+    </div>
 
-  function addTyping() {
-    return addMsg("AI is thinking...", "bot");
-  }
+    <div class="service">
+      <h3>CRM Integration</h3>
+      <p>Connect your entire sales pipeline automatically.</p>
+    </div>
 
-  function fallbackReply(text) {
-    const msg = text.toLowerCase();
+  </div>
+</section>
 
-    if (msg.includes("price") || msg.includes("cost")) {
-      return "💰 Pricing depends on automation scope. Most clients start at $2,500/month.";
-    }
-    if (msg.includes("demo")) {
-      return "📅 I can help you book a demo. What industry are you in?";
-    }
-    if (msg.includes("ai") || msg.includes("automation")) {
-      return "🤖 We build AI systems that automate leads, sales, and CRM workflows.";
-    }
-    return "✨ Tell me more about your business so I can recommend a solution.";
-  }
+<section class="cta">
+  <h2>Ready to build your revenue system?</h2>
+  <p>Let’s turn your business into an automated SaaS machine.</p>
+  <button onclick="alert('Book demo system coming next')">Book a Demo</button>
+</section>
 
-  async function sendMessage(text) {
-    if (!text.trim() || isSending) return;
-
-    isSending = true;
-
-    addMsg(text, "user");
-    input.value = "";
-
-    const botMsg = addTyping();
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-
-    try {
-      const res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      if (!res.ok || !res.body) throw new Error("API error");
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-
-      let full = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        full += decoder.decode(value, { stream: true });
-        botMsg.textContent = full;
-        messages.scrollTop = messages.scrollHeight;
-      }
-
-    } catch (err) {
-      console.warn("API fallback:", err);
-      botMsg.textContent = fallbackReply(text);
-    }
-
-    isSending = false;
-  }
-
-  fab.onclick = () => {
-    panel.classList.toggle("open");
-
-    if (messages.children.length === 0) {
-      addMsg("👋 Hey, I’m your AI Revenue Assistant. Ask me about pricing, automation, or demos.", "bot");
-    }
-  };
-
-  send.onclick = () => sendMessage(input.value);
-
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage(input.value);
-  });
-
-  console.log("✅ SancheSolutions AI loaded successfully");
-});
-</script>
+<footer>
+  © 2026 SancheSolutions · AI SaaS & Automation Studio
+</footer>
 
 </body>
 </html>
