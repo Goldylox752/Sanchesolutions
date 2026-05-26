@@ -1,256 +1,233 @@
 import express from "express";
 import cors from "cors";
-import OpenAI from "openai";
+import Groq from "groq-sdk";
+import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
+
+/* ─────────────────────────────
+   ENV
+───────────────────────────── */
+
+const {
+  GROQ_API_KEY,
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  STRIPE_SECRET_KEY
+} = process.env;
+
+/* ─────────────────────────────
+   CLIENTS
+───────────────────────────── */
+
+const groq = new Groq({
+  apiKey: GROQ_API_KEY
+});
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const stripe = new Stripe(STRIPE_SECRET_KEY);
+
+/* ─────────────────────────────
+   MIDDLEWARE
+───────────────────────────── */
 
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
 /* ─────────────────────────────
-   AI CLIENT
+   ACCESS CHECK (SaaS GATE)
 ───────────────────────────── */
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+async function hasAccess(user_id) {
+  if (!user_id) return false;
 
-/* ─────────────────────────────
-   SIMPLE MEMORY STORE (upgradeable to Redis later)
-───────────────────────────── */
+  const { data } = await supabase
+    .from("users")
+    .select("plan")
+    .eq("id", user_id)
+    .single();
 
-const memory = new Map(); // sessionId -> messages
-
-function getMemory(sessionId) {
-  if (!memory.has(sessionId)) memory.set(sessionId, []);
-  return memory.get(sessionId);
+  return data?.plan === "pro" || data?.plan === "active";
 }
 
 /* ─────────────────────────────
-   AGENTS (UPGRADED PROMPTS)
+   SIMPLE ROUTER (FAST + LIGHT)
+───────────────────────────── */
+
+function route(message = "") {
+  const m = message.toLowerCase();
+
+  if (m.includes("bug") || m.includes("error")) return "technical";
+  if (m.includes("automate")) return "automation";
+  if (m.includes("price") || m.includes("buy")) return "sales";
+
+  return "support";
+}
+
+/* ─────────────────────────────
+   AGENTS (GROQ PROMPTS)
 ───────────────────────────── */
 
 const agents = {
-  router: `
-Classify the user intent into ONLY ONE word:
+  sales:
+    "You are a SaaS sales assistant focused on ROI, conversions, and closing deals quickly.",
 
-sales = buying intent, pricing, conversion, demo, ROI
-technical = bugs, code, integration issues
-seo = ranking, Google, traffic, keywords
-automation = workflows, AI automation, systems
-closer = urgency, ready to buy, "start now", "let's do it"
-support = help, general questions
+  technical:
+    "You are a senior software engineer. Give clear, step-by-step debugging help.",
 
-Return ONLY the word.
-`,
+  automation:
+    "You design AI automation systems and workflows for businesses.",
 
-  sales: `
-You are a high-performance sales engineer.
-
-Rules:
-- Focus on ROI, outcomes, and business value
-- Keep responses short and persuasive
-- Always try to move toward a demo or call
-- Never be vague
-`,
-
-  technical: `
-You are a senior technical engineer.
-
-Rules:
-- Be precise and structured
-- Give step-by-step fixes
-- Assume developer-level clarity
-`,
-
-  seo: `
-You are an SEO strategist.
-
-Rules:
-- Focus on ranking, keywords, traffic growth
-- Give actionable SEO steps
-`,
-
-  automation: `
-You are an AI automation architect.
-
-Rules:
-- Suggest workflows, tools, integrations
-- Focus on business automation ROI
-`,
-
-  closer: `
-You are a high-conversion sales closer.
-
-Rules:
-- Create urgency
-- Push toward booking a demo or call
-- Focus on transformation and ROI
-- Be confident but not spammy
-`,
-
-  support: `
-You are a helpful support assistant.
-
-Rules:
-- Keep answers simple
-- Solve the problem quickly
-`
+  support:
+    "You are a helpful SaaS support assistant. Be short and clear."
 };
 
 /* ─────────────────────────────
-   INTENT DETECTION (IMPROVED)
-───────────────────────────── */
-
-function detectStage(message = "") {
-  const msg = message.toLowerCase();
-
-  if (msg.includes("buy") || msg.includes("start now") || msg.includes("sign up")) {
-    return "purchase";
-  }
-
-  if (msg.includes("price") || msg.includes("cost") || msg.includes("pricing")) {
-    return "decision";
-  }
-
-  return "awareness";
-}
-
-/* ─────────────────────────────
-   SMART ROUTER (MORE RELIABLE)
-───────────────────────────── */
-
-async function routeAgent(message) {
-  try {
-    const res = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0,
-      max_tokens: 10,
-      messages: [
-        { role: "system", content: agents.router },
-        { role: "user", content: message }
-      ]
-    });
-
-    const result = res.choices?.[0]?.message?.content
-      ?.trim()
-      ?.toLowerCase();
-
-    const valid = [
-      "sales",
-      "technical",
-      "seo",
-      "automation",
-      "closer",
-      "support"
-    ];
-
-    return valid.includes(result) ? result : "sales";
-
-  } catch (err) {
-    console.error("Router error:", err);
-    return "sales";
-  }
-}
-
-/* ─────────────────────────────
-   STREAM RESPONSE (FIXED + SAFE)
-───────────────────────────── */
-
-async function streamResponse({ agent, message, res }) {
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      stream: true,
-      temperature: 0.6,
-      max_tokens: 350,
-      messages: [
-        { role: "system", content: agents[agent] || agents.sales },
-        { role: "user", content: message }
-      ]
-    });
-
-    let hasOutput = false;
-
-    for await (const chunk of completion) {
-      const token = chunk.choices?.[0]?.delta?.content;
-
-      if (token) {
-        hasOutput = true;
-        res.write(token);
-      }
-    }
-
-    if (!hasOutput) {
-      res.write("Let me help you with that.");
-    }
-
-    res.end();
-
-  } catch (err) {
-    console.error("Stream error:", err);
-    res.write("AI temporarily unavailable. Please try again.");
-    res.end();
-  }
-}
-
-/* ─────────────────────────────
-   MAIN CHAT ROUTE (WITH MEMORY)
+   CHAT (GROQ CORE)
 ───────────────────────────── */
 
 app.post("/chat", async (req, res) => {
-  const { message = "", sessionId = "default" } = req.body;
+  try {
+    const { message, user_id } = req.body;
 
-  if (!message.trim()) {
-    return res.status(400).json({ error: "No message provided" });
+    if (!message) {
+      return res.status(400).json({ error: "Missing message" });
+    }
+
+    /* ── SAAS ACCESS CONTROL ── */
+    const access = await hasAccess(user_id);
+
+    if (!access) {
+      return res.status(403).json({
+        error: "No active subscription",
+        upgrade: "/pricing"
+      });
+    }
+
+    const agent = route(message);
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: agents[agent]
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 500
+    });
+
+    const reply =
+      completion?.choices?.[0]?.message?.content ||
+      "No response generated.";
+
+    /* ── SAVE CHAT LOG ── */
+    await supabase.from("chat_logs").insert({
+      user_id,
+      message,
+      reply,
+      agent
+    });
+
+    res.json({
+      reply,
+      agent
+    });
+
+  } catch (err) {
+    console.error("CHAT ERROR:", err);
+    res.status(500).json({ error: "Groq AI failed" });
   }
-
-  const stage = detectStage(message);
-  let agent = await routeAgent(message);
-
-  if (stage === "purchase") {
-    agent = "closer";
-  }
-
-  // ── MEMORY CONTEXT ──
-  const history = getMemory(sessionId);
-  history.push({ role: "user", content: message });
-
-  if (history.length > 10) history.shift();
-
-  res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-
-  await streamResponse({
-    agent,
-    message,
-    res
-  });
-
-  history.push({ role: "assistant", content: "streamed_response" });
 });
 
 /* ─────────────────────────────
-   HEALTH CHECK
+   STRIPE CHECKOUT
+───────────────────────────── */
+
+app.post("/create-checkout", async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price: process.env.STRIPE_PRICE_ID,
+          quantity: 1
+        }
+      ],
+      success_url: "https://your-domain.com/success",
+      cancel_url: "https://your-domain.com/cancel",
+      metadata: {
+        user_id
+      }
+    });
+
+    res.json({ url: session.url });
+
+  } catch (err) {
+    console.error("STRIPE ERROR:", err);
+    res.status(500).json({ error: "Stripe failed" });
+  }
+});
+
+/* ─────────────────────────────
+   STRIPE WEBHOOK
+───────────────────────────── */
+
+app.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    try {
+      const event = JSON.parse(req.body);
+
+      if (event.type === "checkout.session.completed") {
+        const user_id = event.data.object.metadata.user_id;
+
+        await supabase
+          .from("users")
+          .update({ plan: "pro" })
+          .eq("id", user_id);
+      }
+
+      res.json({ received: true });
+
+    } catch (err) {
+      console.error("WEBHOOK ERROR:", err);
+      res.status(400).send("Webhook error");
+    }
+  }
+);
+
+/* ─────────────────────────────
+   HEALTH
 ───────────────────────────── */
 
 app.get("/", (req, res) => {
   res.json({
-    status: "ok",
-    version: "2.0-upgraded",
-    streaming: true,
-    memory: true
+    status: "online",
+    ai: "groq-llama-3.3",
+    billing: "stripe",
+    db: "supabase",
+    version: "5.0-groq-saas"
   });
 });
 
 /* ─────────────────────────────
-   START SERVER
+   START
 ───────────────────────────── */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("🚀 Upgraded AI server running on port", PORT);
+  console.log("🚀 Groq SaaS running on", PORT);
 });
