@@ -1,191 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Voice Revenue OS</title>
-
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-<style>
-body {
-  margin: 0;
-  font-family: 'DM Sans', sans-serif;
-  background: radial-gradient(circle at 20% 20%, #0b1a3a, #050816);
-  color: white;
-}
-
-/* NAV */
-nav {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px 30px;
-  position:sticky;
-  top:0;
-  background:rgba(5,8,22,0.7);
-  backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(255,255,255,0.08);
-}
-
-.logo {
-  font-weight:800;
-}
-
-.logo span { color:#4f8cff; }
-
-.btn {
-  background:#4f8cff;
-  border:none;
-  padding:10px 16px;
-  color:white;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:600;
-  transition:0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-/* HERO */
-.hero {
-  text-align:center;
-  padding:110px 20px 80px;
-}
-
-.hero h1 {
-  font-size:54px;
-  margin:0;
-  line-height:1.1;
-}
-
-.hero h1 span {
-  color:#4f8cff;
-}
-
-.hero p {
-  max-width:720px;
-  margin:20px auto;
-  opacity:0.85;
-  line-height:1.6;
-  font-size:18px;
-}
-
-.cta {
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:25px;
-}
-
-.secondary {
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.2);
-}
-
-/* FEATURES */
-.features {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:18px;
-  padding:70px 24px;
-  max-width:1100px;
-  margin:auto;
-}
-
-.card {
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:16px;
-  padding:20px;
-}
-
-/* PRICING */
-.pricing {
-  text-align:center;
-  padding:60px 20px;
-}
-
-.price-box {
-  max-width:320px;
-  margin:0 auto;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:18px;
-  padding:30px;
-}
-
-.price {
-  font-size:42px;
-  font-weight:800;
-}
-
-/* FOOTER */
-footer {
-  text-align:center;
-  padding:50px;
-  opacity:0.6;
-}
-</style>
-</head>
-
 <body>
 
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <button class="btn" onclick="goApp()">Launch App</button>
+  <button class="btn" onclick="goApp()">Launch Platform</button>
 </nav>
 
 <section class="hero">
-  <h1>AI Voice Agents That <span>Answer Calls & Close Leads</span></h1>
+  <h1>AI Voice Agents That <span>Answer Calls, Qualify Leads & Book Appointments</span></h1>
 
   <p>
-    A 24/7 AI call center that answers phone calls, qualifies leads,
-    books appointments, and syncs to your CRM — powered by Groq + Twilio.
+    A 24/7 AI sales system that handles inbound phone calls, qualifies customers in real time,
+    books appointments, and syncs directly into your CRM.
+  </p>
+
+  <p style="opacity:0.7">
+    Stop missing calls. Stop losing leads. Automate your entire front-end sales process.
   </p>
 
   <div class="cta">
-    <button class="btn" onclick="startFree()">Start Free</button>
-    <button class="btn secondary" onclick="goApp()">Launch Platform</button>
+    <button class="btn" onclick="startFree()">Try Demo</button>
+    <button class="btn secondary" onclick="scrollToPricing()">View Pricing</button>
   </div>
 </section>
 
 <section class="features">
 
   <div class="card">
-    <h3>📞 AI Call Center</h3>
-    <p>Answer inbound calls automatically using AI voice agents.</p>
+    <h3>📞 AI Voice Receptionist</h3>
+    <p>Answers every inbound call instantly with natural AI conversation.</p>
   </div>
 
   <div class="card">
-    <h3>🎯 Lead Qualification</h3>
-    <p>Filter and prioritize high-intent customers instantly.</p>
+    <h3>🎯 Smart Lead Qualification</h3>
+    <p>Detects intent, filters spam, and prioritizes high-value leads.</p>
   </div>
 
   <div class="card">
-    <h3>📅 Appointment Booking</h3>
-    <p>AI schedules meetings directly into calendars.</p>
+    <h3>📅 Instant Booking System</h3>
+    <p>Automatically books qualified leads into your calendar.</p>
   </div>
 
   <div class="card">
-    <h3>🔗 CRM Integration</h3>
-    <p>Sync leads into HubSpot, Pipedrive, or custom systems.</p>
+    <h3>🔗 CRM + Pipeline Sync</h3>
+    <p>Pushes every lead into HubSpot, Pipedrive, or custom CRM systems.</p>
   </div>
 
 </section>
 
-<section class="pricing">
+<section class="pricing" id="pricing">
+
+  <h2>AI Voice Revenue System</h2>
+  <p style="opacity:0.7">
+    Choose how powerful you want your automation system to be.
+  </p>
 
   <div class="price-box">
-    <h2>Pro Plan</h2>
-    <div class="price">$29/mo</div>
-    <p>Full AI voice + chat + CRM automation</p>
+    <h2>Starter System</h2>
+    <div class="price">$2,000+</div>
+    <p>AI voice agent + basic CRM integration</p>
+    <button class="btn" onclick="upgrade('starter')">Get Starter</button>
+  </div>
 
-    <button class="btn" onclick="upgrade()">
-      Upgrade to Pro
-    </button>
+  <br><br>
+
+  <div class="price-box">
+    <h2>Growth System</h2>
+    <div class="price">$5,000+</div>
+    <p>AI voice + SMS + advanced qualification + booking system</p>
+    <button class="btn" onclick="upgrade('growth')">Most Popular</button>
+  </div>
+
+  <br><br>
+
+  <div class="price-box">
+    <h2>Enterprise System</h2>
+    <div class="price">$10,000+</div>
+    <p>Full AI call center + CRM automation + pipeline intelligence</p>
+    <button class="btn" onclick="upgrade('enterprise')">Go Enterprise</button>
   </div>
 
 </section>
@@ -196,10 +87,8 @@ footer {
 
 <script>
 
-/* CONFIG */
 const API_URL = "https://YOUR-BACKEND.onrender.com";
 
-/* GET OR CREATE USER */
 function getUserId(){
   let id = localStorage.getItem("user_id");
   if(!id){
@@ -209,25 +98,24 @@ function getUserId(){
   return id;
 }
 
-/* NAV */
 function goApp(){
   window.location.href = "/app.html";
 }
 
-/* FREE ACCOUNT */
 function startFree(){
-  const user_id = getUserId();
-  localStorage.setItem("plan", "free");
-
-  alert("Free account created");
+  localStorage.setItem("plan", "demo");
+  alert("Demo launched");
   goApp();
 }
 
-/* STRIPE CHECKOUT */
-async function upgrade(){
+function scrollToPricing(){
+  document.getElementById("pricing").scrollIntoView({ behavior: "smooth" });
+}
+
+async function upgrade(plan){
 
   const user_id = getUserId();
-  const email = prompt("Enter email for billing:");
+  const email = prompt("Enter email for checkout:");
 
   if(!email) return;
 
@@ -235,7 +123,7 @@ async function upgrade(){
     const res = await fetch(API_URL + "/create-checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id, email })
+      body: JSON.stringify({ user_id, email, plan })
     });
 
     const data = await res.json();
@@ -243,16 +131,15 @@ async function upgrade(){
     if(data?.url){
       window.location.href = data.url;
     } else {
-      alert("Stripe error: missing checkout URL");
+      alert("Stripe checkout failed");
     }
 
   } catch (err) {
     console.error(err);
-    alert("Payment system unavailable");
+    alert("Payment system error");
   }
 }
 
 </script>
 
 </body>
-</html>
