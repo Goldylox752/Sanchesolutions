@@ -15,6 +15,7 @@ body {
   color: white;
 }
 
+/* NAV */
 nav {
   display:flex;
   justify-content:space-between;
@@ -33,6 +34,11 @@ nav {
 
 .logo span { color:#4f8cff; }
 
+.nav-buttons{
+  display:flex;
+  gap:10px;
+}
+
 .btn {
   background:#4f8cff;
   border:none;
@@ -41,8 +47,19 @@ nav {
   border-radius:10px;
   cursor:pointer;
   font-weight:600;
+  transition:0.2s;
 }
 
+.btn:hover{
+  transform:translateY(-1px);
+}
+
+.secondary {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+/* HERO */
 .hero {
   text-align:center;
   padding:120px 20px 70px;
@@ -66,6 +83,15 @@ nav {
   line-height:1.6;
 }
 
+.cta-row{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:25px;
+  flex-wrap:wrap;
+}
+
+/* SECTION */
 .section {
   max-width:1000px;
   margin:auto;
@@ -85,6 +111,7 @@ nav {
   padding:18px;
 }
 
+/* CTA */
 .cta {
   text-align:center;
   padding:80px 20px;
@@ -99,6 +126,7 @@ nav {
   background:rgba(255,255,255,0.03);
 }
 
+/* FOOTER */
 footer {
   text-align:center;
   padding:40px;
@@ -114,9 +142,14 @@ a {
 
 <body>
 
+<!-- NAV -->
 <nav>
   <div class="logo">Sanche<span>Solutions</span></div>
-  <button class="btn" onclick="openInquiry()">Project Inquiry</button>
+
+  <div class="nav-buttons">
+    <button class="btn secondary" onclick="openInquiry()">Contact</button>
+    <button class="btn" onclick="goBot()">Launch AI Bot</button>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -131,6 +164,12 @@ a {
   <p style="opacity:0.6">
     Based in Canada · Available for freelance & contract work
   </p>
+
+  <!-- NEW BOT CTA -->
+  <div class="cta-row">
+    <button class="btn" onclick="goBot()">🚀 Try My AI Bot</button>
+    <button class="btn secondary" onclick="openInquiry()">Project Inquiry</button>
+  </div>
 </section>
 
 <!-- SERVICES -->
@@ -190,9 +229,7 @@ a {
 <section class="cta">
   <div class="cta-box">
     <h2>Project Inquiry</h2>
-    <p>
-      For freelance work, contract builds, or automation systems.
-    </p>
+    <p>For freelance work, contract builds, or automation systems.</p>
 
     <button class="btn" onclick="openInquiry()">
       Contact Me
@@ -206,15 +243,20 @@ a {
 
 <script>
 
-/* SAFE CONTACT HANDLING (HIDDEN DETAILS) */
-
 const EMAIL = "Byronsanche@zohomailcloud.ca";
 const WHATSAPP = "7802679673";
 
+/* 🚀 BOT BUTTON */
+function goBot(){
+  window.location.href = "/app.html"; 
+  // change to "/app" if you're using Next.js routing
+}
+
+/* CONTACT */
 function openInquiry(){
 
   const choice = confirm(
-    "Click OK to email inquiry or Cancel for WhatsApp"
+    "OK = Email\nCancel = WhatsApp"
   );
 
   if(choice){
