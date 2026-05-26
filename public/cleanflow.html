@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CleanFlow AI - Get More Cleaning Bookings Automatically</title>
+  <title>CleanFlow AI - Get More Cleaning Bookings</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f3f5f9;
+      background: #f4f6fb;
       color: #111;
     }
 
+    /* NAV */
     .nav {
       display: flex;
       justify-content: space-between;
@@ -22,6 +23,7 @@
       font-weight: bold;
     }
 
+    /* HERO */
     .hero {
       text-align: center;
       padding: 110px 20px 80px;
@@ -29,7 +31,7 @@
     }
 
     .hero h1 {
-      font-size: 52px;
+      font-size: 54px;
       margin-bottom: 14px;
       line-height: 1.1;
     }
@@ -37,7 +39,7 @@
     .hero p {
       font-size: 18px;
       color: #555;
-      max-width: 750px;
+      max-width: 780px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -48,16 +50,17 @@
       padding: 15px 26px;
       background: #111;
       color: white;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
       transition: 0.2s;
     }
 
     .btn:hover {
-      transform: scale(1.03);
+      transform: scale(1.05);
     }
 
+    /* FEATURES */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -75,6 +78,7 @@
       text-align: center;
     }
 
+    /* SECTION */
     .section {
       text-align: center;
       padding: 70px 20px;
@@ -90,22 +94,23 @@
     .section p {
       color: #555;
       line-height: 1.7;
-      font-size: 16px;
     }
 
+    /* CTA */
     .cta {
       text-align: center;
       padding: 80px 20px;
       background: white;
-      margin-top: 50px;
+      margin-top: 40px;
     }
 
     .price {
       font-size: 24px;
       font-weight: bold;
-      margin: 12px 0;
+      margin: 10px 0;
     }
 
+    /* CHAT BUTTON */
     #bot-btn {
       position: fixed;
       bottom: 20px;
@@ -123,6 +128,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
+    /* CHAT */
     #chat {
       position: fixed;
       bottom: 95px;
@@ -190,15 +196,15 @@
 
 <div class="nav">
   <span>🧼 CleanFlow AI</span>
-  <span>AI That Turns Chats Into Booked Cleaning Jobs</span>
+  <span>AI Receptionist for Cleaning Businesses</span>
 </div>
 
 <div class="hero">
-  <h1>Turn Website Visitors Into Paying Cleaning Clients</h1>
+  <h1>Turn Website Visitors Into Booked Cleaning Jobs</h1>
 
   <p>
-    CleanFlow AI is your 24/7 AI receptionist that instantly responds to customers,
-    qualifies leads, and pushes them toward booking — so you stop losing jobs to slow replies.
+    CleanFlow AI answers leads instantly, qualifies customers, and pushes them into booking —
+    so you stop losing jobs to slow replies.
   </p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
@@ -207,39 +213,37 @@
 </div>
 
 <div class="features">
-
   <div class="card">
     <h3>💰 More Bookings</h3>
-    <p>Convert more website visitors into paying customers automatically</p>
+    <p>Convert visitors into paying clients automatically</p>
   </div>
 
   <div class="card">
     <h3>⚡ Instant Replies</h3>
-    <p>Respond instantly 24/7 so you never lose another lead</p>
+    <p>No missed leads or slow responses</p>
   </div>
 
   <div class="card">
-    <h3>📅 Smart Qualification</h3>
-    <p>Only serious customers get passed through to you</p>
+    <h3>📅 Lead Qualification</h3>
+    <p>Only serious customers get passed to you</p>
   </div>
 
   <div class="card">
-    <h3>📲 Always On</h3>
-    <p>Your cleaning business captures leads even while you sleep</p>
+    <h3>📲 24/7 AI Worker</h3>
+    <p>Your business never stops capturing leads</p>
   </div>
-
 </div>
 
 <div class="section">
   <h2>Why Cleaning Businesses Lose Money</h2>
   <p>
-    Most cleaners lose 40–70% of leads because they respond too slowly or miss messages completely.
-    CleanFlow AI fixes that by responding instantly and guiding customers into booking.
+    Most cleaners lose 40–70% of leads because they reply too slow or miss messages.
+    CleanFlow AI fixes that instantly by responding in seconds.
   </p>
 </div>
 
 <div class="cta">
-  <h2>Start Getting More Cleaning Jobs This Week</h2>
+  <h2>Start Getting More Jobs This Week</h2>
   <p class="price">$49/month — Cancel Anytime</p>
 
   <div class="btn" onclick="document.getElementById('chat').style.display='flex'">
@@ -257,7 +261,7 @@
 
   <div id="messages">
     <div class="msg bot">
-      👋 Hey! I help cleaning businesses get more booked jobs.<br><br>
+      👋 Hey! I can help you get more cleaning jobs.<br><br>
       What type of cleaning do you offer?
     </div>
   </div>
@@ -323,7 +327,7 @@ function bot(msg) {
 
   if (step === 4) {
     step = 5;
-    return "Perfect 🎉 A cleaning specialist will contact you shortly with pricing & availability.";
+    return "Perfect 🎉 Your AI receptionist is now ready to start capturing leads.";
   }
 
   return "What type of cleaning do you offer? 🧼";
