@@ -18,11 +18,17 @@ function getDomain(url) {
   }
 }
 
+function normalizeUrl(url) {
+  if (!url) return null;
+  if (url.startsWith("/")) return null;
+  return url.split("&")[0];
+}
+
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// -------------------- STEP 1: GOOGLE SCRAPE --------------------
+// -------------------- STEP 1: GOOGLE SCRAPE (IMPROVED) --------------------
 
 async function scrapeGoogle() {
   const url = `https://www.google.com/search?q=${encodeURIComponent(
@@ -39,30 +45,35 @@ async function scrapeGoogle() {
   const $ = cheerio.load(data);
 
   const leads = [];
+  const seen = new Set();
 
-  $("a h3").each((_, el) => {
-    const name = clean($(el).text());
-    const parent = $(el).closest("a");
-    const link = parent.attr("href");
+  $("div.g").each((_, el) => {
+    const title = clean($(el).find("h3").text());
+    let link = $(el).find("a").attr("href");
 
-    if (!name || !link) return;
-    if (!link.startsWith("http")) return;
+    link = normalizeUrl(link);
+
+    if (!title || !link) return;
 
     const domain = getDomain(link);
     if (!domain) return;
 
-    // filter junk
+    // filter junk domains
     if (
       domain.includes("google") ||
       domain.includes("facebook") ||
       domain.includes("instagram") ||
-      domain.includes("yelp")
+      domain.includes("yelp") ||
+      domain.includes("linkedin")
     ) {
       return;
     }
 
+    if (seen.has(domain)) return;
+    seen.add(domain);
+
     leads.push({
-      name,
+      name: title,
       website: link,
       domain,
     });
@@ -71,38 +82,40 @@ async function scrapeGoogle() {
   return leads;
 }
 
-// -------------------- STEP 2: FIND CONTACT PAGES --------------------
+// -------------------- STEP 2: FIND CONTACT PATHS --------------------
 
 async function findContactPages(baseUrl) {
-  const possiblePaths = [
+  const paths = [
     "/contact",
     "/contact-us",
     "/about",
     "/about-us",
+    "/services",
     "/book",
+    "/get-a-quote",
   ];
 
   const found = [];
 
-  for (const path of possiblePaths) {
+  for (const path of paths) {
     try {
       const url = baseUrl + path;
 
       const { data } = await axios.get(url, {
-        timeout: 5000,
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-        },
+        timeout: 6000,
+        headers: { "User-Agent": "Mozilla/5.0" },
       });
 
-      if (data) found.push(url);
+      if (data && data.length > 100) {
+        found.push(url);
+      }
     } catch {}
   }
 
   return found;
 }
 
-// -------------------- STEP 3: EXTRACT EMAILS + PHONES --------------------
+// -------------------- STEP 3: EXTRACT CONTACTS --------------------
 
 function extractContacts(html) {
   const emails =
@@ -112,6 +125,14 @@ function extractContacts(html) {
     html.match(
       /(\+?1[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/g
     ) || [];
+
+  const socials = [];
+
+  const socialMatches =
+    html.match(/https?:\/\/(www\.)?(facebook|instagram|tiktok|linkedin)[^\s"']+/g) ||
+    [];
+
+  socials.push(...socialMatches);
 
   const cleanEmails = [...new Set(emails)].filter(
     (e) =>
@@ -125,6 +146,7 @@ function extractContacts(html) {
   return {
     emails: cleanEmails,
     phones: cleanPhones,
+    socials: [...new Set(socials)],
   };
 }
 
@@ -138,6 +160,7 @@ async function enrich(leads) {
 
     let emails = [];
     let phones = [];
+    let socials = [];
 
     try {
       const { data } = await axios.get(lead.website, {
@@ -148,30 +171,39 @@ async function enrich(leads) {
       const main = extractContacts(data);
       emails.push(...main.emails);
       phones.push(...main.phones);
+      socials.push(...main.socials);
 
-      // try contact pages
       const contactPages = await findContactPages(lead.website);
 
       for (const page of contactPages) {
         try {
-          const res = await axios.get(page, { timeout: 5000 });
-          const extra = extractContacts(res.data);
+          const res = await axios.get(page, { timeout: 6000 });
 
+          const extra = extractContacts(res.data);
           emails.push(...extra.emails);
           phones.push(...extra.phones);
+          socials.push(...extra.socials);
         } catch {}
       }
     } catch {}
 
     const uniqueEmails = [...new Set(emails)];
     const uniquePhones = [...new Set(phones)];
+    const uniqueSocials = [...new Set(socials)];
+
+    // -------------------- SCORING --------------------
+    let score = 0;
+    score += uniqueEmails.length * 12;
+    score += uniquePhones.length * 6;
+    score += uniqueSocials.length * 3;
 
     enriched.push({
       ...lead,
       emails: uniqueEmails,
       phones: uniquePhones,
+      socials: uniqueSocials,
       hasContact: uniqueEmails.length > 0 || uniquePhones.length > 0,
-      score: uniqueEmails.length * 10 + uniquePhones.length * 5,
+      score,
     });
 
     await sleep(1200);
@@ -183,12 +215,11 @@ async function enrich(leads) {
 // -------------------- MAIN --------------------
 
 async function run() {
-  console.log("🚀 Scraping Google leads...");
+  console.log("🚀 Starting lead scrape...");
 
   const leads = await scrapeGoogle();
-  console.log(`📦 Found: ${leads.length}`);
+  console.log(`📦 Found leads: ${leads.length}`);
 
-  console.log("📡 Enriching leads with contacts...");
   const enriched = await enrich(leads);
 
   const sorted = enriched.sort((a, b) => b.score - a.score);
@@ -196,7 +227,8 @@ async function run() {
   fs.writeFileSync("leads.json", JSON.stringify(sorted, null, 2));
 
   console.log("✅ DONE");
-  console.log("🔥 Best lead:", sorted[0]);
+  console.log("🔥 Best lead:");
+  console.log(sorted[0]);
 }
 
 run();
