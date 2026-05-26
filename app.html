@@ -1,352 +1,90 @@
 <script>
-
-/* ─────────────────────────────
-   SANCHAI VOICEOS
-   PRODUCTION CLIENT
-───────────────────────────── */
-
-/* API CONFIG */
-
 const API_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "https://sanchesolutions.onrender.com";
 
-const CHAT_ENDPOINT =
-  `${API_URL}/api/chat`;
+const CHAT_ENDPOINT = `${API_URL}/api/chat`;
+const HEALTH_ENDPOINT = `${API_URL}/api/health`;
 
-const HEALTH_ENDPOINT =
-  `${API_URL}/api/health`;
+const sessionId = localStorage.getItem("sessionId") || crypto.randomUUID();
+localStorage.setItem("sessionId", sessionId);
 
-/* SESSION */
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-const sessionId =
-  localStorage.getItem("sanche_session") ||
-  crypto.randomUUID();
-
-localStorage.setItem(
-  "sanche_session",
-  sessionId
-);
-
-/* STATE */
-
-let isLoading = false;
-
-/* DOM */
-
-const chat =
-  document.getElementById("chat");
-
-const input =
-  document.getElementById("input");
-
-/* ─────────────────────────────
-   UI HELPERS
-───────────────────────────── */
-
-function scrollBottom() {
-
-  chat.scrollTop =
-    chat.scrollHeight;
-}
-
-function addMsg(
-  text,
-  type = "bot"
-) {
-
-  const div =
-    document.createElement("div");
-
-  div.className =
-    `msg ${type}`;
-
+function addMsg(text, type) {
+  const div = document.createElement("div");
+  div.className = type;
   div.textContent = text;
-
   chat.appendChild(div);
-
-  scrollBottom();
-
+  chat.scrollTop = chat.scrollHeight;
   return div;
 }
 
-function addTyping() {
-
-  return addMsg(
-    "AI is thinking...",
-    "bot typing"
-  );
-}
-
-/* ─────────────────────────────
-   BACKEND CHECK
-───────────────────────────── */
-
-async function checkBackend() {
-
-  try {
-
-    const res = await fetch(
-      HEALTH_ENDPOINT,
-      {
-        method: "GET"
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error(
-        "Backend offline"
-      );
-    }
-
-    console.log(
-      "✅ Backend connected"
-    );
-
-  } catch (err) {
-
-    console.error(err);
-
-    addMsg(
-      "⚠️ Backend waking up...",
-      "bot"
-    );
-  }
-}
-
-/* ─────────────────────────────
-   SEND MESSAGE
-───────────────────────────── */
-
 async function send() {
-
-  if (isLoading) return;
-
-  const text =
-    input.value.trim();
-
+  const text = input.value.trim();
   if (!text) return;
 
-  /* USER MESSAGE */
-
   addMsg(text, "user");
-
   input.value = "";
 
-  input.focus();
-
-  isLoading = true;
-
-  const loading =
-    addTyping();
+  const loading = addMsg("Thinking...", "bot");
 
   try {
+    const res = await fetch(CHAT_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, sessionId })
+    });
 
-    /* REQUEST TIMEOUT */
-
-    const controller =
-      new AbortController();
-
-    const timeout =
-      setTimeout(() => {
-
-        controller.abort();
-
-      }, 45000);
-
-    /* API REQUEST */
-
-    const res = await fetch(
-      CHAT_ENDPOINT,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          message: text,
-          sessionId
-        }),
-
-        signal:
-          controller.signal
-      }
-    );
-
-    clearTimeout(timeout);
-
-    /* HTTP ERROR */
-
-    if (!res.ok) {
-
-      const error =
-        await res.text();
-
-      throw new Error(
-        error ||
-        `HTTP ${res.status}`
-      );
-    }
-
-    /* JSON RESPONSE */
-
-    const data =
-      await res.json();
-
-    console.log(
-      "AI RESPONSE:",
-      data
-    );
+    const data = await res.json();
 
     loading.textContent =
-      data.reply ||
-      data.message ||
-      "No response received.";
+      data.reply || data.message || "No response";
 
   } catch (err) {
-
-    console.error(
-      "CHAT ERROR:",
-      err
-    );
-
-    if (
-      err.name ===
-      "AbortError"
-    ) {
-
-      loading.textContent =
-        "⏳ AI server timed out.";
-
-    } else {
-
-      loading.textContent =
-        "⚠️ Failed to connect to AI.";
-    }
-
-  } finally {
-
-    isLoading = false;
+    loading.textContent = "Error connecting to server";
   }
 }
 
-/* ─────────────────────────────
-   ENTER KEY
-───────────────────────────── */
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") send();
+});
 
-input.addEventListener(
-  "keydown",
-  (e) => {
-
-    if (
-      e.key === "Enter"
-    ) {
-
-      e.preventDefault();
-
-      send();
-    }
+async function checkBackend() {
+  try {
+    await fetch(HEALTH_ENDPOINT);
+    console.log("Backend OK");
+  } catch {
+    addMsg("Backend starting...", "bot");
   }
-);
+}
 
-/* ─────────────────────────────
-   VOICE INPUT
-───────────────────────────── */
-
+/* Voice (optional) */
 function startVoice() {
-
   const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
   if (!SpeechRecognition) {
-
-    addMsg(
-      "⚠️ Voice input unsupported.",
-      "bot"
-    );
-
+    addMsg("Voice not supported", "bot");
     return;
   }
 
-  const recognition =
-    new SpeechRecognition();
+  const rec = new SpeechRecognition();
+  rec.lang = "en-US";
 
-  recognition.lang =
-    "en-US";
-
-  recognition.interimResults =
-    false;
-
-  recognition.maxAlternatives =
-    1;
-
-  recognition.onstart =
-    () => {
-
-      addMsg(
-        "🎤 Listening...",
-        "bot"
-      );
-    };
-
-  recognition.onresult =
-    (event) => {
-
-      const transcript =
-        event.results[0][0]
-          .transcript;
-
-      input.value =
-        transcript;
-
-      send();
-    };
-
-  recognition.onerror =
-    (event) => {
-
-      console.error(
-        "VOICE ERROR:",
-        event
-      );
-
-      addMsg(
-        "⚠️ Voice recognition failed.",
-        "bot"
-      );
-    };
-
-  recognition.onend =
-    () => {
-
-      console.log(
-        "🎤 Voice ended"
-      );
-    };
-
-  recognition.start();
-}
-
-/* ─────────────────────────────
-   INIT
-───────────────────────────── */
-
-window.onload =
-  async () => {
-
-    addMsg(
-      "👋 SancheAI VoiceOS ready.",
-      "bot"
-    );
-
-    input.focus();
-
-    await checkBackend();
+  rec.onresult = (e) => {
+    input.value = e.results[0][0].transcript;
+    send();
   };
 
+  rec.start();
+}
+
+window.onload = () => {
+  addMsg("AI Ready", "bot");
+  input.focus();
+  checkBackend();
+};
 </script>
