@@ -104,6 +104,12 @@ button{
   background:var(--green);
   color:black;
 }
+
+/* typing pulse */
+.typing{
+  opacity:0.7;
+  font-style:italic;
+}
 </style>
 </head>
 
@@ -121,14 +127,26 @@ button{
 
 <script>
 
-/* CONFIG */
+/* ─────────────────────────────
+   CONFIG
+───────────────────────────── */
+
 const API_URL = "https://YOUR-BACKEND.onrender.com/chat";
 
-/* UI */
+/* session (for Supabase + Stripe later) */
+const session =
+  localStorage.getItem("session") ||
+  crypto.randomUUID();
+
+localStorage.setItem("session", session);
+
+/* ─────────────────────────────
+   UI
+───────────────────────────── */
+
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-/* ADD MESSAGE */
 function addMsg(text,type){
   const div = document.createElement("div");
   div.className = "msg " + type;
@@ -138,7 +156,14 @@ function addMsg(text,type){
   return div;
 }
 
-/* SEND */
+function addTyping(){
+  return addMsg("AI is thinking...","bot typing");
+}
+
+/* ─────────────────────────────
+   SEND MESSAGE
+───────────────────────────── */
+
 async function send(){
 
   const text = input.value.trim();
@@ -147,15 +172,24 @@ async function send(){
   addMsg(text,"user");
   input.value = "";
 
-  const loading = addMsg("Thinking...","bot");
+  const loading = addTyping();
 
   try{
 
     const res = await fetch(API_URL,{
       method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ message:text })
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        message:text,
+        session
+      })
     });
+
+    if(!res.ok){
+      throw new Error("Network error");
+    }
 
     const data = await res.json();
 
@@ -164,13 +198,18 @@ async function send(){
 
   }catch(err){
 
+    console.error(err);
+
     loading.textContent =
-      "Connection failed";
+      "Connection failed. Check backend.";
 
   }
 }
 
-/* VOICE INPUT */
+/* ─────────────────────────────
+   VOICE INPUT
+───────────────────────────── */
+
 function startVoice(){
 
   const Speech =
@@ -178,7 +217,7 @@ function startVoice(){
     window.webkitSpeechRecognition;
 
   if(!Speech){
-    alert("Voice not supported");
+    alert("Voice not supported in this browser");
     return;
   }
 
@@ -187,14 +226,25 @@ function startVoice(){
   rec.start();
 
   rec.onresult = (e)=>{
-    input.value = e.results[0][0].transcript;
+    const text =
+      e.results[0][0].transcript;
+
+    input.value = text;
     send();
   };
 
+  rec.onerror = () => {
+    alert("Voice recognition error");
+  };
 }
 
-/* INIT */
-addMsg("👋 VoiceOS ready. Ask anything.","bot");
+/* ─────────────────────────────
+   INIT
+───────────────────────────── */
+
+window.onload = () => {
+  addMsg("👋 VoiceOS ready. Ask anything.","bot");
+};
 
 </script>
 
