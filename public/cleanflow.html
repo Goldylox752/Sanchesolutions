@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CleanFlow AI · AI Receptionist SaaS</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f5f7fb;
+  color:#111;
+}
+
+.nav{
+  display:flex;
+  justify-content:space-between;
+  padding:18px 30px;
+  background:white;
+  border-bottom:1px solid #eee;
+  font-weight:bold;
+}
+
+.hero{
+  text-align:center;
+  padding:100px 20px;
+  background:white;
+}
+
+.hero h1{
+  font-size:52px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  max-width:750px;
+  margin:auto;
+  color:#555;
+  line-height:1.6;
+}
+
+.btn{
+  display:inline-block;
+  margin-top:25px;
+  padding:14px 26px;
+  background:#111;
+  color:white;
+  border-radius:12px;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  padding:60px 30px;
+  max-width:1000px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:22px;
+  border-radius:14px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.05);
+  text-align:center;
+}
+
+.cta{
+  text-align:center;
+  padding:80px 20px;
+  background:white;
+}
+
+.price{
+  font-size:26px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+/* CHAT */
+#bot{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  background:#111;
+  color:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:26px;
+}
+
+#chat{
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  width:340px;
+  height:460px;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:14px;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#header{
+  background:#111;
+  color:white;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+}
+
+#messages{
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  background:#f7f7f7;
+}
+
+.msg{
+  margin:8px 0;
+  padding:10px;
+  border-radius:10px;
+  max-width:80%;
+}
+
+.user{
+  background:#111;
+  color:white;
+  margin-left:auto;
+}
+
+.bot{
+  background:white;
+}
+
+#inputBox{
+  display:flex;
+  border-top:1px solid #ddd;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+}
+
+button{
+  background:#111;
+  color:white;
+  border:none;
+  padding:0 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  <span>CleanFlow AI</span>
+  <span>AI Receptionist SaaS</span>
+</div>
+
+<div class="hero">
+  <h1>Turn Visitors Into Paying Customers</h1>
+  <p>AI receptionist that captures leads and automates booking 24/7.</p>
+
+  <div class="btn" onclick="openChat()">Try Live Demo</div>
+</div>
+
+<div class="features">
+  <div class="card">More Bookings</div>
+  <div class="card">Instant Replies</div>
+  <div class="card">CRM Storage</div>
+  <div class="card">24/7 AI Agent</div>
+</div>
+
+<div class="cta">
+  <h2>Start Getting More Cleaning Jobs</h2>
+  <div class="price">$49/month</div>
+
+  <div class="btn" onclick="startCheckout()">Start Free Trial</div>
+</div>
+
+<!-- CHAT -->
+<div id="bot" onclick="openChat()">🧼</div>
+
+<div id="chat">
+  <div id="header">
+    <span>CleanFlow AI</span>
+    <span onclick="closeChat()">✕</span>
+  </div>
+
+  <div id="messages"></div>
+
+  <div id="inputBox">
+    <input id="input" placeholder="Type..." />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+
+const API =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "https://sanchesolutions.onrender.com";
+
+let step = 0;
+let lead = {};
+let chatOpened = false;
+
+const chat = document.getElementById("chat");
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+function openChat(){
+  chat.style.display = "flex";
+
+  if(!chatOpened){
+    chatOpened = true;
+    addBot("What type of cleaning service do you offer?");
+  }
+}
+
+function closeChat(){
+  chat.style.display = "none";
+}
+
+function addBot(text){
+  const div = document.createElement("div");
+  div.className = "msg bot";
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addUser(text){
+  const div = document.createElement("div");
+  div.className = "msg user";
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function send(){
+
+  const text = input.value.trim();
+  if(!text) return;
+
+  addUser(text);
+  input.value = "";
+
+  if(step === 0){
+    lead.service = text;
+    step++;
+    return addBot("What city do you serve?");
+  }
+
+  if(step === 1){
+    lead.city = text;
+    step++;
+    return addBot("Homes or offices?");
+  }
+
+  if(step === 2){
+    lead.type = text;
+    step++;
+    return addBot("How soon can you take bookings?");
+  }
+
+  if(step === 3){
+    lead.speed = text;
+    step++;
+    return addBot("Drop your email or phone.");
+  }
+
+  if(step === 4){
+    lead.contact = text;
+    step++;
+    return addBot("Perfect. You can now start checkout.");
+  }
+}
+
+async function startCheckout(){
+
+  if(!lead.contact){
+    alert("Complete chat first (email required)");
+    return;
+  }
+
+  try {
+
+    const res = await fetch(`${API}/api/create-checkout-session`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        email: lead.contact,
+        user_id: crypto.randomUUID()
+      })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+      alert(data.error || "Checkout failed");
+      return;
+    }
+
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      alert("Stripe did not return checkout URL");
+    }
+
+  } catch(err){
+    console.error(err);
+    alert("Checkout failed (server issue)");
+  }
+}
+
+</script>
+
+</body>
+</html>
