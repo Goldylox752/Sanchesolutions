@@ -24,12 +24,12 @@ body{
 
 .hero{
   text-align:center;
-  padding:100px 20px;
+  padding:110px 20px;
   background:white;
 }
 
 .hero h1{
-  font-size:50px;
+  font-size:52px;
   margin-bottom:10px;
 }
 
@@ -39,6 +39,17 @@ body{
   color:#555;
   font-size:18px;
   line-height:1.6;
+}
+
+.btn{
+  display:inline-block;
+  margin-top:18px;
+  padding:12px 20px;
+  background:#111;
+  color:white;
+  border-radius:10px;
+  text-decoration:none;
+  cursor:pointer;
 }
 
 .section{
@@ -65,17 +76,13 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,0.05);
 }
 
-.card h3{
-  margin-top:0;
-}
-
 .tag{
   display:inline-block;
   font-size:12px;
   padding:4px 10px;
   border-radius:20px;
   background:#eee;
-  margin-top:8px;
+  margin-top:10px;
 }
 
 .footer{
@@ -86,14 +93,31 @@ body{
   background:white;
 }
 
-.btn{
-  display:inline-block;
-  margin-top:20px;
-  padding:12px 20px;
+/* CONTACT BAR */
+.contact-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-top:25px;
+}
+
+/* buttons */
+.link-btn{
+  padding:10px 16px;
+  border-radius:10px;
   background:#111;
   color:white;
-  border-radius:10px;
   text-decoration:none;
+  font-size:14px;
+}
+
+.whatsapp{
+  background:#25D366;
+}
+
+.calendly{
+  background:#006bff;
 }
 </style>
 </head>
@@ -102,75 +126,82 @@ body{
 
 <div class="nav">
   <span>SancheSolutions</span>
-  <span>AI Automation Builder</span>
+  <span>AI Automation Systems</span>
 </div>
 
 <div class="hero">
   <h1>AI Systems, SaaS Tools & Automation Bots</h1>
+
   <p>
-    I build end-to-end AI business systems including chatbots, SaaS dashboards,
-    Stripe billing engines, and lead automation tools for real companies.
+    I build full-stack AI business systems: chatbots, SaaS dashboards,
+    Stripe billing engines, lead automation systems, and CRM integrations
+    that help companies turn traffic into revenue.
   </p>
-  <a class="btn" href="#projects">View All Projects</a>
+
+  <div class="contact-bar">
+
+    <!-- Calendly -->
+    <a class="link-btn calendly"
+       href="https://calendly.com/"
+       target="_blank">
+      Book a Call
+    </a>
+
+    <!-- WhatsApp (number hidden in link) -->
+    <a class="link-btn whatsapp"
+       href="https://wa.me/17802679673"
+       target="_blank">
+      WhatsApp Me
+    </a>
+
+    <!-- Email (Zoho Mail hidden behind link) -->
+    <a class="link-btn"
+       href="mailto:byronsanche@zohomailcloud.ca">
+      Email Me
+    </a>
+
+  </div>
 </div>
 
 <!-- PROJECTS -->
-<div class="section" id="projects">
+<div class="section">
 <h2>🚀 My AI Systems & Bots</h2>
 
 <div class="grid">
 
   <div class="card">
     <h3>CleanFlow AI</h3>
-    <p>
-      AI receptionist SaaS that captures leads, qualifies customers,
-      and books cleaning jobs automatically.
-    </p>
-    <div class="tag">SaaS · Stripe · AI Chatbot</div>
+    <p>AI receptionist SaaS that captures leads and books jobs automatically.</p>
+    <div class="tag">SaaS · Stripe · AI Bot</div>
   </div>
 
   <div class="card">
-    <h3>AI Sales Chat Bot</h3>
-    <p>
-      Conversational AI system that turns website visitors into leads
-      using step-by-step qualification flows.
-    </p>
-    <div class="tag">Lead Gen · Funnel Bot</div>
+    <h3>AI Sales Bot</h3>
+    <p>Conversational funnel bot that converts visitors into leads.</p>
+    <div class="tag">Lead Gen · Automation</div>
   </div>
 
   <div class="card">
-    <h3>Stripe Checkout Engine</h3>
-    <p>
-      Subscription billing system with checkout sessions,
-      webhook upgrades, and user plan management.
-    </p>
-    <div class="tag">Payments · SaaS Backend</div>
+    <h3>Stripe Billing Engine</h3>
+    <p>Subscription system with checkout sessions and webhook upgrades.</p>
+    <div class="tag">Payments · SaaS</div>
   </div>
 
   <div class="card">
     <h3>Groq AI Backend</h3>
-    <p>
-      High-speed AI API integration using Groq for ultra-fast
-      LLM responses inside chat systems.
-    </p>
-    <div class="tag">LLM · AI API</div>
+    <p>Ultra-fast LLM backend powering real-time chat systems.</p>
+    <div class="tag">AI · API</div>
   </div>
 
   <div class="card">
-    <h3>Lead Capture System</h3>
-    <p>
-      Supabase-powered lead storage system that saves customer
-      data from chatbot conversations.
-    </p>
-    <div class="tag">CRM · Database</div>
+    <h3>Lead CRM System</h3>
+    <p>Supabase-powered CRM storing leads from chatbot funnels.</p>
+    <div class="tag">Database · CRM</div>
   </div>
 
   <div class="card">
-    <h3>AI Dashboard UI</h3>
-    <p>
-      Protected dashboard interface that locks AI features
-      behind Stripe subscription status.
-    </p>
+    <h3>SaaS Dashboard UI</h3>
+    <p>Locked subscription dashboard for premium AI features.</p>
     <div class="tag">Frontend · SaaS UI</div>
   </div>
 
@@ -182,13 +213,14 @@ body{
 <h2>What I Do</h2>
 
 <p style="text-align:center; max-width:750px; margin:auto; color:#555; line-height:1.6;">
-I design full-stack AI automation systems that combine frontend UI, backend APIs,
-Stripe billing, and database-driven workflows. These systems help small businesses
-convert traffic into paying customers automatically.
+I design and build complete AI automation systems for businesses.
+Everything from frontend UI → backend APIs → Stripe billing → CRM integration.
 </p>
 
-<div style="text-align:center;">
-  <a class="btn" href="mailto:youremail@example.com">Contact Me</a>
+<div style="text-align:center; margin-top:25px;">
+  <a class="btn" href="https://calendly.com/" target="_blank">
+    Book Strategy Call
+  </a>
 </div>
 </div>
 
