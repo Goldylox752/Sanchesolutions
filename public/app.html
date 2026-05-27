@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · Dashboard</title>
+<title>SancheSolutions · AI Control Dashboard</title>
 
 <style>
 :root{
@@ -30,7 +30,7 @@ body{
   color:var(--text);
 }
 
-/* TOP BAR */
+/* HEADER */
 header{
   padding:14px 16px;
   background:var(--panel);
@@ -57,6 +57,34 @@ header h1{
   color:var(--danger);
 }
 
+/* MAIN LAYOUT */
+.wrapper{
+  display:flex;
+  flex:1;
+  overflow:hidden;
+}
+
+/* LEFT PANEL (AI CONTROL) */
+.panel{
+  width:220px;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  padding:12px;
+}
+
+.agent{
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  cursor:pointer;
+}
+
+.agent.active{
+  background:var(--accent);
+  color:#000;
+}
+
 /* CHAT */
 .chat{
   flex:1;
@@ -72,7 +100,6 @@ header h1{
   padding:12px 14px;
   border-radius:12px;
   font-size:14px;
-  white-space:pre-wrap;
 }
 
 .user{
@@ -129,16 +156,30 @@ button{
 <body>
 
 <header>
-  <h1>SancheSolutions · Control Dashboard</h1>
-  <div id="status" class="badge locked">Checking plan...</div>
+  <h1>SancheSolutions · AI Control System</h1>
+  <div id="status" class="badge locked">Initializing AI...</div>
 </header>
 
-<div class="chat" id="chat"></div>
+<div class="wrapper">
 
-<div class="input-bar">
-  <input id="input" placeholder="Ask your AI system..." />
-  <button class="send" onclick="send()">Send</button>
-  <button class="upgrade" onclick="goStripe()">Upgrade</button>
+  <!-- CONTROL PANEL -->
+  <div class="panel">
+    <div class="agent active" onclick="setAgent('cleanflow')">CleanFlow AI</div>
+    <div class="agent" onclick="setAgent('roofflow')">RoofFlow AI</div>
+    <div class="agent" onclick="setAgent('sales')">Sales Bot</div>
+  </div>
+
+  <!-- CHAT -->
+  <div style="flex:1; display:flex; flex-direction:column;">
+    <div class="chat" id="chat"></div>
+
+    <div class="input-bar">
+      <input id="input" placeholder="Control your AI system..." />
+      <button class="send" onclick="send()">Send</button>
+      <button class="upgrade" onclick="goStripe()">Upgrade</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -152,23 +193,17 @@ const API_URL =
 const CHAT = `${API_URL}/api/chat`;
 const STRIPE = `${API_URL}/api/create-checkout-session`;
 
-const SESSION =
-  localStorage.getItem("sessionId") || crypto.randomUUID();
-
-localStorage.setItem("sessionId", SESSION);
-
 /* STATE */
+let sessionId = localStorage.getItem("sessionId") || crypto.randomUUID();
+localStorage.setItem("sessionId", sessionId);
+
 let plan = localStorage.getItem("plan") || "free";
+let agent = "cleanflow";
 
 /* UI */
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const status = document.getElementById("status");
-
-function setStatus(text, locked=false){
-  status.textContent = text;
-  status.className = locked ? "badge locked" : "badge";
-}
 
 function addMsg(text, type){
   const div = document.createElement("div");
@@ -178,25 +213,32 @@ function addMsg(text, type){
   chat.scrollTop = chat.scrollHeight;
 }
 
+/* AGENT SWITCH */
+function setAgent(a){
+  agent = a;
+
+  document.querySelectorAll(".agent").forEach(e=>e.classList.remove("active"));
+  event.target.classList.add("active");
+
+  addMsg(`Switched to ${a.toUpperCase()} AI`, "ai");
+}
+
 /* PLAN CHECK */
 async function checkPlan(){
-  try {
-    await fetch(`${API_URL}/api/health`);
+  await fetch(`${API_URL}/api/health`);
 
-    if(plan === "pro"){
-      setStatus("Pro Active", false);
-      addMsg("Pro unlocked. Full system access enabled.", "ai");
-    } else {
-      setStatus("Free Plan", true);
-      addMsg("Free plan detected. Upgrade to unlock automation features.", "ai");
-    }
-
-  } catch {
-    setStatus("Offline", true);
+  if(plan === "pro"){
+    status.textContent = "PRO AI ACTIVE";
+    status.className = "badge";
+    addMsg("Full AI system unlocked.", "ai");
+  } else {
+    status.textContent = "FREE MODE";
+    status.className = "badge locked";
+    addMsg("Free mode active. Upgrade for full AI control.", "ai");
   }
 }
 
-/* CHAT */
+/* CHAT CONTROL SYSTEM */
 async function send(){
 
   const text = input.value.trim();
@@ -206,7 +248,7 @@ async function send(){
   input.value = "";
 
   if(plan !== "pro"){
-    addMsg("Upgrade required to use AI system.", "ai");
+    addMsg("System locked. Upgrade required.", "ai");
     return;
   }
 
@@ -217,7 +259,8 @@ async function send(){
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
         message: text,
-        sessionId: SESSION
+        sessionId,
+        agent
       })
     });
 
@@ -226,39 +269,33 @@ async function send(){
     addMsg(data.reply || "No response", "ai");
 
   } catch {
-    addMsg("Error connecting to backend.", "ai");
+    addMsg("AI system error.", "ai");
   }
 }
 
 /* STRIPE */
 async function goStripe(){
 
-  try {
+  const res = await fetch(STRIPE, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      email: "test@test.com",
+      user_id: sessionId
+    })
+  });
 
-    const res = await fetch(STRIPE, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        email: "test@test.com",
-        user_id: SESSION
-      })
-    });
+  const data = await res.json();
 
-    const data = await res.json();
-
-    if(data.url){
-      localStorage.setItem("checkout_started", "true");
-      window.location.href = data.url;
-    } else {
-      addMsg("Stripe error: no checkout URL", "ai");
-    }
-
-  } catch {
-    addMsg("Checkout failed", "ai");
+  if(data.url){
+    localStorage.setItem("checkout", "1");
+    window.location.href = data.url;
+  } else {
+    addMsg("Stripe failed.", "ai");
   }
 }
 
-/* AUTO UPGRADE (TEMP) */
+/* AUTO UPGRADE */
 if(window.location.search.includes("success=1")){
   localStorage.setItem("plan", "pro");
   plan = "pro";
@@ -266,7 +303,7 @@ if(window.location.search.includes("success=1")){
 
 /* INIT */
 window.onload = () => {
-  addMsg("SancheSolutions Dashboard online.", "ai");
+  addMsg("SancheSolutions AI Control System online.", "ai");
   checkPlan();
 };
 
