@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheAI · Live Bot</title>
+<title>CleanFlow AI · Booking Assistant</title>
 
 <style>
 :root{
-  --bg:#050816;
-  --panel:#0b1224;
+  --bg:#060914;
+  --panel:#0c1328;
   --border:rgba(255,255,255,0.08);
-  --blue:#4f8cff;
-  --text:#edf2ff;
+  --accent:#38f2a5;
+  --text:#eaf2ff;
 }
 
 *{
@@ -47,8 +47,8 @@ header h1{
   font-size:12px;
   padding:6px 10px;
   border-radius:20px;
-  background:rgba(79,140,255,0.15);
-  color:var(--blue);
+  background:rgba(56,242,165,0.12);
+  color:var(--accent);
 }
 
 /* CHAT */
@@ -71,7 +71,8 @@ header h1{
 }
 
 .user{
-  background:var(--blue);
+  background:var(--accent);
+  color:#000;
   align-self:flex-end;
 }
 
@@ -109,8 +110,8 @@ button{
 }
 
 .send{
-  background:var(--blue);
-  color:white;
+  background:var(--accent);
+  color:#000;
 }
 
 .small{
@@ -125,26 +126,23 @@ button{
 <body>
 
 <header>
-  <h1>SancheAI Bot</h1>
-  <div class="badge">Groq · SaaS AI</div>
+  <h1>CleanFlow AI · Booking Bot</h1>
+  <div class="badge">AI Lead Closer</div>
 </header>
 
 <div class="chat" id="chat"></div>
 
 <div class="small">
-  AI Sales + Automation Bot · Powered by Groq Backend
+  AI Sales Assistant · Turns Visitors Into Cleaning Bookings
 </div>
 
 <div class="input-bar">
-  <input id="input" placeholder="Ask your AI bot..." />
+  <input id="input" placeholder="Tell me what you need cleaned..." />
   <button class="send" onclick="send()">Send</button>
 </div>
 
 <script>
 
-/* =========================
-   CONFIG (FIXED)
-========================= */
 const API_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
@@ -153,111 +151,83 @@ const API_URL =
 const CHAT_ENDPOINT = `${API_URL}/api/chat`;
 const HEALTH_ENDPOINT = `${API_URL}/api/health`;
 
-/* =========================
-   SESSION
-========================= */
 const sessionId =
   localStorage.getItem("sessionId") ||
   crypto.randomUUID();
 
 localStorage.setItem("sessionId", sessionId);
 
-/* =========================
-   DOM
-========================= */
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-/* =========================
-   UI HELPERS
-========================= */
+/* ───────── UI ───────── */
+
 function addMsg(text, type){
   const div = document.createElement("div");
   div.className = "msg " + type;
   div.textContent = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-  return div;
 }
 
 function typing(){
   const div = document.createElement("div");
   div.className = "msg ai";
-  div.textContent = "Thinking...";
+  div.textContent = "Finding best cleaning option...";
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   return div;
 }
 
-/* =========================
-   SEND MESSAGE
-========================= */
+/* ───────── SEND ───────── */
+
 async function send(){
 
   const text = input.value.trim();
   if(!text) return;
 
-  addMsg(text,"user");
+  addMsg(text, "user");
   input.value = "";
 
-  const load = typing();
+  const loader = typing();
 
   try {
 
     const res = await fetch(CHAT_ENDPOINT, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         message: text,
-        sessionId: sessionId
+        sessionId
       })
     });
 
-    if(!res.ok){
-      throw new Error("Server error");
-    }
-
     const data = await res.json();
 
-    load.textContent =
+    loader.textContent =
       data.reply ||
-      data.message ||
-      "No response received.";
+      "I can help you book a cleaner today.";
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
-    load.textContent = "⚠️ Error connecting to server";
+    loader.textContent = "⚠️ Unable to connect to booking system";
   }
 }
 
-/* =========================
-   ENTER KEY
-========================= */
-input.addEventListener("keydown",(e)=>{
+/* ───────── EVENTS ───────── */
+
+input.addEventListener("keydown", (e)=>{
   if(e.key === "Enter") send();
 });
 
-/* =========================
-   BACKEND CHECK
-========================= */
-async function checkBackend(){
-  try {
-    await fetch(HEALTH_ENDPOINT);
-    console.log("Backend OK");
-  } catch {
-    addMsg("⚠️ Backend starting...", "ai");
-  }
-}
+/* ───────── INIT ───────── */
 
-/* =========================
-   INIT
-========================= */
 window.onload = () => {
-  addMsg("👋 SancheAI Bot is live. Ask me anything.", "ai");
+  addMsg(
+    "👋 Hi! I’m your CleanFlow AI assistant. I help you book trusted cleaning services instantly. What do you need cleaned today?",
+    "ai"
+  );
   input.focus();
-  checkBackend();
 };
 
 </script>
