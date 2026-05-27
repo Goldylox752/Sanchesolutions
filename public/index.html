@@ -13,7 +13,7 @@
   --text:#eaf2ff;
   --muted:rgba(255,255,255,0.65);
   --accent:#38f2a5;
-  --danger:#ff4d4d;
+  --darkAccent:#4f8cff;
 }
 
 *{
@@ -34,7 +34,6 @@ body{
   justify-content:space-between;
   padding:18px 28px;
   border-bottom:1px solid var(--border);
-  backdrop-filter:blur(10px);
 }
 
 .nav span{
@@ -88,7 +87,7 @@ body{
 
 .primary:hover{ transform:translateY(-2px); }
 
-.dark{
+.secondary{
   background:rgba(255,255,255,0.06);
   color:white;
   border:1px solid var(--border);
@@ -147,6 +146,14 @@ body{
   color:var(--accent);
 }
 
+/* POWERED BY */
+.powered{
+  text-align:center;
+  font-size:12px;
+  color:rgba(255,255,255,0.5);
+  margin-top:10px;
+}
+
 /* CONTACT */
 .contact-bar{
   display:flex;
@@ -199,9 +206,8 @@ body{
   <h1>AI Systems That Turn Clicks Into Revenue</h1>
 
   <p>
-    I build full-stack AI automation systems for service businesses and SaaS startups —
-    combining AI chat agents, lead generation engines, Stripe billing, and CRM pipelines
-    into one revenue-driven ecosystem.
+    I design and deploy full-stack AI automation systems for service businesses and SaaS startups —
+    combining AI agents, lead generation engines, CRM pipelines, and Stripe billing into one system.
   </p>
 
   <div class="cta-row">
@@ -209,20 +215,25 @@ body{
       Book a Strategy Call
     </a>
 
-    <a class="btn dark" href="https://wa.me/17802679673" target="_blank">
-      WhatsApp Me
+    <a class="btn secondary" href="https://wa.me/17802679673" target="_blank">
+      WhatsApp
     </a>
 
-    <a class="btn dark" href="mailto:byronsanche@zohomailcloud.ca">
+    <a class="btn secondary" href="mailto:byronsanche@zohomailcloud.ca">
       Email
     </a>
   </div>
+
+  <div class="powered">
+    Powered by Northsky Systems
+  </div>
+
 </div>
 
 <!-- PROJECTS -->
 <div class="section">
 
-<h2>🚀 AI Systems & SaaS Products</h2>
+<h2>🚀 AI Systems Built & Deployed</h2>
 
 <div class="grid">
 
@@ -234,31 +245,31 @@ body{
 
   <div class="card">
     <h3>RoofFlow AI</h3>
-    <p>Roofing-focused AI sales system that converts website traffic into booked estimates.</p>
+    <p>AI sales system for roofing companies that converts traffic into booked estimates.</p>
     <div class="tag">Lead Gen · Automation</div>
   </div>
 
   <div class="card">
-    <h3>AI Sales Funnel Engine</h3>
-    <p>Conversational funnel system that guides visitors into high-intent lead submissions.</p>
-    <div class="tag">Conversion · Funnel AI</div>
+    <h3>AI Funnel Engine</h3>
+    <p>Conversational AI system that turns visitors into high-intent leads automatically.</p>
+    <div class="tag">Conversion · AI Chat</div>
   </div>
 
   <div class="card">
     <h3>Stripe Billing Engine</h3>
-    <p>Subscription system with checkout sessions, webhooks, and automated plan upgrades.</p>
+    <p>Subscription infrastructure with checkout sessions, webhooks, and plan upgrades.</p>
     <div class="tag">Payments · SaaS Backend</div>
   </div>
 
   <div class="card">
     <h3>Groq AI Backend</h3>
     <p>High-speed LLM backend powering real-time AI chat and automation workflows.</p>
-    <div class="tag">LLM · API · AI</div>
+    <div class="tag">LLM · API</div>
   </div>
 
   <div class="card">
     <h3>Lead CRM System</h3>
-    <p>Supabase-powered CRM that stores, tracks, and scores AI-generated leads.</p>
+    <p>Supabase-powered CRM that tracks, stores, and scores AI-generated leads.</p>
     <div class="tag">CRM · Database</div>
   </div>
 
@@ -267,11 +278,12 @@ body{
 
 <!-- ABOUT -->
 <div class="section">
+
 <h2>What I Do</h2>
 
 <p style="max-width:750px;margin:auto;text-align:center;color:var(--muted);line-height:1.7;">
-I design and deploy AI-powered business systems that automate customer acquisition, sales, and operations.
-My focus is building revenue-first SaaS tools that replace manual workflows with intelligent automation.
+I build AI-powered business systems that automate customer acquisition, sales, and operations.
+Every system is designed to replace manual work with intelligent automation that scales.
 </p>
 
 <div class="contact-bar">
@@ -284,7 +296,7 @@ My focus is building revenue-first SaaS tools that replace manual workflows with
 
 <!-- FOOTER -->
 <div class="footer">
-© 2026 SancheSolutions · AI Automation Systems Portfolio
+© 2026 SancheSolutions · AI Automation Systems · Powered by Northsky Systems
 </div>
 
 </body>
