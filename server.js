@@ -10,17 +10,17 @@ dotenv.config();
 const app = express();
 
 /* ─────────────────────────────
-   ENV SAFETY
+   ENV VALIDATION
 ───────────────────────────── */
 
 function requireEnv(key) {
   const value = process.env[key];
-  if (!value) throw new Error(`❌ Missing env: ${key}`);
+  if (!value) throw new Error(`Missing env: ${key}`);
   return value;
 }
 
 /* ─────────────────────────────
-   CLIENTS
+   CLIENT INITIALIZATION
 ───────────────────────────── */
 
 const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
@@ -40,7 +40,7 @@ const supabase = createClient(
 );
 
 /* ─────────────────────────────
-   MIDDLEWARE
+   CORS
 ───────────────────────────── */
 
 app.use(
@@ -53,7 +53,7 @@ app.use(
 );
 
 /* ─────────────────────────────
-   STRIPE WEBHOOK (RAW FIRST)
+   STRIPE WEBHOOK (RAW BODY FIRST)
 ───────────────────────────── */
 
 app.post(
@@ -69,7 +69,6 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("❌ Webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -90,20 +89,22 @@ app.post(
 
       return res.json({ received: true });
     } catch (err) {
-      console.error("❌ Webhook handling error:", err);
       return res.status(500).json({ error: "Webhook processing failed" });
     }
   }
 );
 
-/* JSON BODY (AFTER WEBHOOK) */
+/* ─────────────────────────────
+   JSON MIDDLEWARE (AFTER WEBHOOK)
+───────────────────────────── */
+
 app.use(express.json());
 
 /* ─────────────────────────────
    HEALTH CHECK
 ───────────────────────────── */
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (_, res) => {
   res.json({
     status: "ok",
     service: "CleanFlow AI",
@@ -112,7 +113,7 @@ app.get("/api/health", (req, res) => {
 });
 
 /* ─────────────────────────────
-   AUTH (SUPABASE JWT)
+   AUTH MIDDLEWARE
 ───────────────────────────── */
 
 async function requireUser(req, res, next) {
@@ -137,7 +138,7 @@ async function requireUser(req, res, next) {
 }
 
 /* ─────────────────────────────
-   AI CHAT
+   AI CHAT ROUTE
 ───────────────────────────── */
 
 app.post("/api/chat", requireUser, async (req, res) => {
@@ -154,7 +155,7 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are CleanFlow AI, an assistant that helps cleaning businesses get more bookings, respond faster, and automate leads.",
+            "You are CleanFlow AI, a SaaS assistant for cleaning businesses that helps generate bookings and automate leads.",
         },
         { role: "user", content: message },
       ],
@@ -167,14 +168,13 @@ app.post("/api/chat", requireUser, async (req, res) => {
       success: true,
       reply,
     });
-  } catch (err) {
-    console.error("❌ AI error:", err);
+  } catch {
     return res.status(500).json({ error: "AI request failed" });
   }
 });
 
 /* ─────────────────────────────
-   STRIPE CHECKOUT
+   STRIPE CHECKOUT SESSION
 ───────────────────────────── */
 
 app.post("/api/create-checkout-session", async (req, res) => {
@@ -187,6 +187,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
+      payment_method_types: ["card"],
       customer_email: email,
 
       line_items: [
@@ -196,7 +197,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: "CleanFlow AI Pro",
               description:
-                "AI receptionist that turns visitors into booked cleaning jobs",
+                "AI receptionist that converts visitors into booked cleaning jobs",
             },
             unit_amount: 4900,
             recurring: {
@@ -218,15 +219,14 @@ app.post("/api/create-checkout-session", async (req, res) => {
       },
     });
 
-    if (!session?.url) {
+    if (!session || !session.url) {
       return res.status(500).json({
         error: "Stripe did not return checkout URL",
       });
     }
 
     return res.json({ url: session.url });
-  } catch (err) {
-    console.error("❌ Checkout error:", err);
+  } catch {
     return res.status(500).json({ error: "Checkout failed" });
   }
 });
@@ -237,6 +237,4 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 CleanFlow AI running on port ${PORT}`);
-});
+app.listen(PORT);
