@@ -22,6 +22,19 @@ body{
   font-weight:bold;
 }
 
+.nav a{
+  text-decoration:none;
+  color:#111;
+  margin-left:14px;
+  font-weight:600;
+}
+
+.nav-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
 .hero{
   text-align:center;
   padding:110px 20px;
@@ -112,13 +125,9 @@ body{
   font-size:14px;
 }
 
-.whatsapp{
-  background:#25D366;
-}
-
-.calendly{
-  background:#006bff;
-}
+.whatsapp{ background:#25D366; }
+.calendly{ background:#006bff; }
+.dashboard{ background:#ff4d4d; }
 </style>
 </head>
 
@@ -126,7 +135,11 @@ body{
 
 <div class="nav">
   <span>SancheSolutions</span>
-  <span>AI Automation Systems</span>
+
+  <div class="nav-right">
+    <a href="#projects">Projects</a>
+    <a href="/dashboard.html" class="dashboard">Dashboard</a>
+  </div>
 </div>
 
 <div class="hero">
@@ -135,36 +148,32 @@ body{
   <p>
     I build full-stack AI business systems: chatbots, SaaS dashboards,
     Stripe billing engines, lead automation systems, and CRM integrations
-    that help companies turn traffic into revenue.
+    that turn traffic into revenue.
   </p>
 
   <div class="contact-bar">
 
-    <!-- Calendly -->
-    <a class="link-btn calendly"
-       href="https://calendly.com/"
-       target="_blank">
+    <a class="link-btn calendly" href="https://calendly.com/" target="_blank">
       Book a Call
     </a>
 
-    <!-- WhatsApp (number hidden in link) -->
-    <a class="link-btn whatsapp"
-       href="https://wa.me/17802679673"
-       target="_blank">
+    <a class="link-btn whatsapp" href="https://wa.me/17802679673" target="_blank">
       WhatsApp Me
     </a>
 
-    <!-- Email (Zoho Mail hidden behind link) -->
-    <a class="link-btn"
-       href="mailto:byronsanche@zohomailcloud.ca">
+    <a class="link-btn" href="mailto:byronsanche@zohomailcloud.ca">
       Email Me
+    </a>
+
+    <a class="link-btn dashboard" href="/dashboard.html">
+      Open Dashboard
     </a>
 
   </div>
 </div>
 
 <!-- PROJECTS -->
-<div class="section">
+<div class="section" id="projects">
 <h2>🚀 My AI Systems & Bots</h2>
 
 <div class="grid">
@@ -214,17 +223,20 @@ body{
 
 <p style="text-align:center; max-width:750px; margin:auto; color:#555; line-height:1.6;">
 I design and build complete AI automation systems for businesses.
-Everything from frontend UI → backend APIs → Stripe billing → CRM integration.
+From frontend UI → backend APIs → Stripe billing → CRM integration.
 </p>
 
 <div style="text-align:center; margin-top:25px;">
   <a class="btn" href="https://calendly.com/" target="_blank">
     Book Strategy Call
   </a>
+
+  <a class="btn" href="/dashboard.html" style="background:#ff4d4d;">
+    View Dashboard
+  </a>
 </div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
 © 2026 SancheSolutions · AI Systems Portfolio
 </div>
