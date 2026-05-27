@@ -3,303 +3,199 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Revenue Systems & Automation</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>SancheSolutions · AI Systems Portfolio</title>
 
 <style>
-:root {
-  --bg:#060810;
-  --surface:#0d1123;
-  --border:rgba(255,255,255,0.08);
-  --accent:#3d7fff;
-  --accent2:#00d4ff;
-  --text:#e8eaf0;
-  --muted:rgba(232,234,240,0.6);
-  --font-head:'Syne', sans-serif;
-  --font-body:'Instrument Sans', sans-serif;
-}
-
-*{margin:0;padding:0;box-sizing:border-box}
-
 body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--font-body);
-  transition:all 0.3s ease;
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f6f7fb;
+  color:#111;
 }
 
-/* LIGHT MODE */
-body.light{
-  --bg:#f5f7ff;
-  --surface:#ffffff;
-  --border:rgba(0,0,0,0.08);
-  --text:#0b0f1a;
-  --muted:rgba(0,0,0,0.6);
-}
-
-/* NAV */
-nav{
+.nav{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:18px 40px;
-  position:sticky;
-  top:0;
-  background:rgba(6,8,16,0.75);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
+  padding:18px 28px;
+  background:white;
+  border-bottom:1px solid #eee;
+  font-weight:bold;
 }
 
-body.light nav{
-  background:rgba(255,255,255,0.8);
-}
-
-.logo{
-  font-family:var(--font-head);
-  font-weight:800;
-}
-.logo span{color:var(--accent)}
-
-.btn{
-  padding:10px 14px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  cursor:pointer;
-  font-weight:500;
-  color:var(--text);
-  background:transparent;
-  font-size:13px;
-  text-decoration:none;
-  display:inline-block;
-}
-
-.btn-primary{
-  background:var(--accent);
-  color:#fff;
-  border:none;
-}
-
-.small{
-  font-size:12px;
-  padding:6px 10px;
-}
-
-/* HERO */
 .hero{
   text-align:center;
-  padding:120px 20px 80px;
+  padding:100px 20px;
+  background:white;
 }
 
 .hero h1{
-  font-family:var(--font-head);
-  font-size:clamp(40px,6vw,72px);
-  line-height:1.05;
-}
-
-.hero h1 span{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-.hero p{
-  max-width:650px;
-  margin:20px auto;
-  color:var(--muted);
-  font-size:17px;
-}
-
-/* TRUST */
-.trust{
-  text-align:center;
-  padding:20px;
-  color:var(--muted);
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-}
-
-/* SECTIONS */
-section{
-  padding:90px 20px;
-  max-width:1100px;
-  margin:auto;
-}
-
-h2{
-  font-family:var(--font-head);
-  font-size:36px;
-  margin-bottom:40px;
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:16px;
-}
-
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  padding:24px;
-  border-radius:14px;
-}
-
-.card h3{
-  font-family:var(--font-head);
+  font-size:50px;
   margin-bottom:10px;
 }
 
-.card p{
-  color:var(--muted);
-  font-size:14px;
+.hero p{
+  max-width:780px;
+  margin:auto;
+  color:#555;
+  font-size:18px;
   line-height:1.6;
 }
 
-/* STEPS */
-.steps{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:16px;
+.section{
+  max-width:1100px;
+  margin:auto;
+  padding:70px 20px;
 }
 
-.step{
-  background:var(--surface);
-  border:1px solid var(--border);
-  padding:24px;
-  border-radius:14px;
-}
-
-/* CTA */
-.cta-box{
+.section h2{
   text-align:center;
-  background:var(--surface);
-  padding:60px 30px;
-  border-radius:20px;
-  border:1px solid var(--border);
+  margin-bottom:30px;
 }
 
-.cta-buttons{
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:18px;
+}
+
+.card{
+  background:white;
+  padding:22px;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.05);
+}
+
+.card h3{
+  margin-top:0;
+}
+
+.tag{
+  display:inline-block;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:20px;
+  background:#eee;
+  margin-top:8px;
+}
+
+.footer{
+  text-align:center;
+  padding:40px;
+  font-size:13px;
+  color:#666;
+  background:white;
+}
+
+.btn{
+  display:inline-block;
   margin-top:20px;
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
+  padding:12px 20px;
+  background:#111;
+  color:white;
+  border-radius:10px;
+  text-decoration:none;
 }
 </style>
 </head>
 
 <body>
 
-<nav>
-  <div class="logo">Sanche<span>Solutions</span></div>
-
-  <div style="display:flex; gap:10px; align-items:center;">
-    <button class="btn small" onclick="toggleTheme()">🌓 Theme</button>
-    <a href="./app.html" class="btn btn-primary small">⚡ Open App</a>
-  </div>
-</nav>
+<div class="nav">
+  <span>SancheSolutions</span>
+  <span>AI Automation Builder</span>
+</div>
 
 <div class="hero">
-  <h1>We Build <span>AI Revenue Systems</span> That Run Your Business</h1>
+  <h1>AI Systems, SaaS Tools & Automation Bots</h1>
   <p>
-    We design automation systems that generate leads, qualify customers,
-    and streamline sales so your business runs with less manual work.
+    I build end-to-end AI business systems including chatbots, SaaS dashboards,
+    Stripe billing engines, and lead automation tools for real companies.
   </p>
+  <a class="btn" href="#projects">View All Projects</a>
 </div>
 
-<div class="trust">
-  AI Automation · CRM Systems · Lead Generation · Web Apps · Canada-Based
+<!-- PROJECTS -->
+<div class="section" id="projects">
+<h2>🚀 My AI Systems & Bots</h2>
+
+<div class="grid">
+
+  <div class="card">
+    <h3>CleanFlow AI</h3>
+    <p>
+      AI receptionist SaaS that captures leads, qualifies customers,
+      and books cleaning jobs automatically.
+    </p>
+    <div class="tag">SaaS · Stripe · AI Chatbot</div>
+  </div>
+
+  <div class="card">
+    <h3>AI Sales Chat Bot</h3>
+    <p>
+      Conversational AI system that turns website visitors into leads
+      using step-by-step qualification flows.
+    </p>
+    <div class="tag">Lead Gen · Funnel Bot</div>
+  </div>
+
+  <div class="card">
+    <h3>Stripe Checkout Engine</h3>
+    <p>
+      Subscription billing system with checkout sessions,
+      webhook upgrades, and user plan management.
+    </p>
+    <div class="tag">Payments · SaaS Backend</div>
+  </div>
+
+  <div class="card">
+    <h3>Groq AI Backend</h3>
+    <p>
+      High-speed AI API integration using Groq for ultra-fast
+      LLM responses inside chat systems.
+    </p>
+    <div class="tag">LLM · AI API</div>
+  </div>
+
+  <div class="card">
+    <h3>Lead Capture System</h3>
+    <p>
+      Supabase-powered lead storage system that saves customer
+      data from chatbot conversations.
+    </p>
+    <div class="tag">CRM · Database</div>
+  </div>
+
+  <div class="card">
+    <h3>AI Dashboard UI</h3>
+    <p>
+      Protected dashboard interface that locks AI features
+      behind Stripe subscription status.
+    </p>
+    <div class="tag">Frontend · SaaS UI</div>
+  </div>
+
+</div>
 </div>
 
-<section>
-  <h2>High-Impact Systems We Build</h2>
+<!-- ABOUT -->
+<div class="section">
+<h2>What I Do</h2>
 
-  <div class="grid">
-    <div class="card">
-      <h3>AI Lead Generation System</h3>
-      <p>Captures and qualifies leads automatically using AI chat + CRM integration.</p>
-    </div>
+<p style="text-align:center; max-width:750px; margin:auto; color:#555; line-height:1.6;">
+I design full-stack AI automation systems that combine frontend UI, backend APIs,
+Stripe billing, and database-driven workflows. These systems help small businesses
+convert traffic into paying customers automatically.
+</p>
 
-    <div class="card">
-      <h3>Business Automation Engine</h3>
-      <p>Eliminates manual admin work with workflows, APIs, and smart routing systems.</p>
-    </div>
+<div style="text-align:center;">
+  <a class="btn" href="mailto:youremail@example.com">Contact Me</a>
+</div>
+</div>
 
-    <div class="card">
-      <h3>AI Sales System (Flagship)</h3>
-      <p>Full AI-powered funnel that replaces manual sales handling and follow-ups.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>How It Works</h2>
-
-  <div class="steps">
-    <div class="step">
-      <h3>1. Diagnose</h3>
-      <p>We analyze your business flow and find where leads are being lost.</p>
-    </div>
-
-    <div class="step">
-      <h3>2. Build</h3>
-      <p>We design and deploy your AI automation system and integrations.</p>
-    </div>
-
-    <div class="step">
-      <h3>3. Scale</h3>
-      <p>Your system runs 24/7 generating and managing leads automatically.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="cta-box">
-    <h2>Let’s Build Your System</h2>
-    <p>Book a call or message directly on WhatsApp.</p>
-
-    <div class="cta-buttons">
-
-      <!-- WHATSAPP (hidden number via link) -->
-      <a class="btn btn-primary"
-         href="https://wa.me/17802679673"
-         target="_blank">
-         💬 WhatsApp Me
-      </a>
-
-      <!-- CALENDLY -->
-      <a class="btn"
-         href="https://calendly.com"
-         target="_blank">
-         📅 Book on Calendly
-      </a>
-
-    </div>
-  </div>
-</section>
-
-<footer style="text-align:center; padding:40px; color:var(--muted); border-top:1px solid var(--border);">
-  © 2026 SancheSolutions · AI Automation & Web Systems · Alberta, Canada
-</footer>
-
-<script>
-function toggleTheme() {
-  document.body.classList.toggle("light");
-  localStorage.setItem(
-    "theme",
-    document.body.classList.contains("light") ? "light" : "dark"
-  );
-}
-
-window.onload = () => {
-  if (localStorage.getItem("theme") === "light") {
-    document.body.classList.add("light");
-  }
-};
-</script>
+<!-- FOOTER -->
+<div class="footer">
+© 2026 SancheSolutions · AI Systems Portfolio
+</div>
 
 </body>
 </html>
