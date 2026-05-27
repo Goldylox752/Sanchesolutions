@@ -13,11 +13,11 @@ const app = express();
    ENV SAFETY
 ───────────────────────────── */
 
-function requireEnv(key) {
-  const val = process.env[key];
-  if (!val) throw new Error(`❌ Missing env: ${key}`);
-  return val;
-}
+const requireEnv = (key) => {
+  const value = process.env[key];
+  if (!value) throw new Error(`❌ Missing env: ${key}`);
+  return value;
+};
 
 /* ─────────────────────────────
    CLIENTS
@@ -31,16 +31,11 @@ const groq = new Groq({
   apiKey: requireEnv("GROQ_API_KEY"),
 });
 
-/**
- * FIX: use SERVICE ROLE for backend writes
- */
 const supabase = createClient(
   requireEnv("SUPABASE_URL"),
   requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   {
-    auth: {
-      persistSession: false,
-    },
+    auth: { persistSession: false },
   }
 );
 
@@ -57,9 +52,10 @@ app.use(
   })
 );
 
-/**
- * Stripe webhook MUST be BEFORE express.json()
- */
+/* ─────────────────────────────
+   STRIPE WEBHOOK (RAW BODY REQUIRED)
+───────────────────────────── */
+
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
@@ -73,44 +69,48 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("Webhook error:", err.message);
+      console.error("❌ Stripe webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     try {
-      if (event.type === "checkout.session.completed") {
-        const session = event.data.object;
-        const userId = session?.metadata?.user_id;
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const session = event.data.object;
+          const userId = session?.metadata?.user_id;
 
-        if (userId) {
-          await supabase.from("users").upsert({
-            id: userId,
-            plan: "pro",
-            stripe_customer_id: session.customer,
-            updated_at: new Date().toISOString(),
-          });
+          if (userId) {
+            await supabase.from("users").upsert({
+              id: userId,
+              plan: "pro",
+              stripe_customer_id: session.customer,
+              updated_at: new Date().toISOString(),
+            });
+          }
+
+          break;
         }
       }
 
       return res.json({ received: true });
     } catch (err) {
-      console.error("Webhook handling error:", err);
+      console.error("❌ Webhook handling failed:", err);
       return res.status(500).json({ error: "Webhook processing failed" });
     }
   }
 );
 
-/* JSON parser AFTER webhook */
+/* JSON middleware AFTER webhook */
 app.use(express.json());
 
 /* ─────────────────────────────
    HEALTH CHECK
 ───────────────────────────── */
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (_, res) => {
   res.json({
     status: "ok",
-    service: "CleanFlow AI Backend",
+    service: "CleanFlow AI",
     time: new Date().toISOString(),
   });
 });
@@ -119,12 +119,12 @@ app.get("/api/health", (req, res) => {
    AUTH MIDDLEWARE (SUPABASE JWT)
 ───────────────────────────── */
 
-async function requireUser(req, res, next) {
+const requireUser = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ error: "Missing auth token" });
+      return res.status(401).json({ error: "Missing token" });
     }
 
     const { data, error } = await supabase.auth.getUser(token);
@@ -135,10 +135,10 @@ async function requireUser(req, res, next) {
 
     req.user = data.user;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: "Auth failed" });
   }
-}
+};
 
 /* ─────────────────────────────
    AI CHAT (PROTECTED)
@@ -158,7 +158,7 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are CleanFlow AI, a SaaS assistant that helps cleaning businesses get more bookings and automate leads.",
+            "You are CleanFlow AI, a SaaS assistant helping cleaning businesses get more bookings, respond faster, and automate leads.",
         },
         { role: "user", content: message },
       ],
@@ -172,7 +172,7 @@ app.post("/api/chat", requireUser, async (req, res) => {
       reply,
     });
   } catch (err) {
-    console.error(err);
+    console.error("❌ AI error:", err);
     return res.status(500).json({ error: "AI request failed" });
   }
 });
@@ -200,7 +200,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: "CleanFlow AI Pro",
               description:
-                "AI receptionist that books cleaning jobs automatically",
+                "24/7 AI receptionist that turns visitors into booked cleaning jobs",
             },
             unit_amount: 4900,
             recurring: {
@@ -222,15 +222,15 @@ app.post("/api/create-checkout-session", async (req, res) => {
       },
     });
 
-    if (!session.url) {
-      return res
-        .status(500)
-        .json({ error: "Stripe did not return checkout URL" });
+    if (!session?.url) {
+      return res.status(500).json({
+        error: "Stripe did not return checkout URL",
+      });
     }
 
     return res.json({ url: session.url });
   } catch (err) {
-    console.error("Checkout error:", err);
+    console.error("❌ Checkout error:", err);
     return res.status(500).json({ error: "Checkout failed" });
   }
 });
