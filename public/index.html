@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SancheSolutions · AI Revenue Systems & Automation</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#060810;
+  --surface:#0d1123;
+  --border:rgba(255,255,255,0.08);
+  --accent:#3d7fff;
+  --accent2:#00d4ff;
+  --text:#e8eaf0;
+  --muted:rgba(232,234,240,0.6);
+  --font-head:'Syne', sans-serif;
+  --font-body:'Instrument Sans', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  transition:all 0.3s ease;
+}
+
+/* LIGHT MODE */
+body.light{
+  --bg:#f5f7ff;
+  --surface:#ffffff;
+  --border:rgba(0,0,0,0.08);
+  --text:#0b0f1a;
+  --muted:rgba(0,0,0,0.6);
+}
+
+/* NAV */
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 40px;
+  position:sticky;
+  top:0;
+  background:rgba(6,8,16,0.75);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+
+body.light nav{
+  background:rgba(255,255,255,0.8);
+}
+
+.logo{
+  font-family:var(--font-head);
+  font-weight:800;
+}
+.logo span{color:var(--accent)}
+
+.btn{
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  font-weight:500;
+  color:var(--text);
+  background:transparent;
+  font-size:13px;
+  text-decoration:none;
+  display:inline-block;
+}
+
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+}
+
+.small{
+  font-size:12px;
+  padding:6px 10px;
+}
+
+/* HERO */
+.hero{
+  text-align:center;
+  padding:120px 20px 80px;
+}
+
+.hero h1{
+  font-family:var(--font-head);
+  font-size:clamp(40px,6vw,72px);
+  line-height:1.05;
+}
+
+.hero h1 span{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+  max-width:650px;
+  margin:20px auto;
+  color:var(--muted);
+  font-size:17px;
+}
+
+/* TRUST */
+.trust{
+  text-align:center;
+  padding:20px;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+/* SECTIONS */
+section{
+  padding:90px 20px;
+  max-width:1100px;
+  margin:auto;
+}
+
+h2{
+  font-family:var(--font-head);
+  font-size:36px;
+  margin-bottom:40px;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:24px;
+  border-radius:14px;
+}
+
+.card h3{
+  font-family:var(--font-head);
+  margin-bottom:10px;
+}
+
+.card p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* STEPS */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
+}
+
+.step{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:24px;
+  border-radius:14px;
+}
+
+/* CTA */
+.cta-box{
+  text-align:center;
+  background:var(--surface);
+  padding:60px 30px;
+  border-radius:20px;
+  border:1px solid var(--border);
+}
+
+.cta-buttons{
+  margin-top:20px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">Sanche<span>Solutions</span></div>
+
+  <div style="display:flex; gap:10px; align-items:center;">
+    <button class="btn small" onclick="toggleTheme()">🌓 Theme</button>
+    <a href="./app.html" class="btn btn-primary small">⚡ Open App</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>We Build <span>AI Revenue Systems</span> That Run Your Business</h1>
+  <p>
+    We design automation systems that generate leads, qualify customers,
+    and streamline sales so your business runs with less manual work.
+  </p>
+</div>
+
+<div class="trust">
+  AI Automation · CRM Systems · Lead Generation · Web Apps · Canada-Based
+</div>
+
+<section>
+  <h2>High-Impact Systems We Build</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>AI Lead Generation System</h3>
+      <p>Captures and qualifies leads automatically using AI chat + CRM integration.</p>
+    </div>
+
+    <div class="card">
+      <h3>Business Automation Engine</h3>
+      <p>Eliminates manual admin work with workflows, APIs, and smart routing systems.</p>
+    </div>
+
+    <div class="card">
+      <h3>AI Sales System (Flagship)</h3>
+      <p>Full AI-powered funnel that replaces manual sales handling and follow-ups.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>How It Works</h2>
+
+  <div class="steps">
+    <div class="step">
+      <h3>1. Diagnose</h3>
+      <p>We analyze your business flow and find where leads are being lost.</p>
+    </div>
+
+    <div class="step">
+      <h3>2. Build</h3>
+      <p>We design and deploy your AI automation system and integrations.</p>
+    </div>
+
+    <div class="step">
+      <h3>3. Scale</h3>
+      <p>Your system runs 24/7 generating and managing leads automatically.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-box">
+    <h2>Let’s Build Your System</h2>
+    <p>Book a call or message directly on WhatsApp.</p>
+
+    <div class="cta-buttons">
+
+      <!-- WHATSAPP (hidden number via link) -->
+      <a class="btn btn-primary"
+         href="https://wa.me/17802679673"
+         target="_blank">
+         💬 WhatsApp Me
+      </a>
+
+      <!-- CALENDLY -->
+      <a class="btn"
+         href="https://calendly.com"
+         target="_blank">
+         📅 Book on Calendly
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center; padding:40px; color:var(--muted); border-top:1px solid var(--border);">
+  © 2026 SancheSolutions · AI Automation & Web Systems · Alberta, Canada
+</footer>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
+}
+
+window.onload = () => {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+  }
+};
+</script>
+
+</body>
+</html>
