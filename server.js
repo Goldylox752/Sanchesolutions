@@ -20,7 +20,7 @@ function requireEnv(key) {
 }
 
 /* ─────────────────────────────
-   CLIENT INITIALIZATION
+   CLIENTS
 ───────────────────────────── */
 
 const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
@@ -40,7 +40,7 @@ const supabase = createClient(
 );
 
 /* ─────────────────────────────
-   CORS
+   MIDDLEWARE
 ───────────────────────────── */
 
 app.use(
@@ -52,10 +52,7 @@ app.use(
   })
 );
 
-/* ─────────────────────────────
-   STRIPE WEBHOOK (RAW BODY FIRST)
-───────────────────────────── */
-
+/* IMPORTANT: Stripe webhook MUST come BEFORE express.json */
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
@@ -69,6 +66,7 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
+      console.error("Webhook signature error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -89,15 +87,13 @@ app.post(
 
       return res.json({ received: true });
     } catch (err) {
-      return res.status(500).json({ error: "Webhook processing failed" });
+      console.error("Webhook processing error:", err);
+      return res.status(500).json({ error: "Webhook failed" });
     }
   }
 );
 
-/* ─────────────────────────────
-   JSON MIDDLEWARE (AFTER WEBHOOK)
-───────────────────────────── */
-
+/* JSON middleware AFTER webhook */
 app.use(express.json());
 
 /* ─────────────────────────────
@@ -107,7 +103,7 @@ app.use(express.json());
 app.get("/api/health", (_, res) => {
   res.json({
     status: "ok",
-    service: "CleanFlow AI",
+    service: "SancheSolutions AI Backend",
     time: new Date().toISOString(),
   });
 });
@@ -132,13 +128,34 @@ async function requireUser(req, res, next) {
 
     req.user = data.user;
     next();
-  } catch {
+  } catch (err) {
     return res.status(401).json({ error: "Auth failed" });
   }
 }
 
 /* ─────────────────────────────
-   AI CHAT ROUTE
+   USER PLAN CHECK (IMPORTANT FOR DASHBOARD)
+───────────────────────────── */
+
+app.get("/api/me", requireUser, async (req, res) => {
+  try {
+    const { data } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", req.user.id)
+      .single();
+
+    return res.json({
+      user: req.user,
+      profile: data || { plan: "free" },
+    });
+  } catch {
+    return res.status(500).json({ error: "Failed to load user" });
+  }
+});
+
+/* ─────────────────────────────
+   AI CHAT
 ───────────────────────────── */
 
 app.post("/api/chat", requireUser, async (req, res) => {
@@ -155,7 +172,7 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are CleanFlow AI, a SaaS assistant for cleaning businesses that helps generate bookings and automate leads.",
+            "You are an AI assistant for SancheSolutions SaaS automation systems.",
         },
         { role: "user", content: message },
       ],
@@ -168,13 +185,14 @@ app.post("/api/chat", requireUser, async (req, res) => {
       success: true,
       reply,
     });
-  } catch {
+  } catch (err) {
+    console.error("AI error:", err);
     return res.status(500).json({ error: "AI request failed" });
   }
 });
 
 /* ─────────────────────────────
-   STRIPE CHECKOUT SESSION
+   STRIPE CHECKOUT
 ───────────────────────────── */
 
 app.post("/api/create-checkout-session", async (req, res) => {
@@ -195,9 +213,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "CleanFlow AI Pro",
+              name: "SancheSolutions Pro",
               description:
-                "AI receptionist that converts visitors into booked cleaning jobs",
+                "Full AI automation dashboard + bots + CRM system",
             },
             unit_amount: 4900,
             recurring: {
@@ -219,15 +237,19 @@ app.post("/api/create-checkout-session", async (req, res) => {
       },
     });
 
-    if (!session || !session.url) {
+    if (!session?.url) {
+      console.error("Stripe session missing URL:", session);
       return res.status(500).json({
         error: "Stripe did not return checkout URL",
       });
     }
 
     return res.json({ url: session.url });
-  } catch {
-    return res.status(500).json({ error: "Checkout failed" });
+  } catch (err) {
+    console.error("Checkout error:", err);
+    return res.status(500).json({
+      error: err.message || "Checkout failed",
+    });
   }
 });
 
@@ -237,4 +259,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`SancheSolutions backend running on port ${PORT}`);
+});
