@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CleanFlow AI · Dashboard</title>
+<title>SancheSolutions · Dashboard</title>
 
 <style>
 :root{
@@ -38,6 +38,10 @@ header{
   display:flex;
   justify-content:space-between;
   align-items:center;
+}
+
+header h1{
+  font-size:15px;
 }
 
 .badge{
@@ -125,22 +129,21 @@ button{
 <body>
 
 <header>
-  <h1>CleanFlow AI Dashboard</h1>
-  <div id="status" class="badge locked">Checking subscription...</div>
+  <h1>SancheSolutions · Control Dashboard</h1>
+  <div id="status" class="badge locked">Checking plan...</div>
 </header>
 
 <div class="chat" id="chat"></div>
 
 <div class="input-bar">
-  <input id="input" placeholder="Ask your AI assistant..." />
+  <input id="input" placeholder="Ask your AI system..." />
   <button class="send" onclick="send()">Send</button>
   <button class="upgrade" onclick="goStripe()">Upgrade</button>
 </div>
 
 <script>
 
-/* ───────── CONFIG ───────── */
-
+/* CONFIG */
 const API_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
@@ -148,16 +151,16 @@ const API_URL =
 
 const CHAT = `${API_URL}/api/chat`;
 const STRIPE = `${API_URL}/api/create-checkout-session`;
-const SESSION = localStorage.getItem("sessionId") || crypto.randomUUID();
+
+const SESSION =
+  localStorage.getItem("sessionId") || crypto.randomUUID();
 
 localStorage.setItem("sessionId", SESSION);
 
-/* ───────── STATE ───────── */
-
+/* STATE */
 let plan = localStorage.getItem("plan") || "free";
 
-/* ───────── UI ───────── */
-
+/* UI */
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const status = document.getElementById("status");
@@ -175,26 +178,17 @@ function addMsg(text, type){
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* ───────── PLAN SYSTEM (REALISTIC LAYER) ───────── */
-
+/* PLAN CHECK */
 async function checkPlan(){
-
   try {
-    const res = await fetch(`${API_URL}/api/health`);
-    await res.json();
-
-    // STEP 1: local check (fast UX)
-    plan = localStorage.getItem("plan") || "free";
-
-    // STEP 2: placeholder for Stripe DB sync (IMPORTANT NEXT STEP)
-    // later: fetch /api/me from Supabase
+    await fetch(`${API_URL}/api/health`);
 
     if(plan === "pro"){
       setStatus("Pro Active", false);
-      addMsg("Pro plan active. Full AI unlocked.", "ai");
+      addMsg("Pro unlocked. Full system access enabled.", "ai");
     } else {
       setStatus("Free Plan", true);
-      addMsg("Free plan active. Upgrade to unlock AI automation.", "ai");
+      addMsg("Free plan detected. Upgrade to unlock automation features.", "ai");
     }
 
   } catch {
@@ -202,8 +196,7 @@ async function checkPlan(){
   }
 }
 
-/* ───────── CHAT ───────── */
-
+/* CHAT */
 async function send(){
 
   const text = input.value.trim();
@@ -213,7 +206,7 @@ async function send(){
   input.value = "";
 
   if(plan !== "pro"){
-    addMsg("Upgrade required to use AI features.", "ai");
+    addMsg("Upgrade required to use AI system.", "ai");
     return;
   }
 
@@ -233,12 +226,11 @@ async function send(){
     addMsg(data.reply || "No response", "ai");
 
   } catch {
-    addMsg("Error connecting to AI", "ai");
+    addMsg("Error connecting to backend.", "ai");
   }
 }
 
-/* ───────── STRIPE ───────── */
-
+/* STRIPE */
 async function goStripe(){
 
   try {
@@ -255,14 +247,10 @@ async function goStripe(){
     const data = await res.json();
 
     if(data.url){
-
-      // OPTIONAL: mark intent locally
       localStorage.setItem("checkout_started", "true");
-
       window.location.href = data.url;
-
     } else {
-      addMsg("Stripe error: no checkout link", "ai");
+      addMsg("Stripe error: no checkout URL", "ai");
     }
 
   } catch {
@@ -270,18 +258,15 @@ async function goStripe(){
   }
 }
 
-/* ───────── SIMULATE UPGRADE AFTER RETURN ───────── */
-/* (temporary until webhook is wired) */
-
+/* AUTO UPGRADE (TEMP) */
 if(window.location.search.includes("success=1")){
   localStorage.setItem("plan", "pro");
   plan = "pro";
 }
 
-/* ───────── INIT ───────── */
-
+/* INIT */
 window.onload = () => {
-  addMsg("CleanFlow AI Dashboard loaded.", "ai");
+  addMsg("SancheSolutions Dashboard online.", "ai");
   checkPlan();
 };
 
