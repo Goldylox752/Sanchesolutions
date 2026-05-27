@@ -45,7 +45,6 @@ header{
 .title{
   font-size:14px;
   font-weight:700;
-  letter-spacing:0.5px;
 }
 
 .badge{
@@ -109,7 +108,7 @@ header{
   flex-direction:column;
 }
 
-/* TOP METRICS */
+/* METRICS */
 .metrics{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -128,7 +127,6 @@ header{
 .card h3{
   font-size:12px;
   color:var(--muted);
-  margin-bottom:6px;
 }
 
 .card p{
@@ -151,7 +149,6 @@ header{
   padding:12px 14px;
   border-radius:12px;
   font-size:14px;
-  line-height:1.4;
 }
 
 .user{
@@ -218,9 +215,9 @@ button{
   <div class="sidebar">
 
     <div class="section-title">AI SYSTEMS</div>
-    <div class="agent active" onclick="setAgent('cleanflow')">CleanFlow AI</div>
-    <div class="agent" onclick="setAgent('roofflow')">RoofFlow AI</div>
-    <div class="agent" onclick="setAgent('sales')">Sales Bot</div>
+    <div class="agent active" data-agent="cleanflow">CleanFlow AI</div>
+    <div class="agent" data-agent="roofflow">RoofFlow AI</div>
+    <div class="agent" data-agent="sales">Sales Bot</div>
 
     <div class="section-title">CONTROL</div>
     <div class="agent">Deploy System</div>
@@ -232,7 +229,6 @@ button{
   <!-- MAIN -->
   <div class="main">
 
-    <!-- METRICS -->
     <div class="metrics">
       <div class="card">
         <h3>Active AI</h3>
@@ -250,10 +246,8 @@ button{
       </div>
     </div>
 
-    <!-- CHAT -->
     <div class="chat" id="chat"></div>
 
-    <!-- INPUT -->
     <div class="input-bar">
       <input id="input" placeholder="Command AI system..." />
       <button class="send" onclick="send()">Execute</button>
@@ -284,7 +278,6 @@ let agent = "cleanflow";
 /* UI */
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
-
 const status = document.getElementById("status");
 const statusText = document.getElementById("statusText");
 const activeAI = document.getElementById("activeAI");
@@ -297,21 +290,24 @@ function addMsg(text, type){
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* AGENT SWITCH */
-function setAgent(a){
-  agent = a;
-  activeAI.textContent = a.charAt(0).toUpperCase() + a.slice(1);
+/* FIXED AGENT SWITCH */
+document.querySelectorAll(".agent[data-agent]").forEach(el => {
+  el.addEventListener("click", () => {
 
-  document.querySelectorAll(".agent").forEach(e=>{
-    e.classList.remove("active");
+    document.querySelectorAll(".agent[data-agent]")
+      .forEach(e => e.classList.remove("active"));
+
+    el.classList.add("active");
+
+    agent = el.dataset.agent;
+    activeAI.textContent =
+      agent.charAt(0).toUpperCase() + agent.slice(1);
+
+    addMsg(`Switched to ${agent.toUpperCase()} AI system`, "ai");
   });
+});
 
-  event.target.classList.add("active");
-
-  addMsg(`Switched to ${a.toUpperCase()} AI system`, "ai");
-}
-
-/* PLAN */
+/* PLAN CHECK */
 async function checkPlan(){
   await fetch(`${API_URL}/api/health`);
 
@@ -319,12 +315,10 @@ async function checkPlan(){
     status.textContent = "PRO ACTIVE";
     status.className = "badge";
     statusText.textContent = "Pro Mode";
-    addMsg("Full AI Operator access unlocked.", "ai");
   } else {
     status.textContent = "FREE MODE";
     status.className = "badge locked";
     statusText.textContent = "Limited";
-    addMsg("System running in restricted mode.", "ai");
   }
 }
 
@@ -343,7 +337,6 @@ async function send(){
   }
 
   try {
-
     const res = await fetch(CHAT, {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
@@ -355,13 +348,17 @@ async function send(){
     });
 
     const data = await res.json();
-
     addMsg(data.reply || "No response", "ai");
 
   } catch {
     addMsg("AI system error", "ai");
   }
 }
+
+/* ENTER KEY SUPPORT */
+input.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") send();
+});
 
 /* STRIPE */
 async function goStripe(){
@@ -383,12 +380,6 @@ async function goStripe(){
   } else {
     addMsg("Stripe failed", "ai");
   }
-}
-
-/* AUTO UPGRADE */
-if(window.location.search.includes("success=1")){
-  localStorage.setItem("plan", "pro");
-  plan = "pro";
 }
 
 /* INIT */
