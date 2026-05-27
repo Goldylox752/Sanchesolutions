@@ -13,11 +13,11 @@ const app = express();
    ENV SAFETY
 ───────────────────────────── */
 
-const requireEnv = (key) => {
+function requireEnv(key) {
   const value = process.env[key];
   if (!value) throw new Error(`❌ Missing env: ${key}`);
   return value;
-};
+}
 
 /* ─────────────────────────────
    CLIENTS
@@ -53,7 +53,7 @@ app.use(
 );
 
 /* ─────────────────────────────
-   STRIPE WEBHOOK (RAW BODY REQUIRED)
+   STRIPE WEBHOOK (RAW FIRST)
 ───────────────────────────── */
 
 app.post(
@@ -69,45 +69,41 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("❌ Stripe webhook error:", err.message);
+      console.error("❌ Webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     try {
-      switch (event.type) {
-        case "checkout.session.completed": {
-          const session = event.data.object;
-          const userId = session?.metadata?.user_id;
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object;
+        const userId = session?.metadata?.user_id;
 
-          if (userId) {
-            await supabase.from("users").upsert({
-              id: userId,
-              plan: "pro",
-              stripe_customer_id: session.customer,
-              updated_at: new Date().toISOString(),
-            });
-          }
-
-          break;
+        if (userId) {
+          await supabase.from("users").upsert({
+            id: userId,
+            plan: "pro",
+            stripe_customer_id: session.customer,
+            updated_at: new Date().toISOString(),
+          });
         }
       }
 
       return res.json({ received: true });
     } catch (err) {
-      console.error("❌ Webhook handling failed:", err);
+      console.error("❌ Webhook handling error:", err);
       return res.status(500).json({ error: "Webhook processing failed" });
     }
   }
 );
 
-/* JSON middleware AFTER webhook */
+/* JSON BODY (AFTER WEBHOOK) */
 app.use(express.json());
 
 /* ─────────────────────────────
    HEALTH CHECK
 ───────────────────────────── */
 
-app.get("/api/health", (_, res) => {
+app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
     service: "CleanFlow AI",
@@ -116,10 +112,10 @@ app.get("/api/health", (_, res) => {
 });
 
 /* ─────────────────────────────
-   AUTH MIDDLEWARE (SUPABASE JWT)
+   AUTH (SUPABASE JWT)
 ───────────────────────────── */
 
-const requireUser = async (req, res, next) => {
+async function requireUser(req, res, next) {
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
 
@@ -138,10 +134,10 @@ const requireUser = async (req, res, next) => {
   } catch {
     return res.status(401).json({ error: "Auth failed" });
   }
-};
+}
 
 /* ─────────────────────────────
-   AI CHAT (PROTECTED)
+   AI CHAT
 ───────────────────────────── */
 
 app.post("/api/chat", requireUser, async (req, res) => {
@@ -158,7 +154,7 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are CleanFlow AI, a SaaS assistant helping cleaning businesses get more bookings, respond faster, and automate leads.",
+            "You are CleanFlow AI, an assistant that helps cleaning businesses get more bookings, respond faster, and automate leads.",
         },
         { role: "user", content: message },
       ],
@@ -200,7 +196,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: "CleanFlow AI Pro",
               description:
-                "24/7 AI receptionist that turns visitors into booked cleaning jobs",
+                "AI receptionist that turns visitors into booked cleaning jobs",
             },
             unit_amount: 4900,
             recurring: {
