@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SancheSolutions · AI Control Dashboard</title>
+<title>SancheSolutions · AI Operator Dashboard</title>
 
 <style>
 :root{
-  --bg:#060914;
-  --panel:#0c1328;
+  --bg:#070A12;
+  --panel:#0E1424;
+  --panel2:#0B1020;
   --border:rgba(255,255,255,0.08);
   --accent:#38f2a5;
-  --text:#eaf2ff;
+  --text:#EAF2FF;
   --danger:#ff4d4d;
+  --muted:rgba(255,255,255,0.6);
 }
 
 *{
@@ -32,7 +34,7 @@ body{
 
 /* HEADER */
 header{
-  padding:14px 16px;
+  padding:14px 18px;
   background:var(--panel);
   border-bottom:1px solid var(--border);
   display:flex;
@@ -40,8 +42,10 @@ header{
   align-items:center;
 }
 
-header h1{
-  font-size:15px;
+.title{
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:0.5px;
 }
 
 .badge{
@@ -57,32 +61,79 @@ header h1{
   color:var(--danger);
 }
 
-/* MAIN LAYOUT */
+/* LAYOUT */
 .wrapper{
   display:flex;
   flex:1;
   overflow:hidden;
 }
 
-/* LEFT PANEL (AI CONTROL) */
-.panel{
-  width:220px;
+/* SIDEBAR */
+.sidebar{
+  width:240px;
   background:var(--panel);
   border-right:1px solid var(--border);
-  padding:12px;
+  padding:14px;
+}
+
+.section-title{
+  font-size:11px;
+  color:var(--muted);
+  margin:10px 0;
 }
 
 .agent{
   padding:10px;
   margin-bottom:8px;
   border-radius:10px;
-  background:rgba(255,255,255,0.04);
+  background:var(--panel2);
   cursor:pointer;
+  border:1px solid var(--border);
+  transition:0.2s;
+}
+
+.agent:hover{
+  border-color:var(--accent);
 }
 
 .agent.active{
   background:var(--accent);
   color:#000;
+  font-weight:700;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+/* TOP METRICS */
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  padding:14px;
+  border-bottom:1px solid var(--border);
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:12px;
+}
+
+.card h3{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.card p{
+  font-size:16px;
+  font-weight:700;
 }
 
 /* CHAT */
@@ -96,10 +147,11 @@ header h1{
 }
 
 .msg{
-  max-width:75%;
+  max-width:70%;
   padding:12px 14px;
   border-radius:12px;
   font-size:14px;
+  line-height:1.4;
 }
 
 .user{
@@ -156,30 +208,59 @@ button{
 <body>
 
 <header>
-  <h1>SancheSolutions · AI Control System</h1>
-  <div id="status" class="badge locked">Initializing AI...</div>
+  <div class="title">SancheSolutions · AI Operator Control Center</div>
+  <div id="status" class="badge locked">INITIALIZING</div>
 </header>
 
 <div class="wrapper">
 
-  <!-- CONTROL PANEL -->
-  <div class="panel">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="section-title">AI SYSTEMS</div>
     <div class="agent active" onclick="setAgent('cleanflow')">CleanFlow AI</div>
     <div class="agent" onclick="setAgent('roofflow')">RoofFlow AI</div>
     <div class="agent" onclick="setAgent('sales')">Sales Bot</div>
+
+    <div class="section-title">CONTROL</div>
+    <div class="agent">Deploy System</div>
+    <div class="agent">Pause AI</div>
+    <div class="agent">Export Leads</div>
+
   </div>
 
-  <!-- CHAT -->
-  <div style="flex:1; display:flex; flex-direction:column;">
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="card">
+        <h3>Active AI</h3>
+        <p id="activeAI">CleanFlow</p>
+      </div>
+
+      <div class="card">
+        <h3>Status</h3>
+        <p id="statusText">Free Mode</p>
+      </div>
+
+      <div class="card">
+        <h3>System Load</h3>
+        <p>Stable</p>
+      </div>
+    </div>
+
+    <!-- CHAT -->
     <div class="chat" id="chat"></div>
 
+    <!-- INPUT -->
     <div class="input-bar">
-      <input id="input" placeholder="Control your AI system..." />
-      <button class="send" onclick="send()">Send</button>
+      <input id="input" placeholder="Command AI system..." />
+      <button class="send" onclick="send()">Execute</button>
       <button class="upgrade" onclick="goStripe()">Upgrade</button>
     </div>
-  </div>
 
+  </div>
 </div>
 
 <script>
@@ -203,7 +284,10 @@ let agent = "cleanflow";
 /* UI */
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
+
 const status = document.getElementById("status");
+const statusText = document.getElementById("statusText");
+const activeAI = document.getElementById("activeAI");
 
 function addMsg(text, type){
   const div = document.createElement("div");
@@ -216,29 +300,35 @@ function addMsg(text, type){
 /* AGENT SWITCH */
 function setAgent(a){
   agent = a;
+  activeAI.textContent = a.charAt(0).toUpperCase() + a.slice(1);
 
-  document.querySelectorAll(".agent").forEach(e=>e.classList.remove("active"));
+  document.querySelectorAll(".agent").forEach(e=>{
+    e.classList.remove("active");
+  });
+
   event.target.classList.add("active");
 
-  addMsg(`Switched to ${a.toUpperCase()} AI`, "ai");
+  addMsg(`Switched to ${a.toUpperCase()} AI system`, "ai");
 }
 
-/* PLAN CHECK */
+/* PLAN */
 async function checkPlan(){
   await fetch(`${API_URL}/api/health`);
 
   if(plan === "pro"){
-    status.textContent = "PRO AI ACTIVE";
+    status.textContent = "PRO ACTIVE";
     status.className = "badge";
-    addMsg("Full AI system unlocked.", "ai");
+    statusText.textContent = "Pro Mode";
+    addMsg("Full AI Operator access unlocked.", "ai");
   } else {
     status.textContent = "FREE MODE";
     status.className = "badge locked";
-    addMsg("Free mode active. Upgrade for full AI control.", "ai");
+    statusText.textContent = "Limited";
+    addMsg("System running in restricted mode.", "ai");
   }
 }
 
-/* CHAT CONTROL SYSTEM */
+/* CHAT */
 async function send(){
 
   const text = input.value.trim();
@@ -248,7 +338,7 @@ async function send(){
   input.value = "";
 
   if(plan !== "pro"){
-    addMsg("System locked. Upgrade required.", "ai");
+    addMsg("Upgrade required to execute AI commands.", "ai");
     return;
   }
 
@@ -269,7 +359,7 @@ async function send(){
     addMsg(data.reply || "No response", "ai");
 
   } catch {
-    addMsg("AI system error.", "ai");
+    addMsg("AI system error", "ai");
   }
 }
 
@@ -291,7 +381,7 @@ async function goStripe(){
     localStorage.setItem("checkout", "1");
     window.location.href = data.url;
   } else {
-    addMsg("Stripe failed.", "ai");
+    addMsg("Stripe failed", "ai");
   }
 }
 
@@ -303,7 +393,7 @@ if(window.location.search.includes("success=1")){
 
 /* INIT */
 window.onload = () => {
-  addMsg("SancheSolutions AI Control System online.", "ai");
+  addMsg("SancheSolutions AI Operator System online.", "ai");
   checkPlan();
 };
 
