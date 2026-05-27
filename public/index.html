@@ -22,19 +22,6 @@ body{
   font-weight:bold;
 }
 
-.nav a{
-  text-decoration:none;
-  color:#111;
-  margin-left:14px;
-  font-weight:600;
-}
-
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
 .hero{
   text-align:center;
   padding:110px 20px;
@@ -106,7 +93,7 @@ body{
   background:white;
 }
 
-/* CONTACT BAR */
+/* CONTACT */
 .contact-bar{
   display:flex;
   flex-wrap:wrap;
@@ -115,7 +102,6 @@ body{
   margin-top:25px;
 }
 
-/* buttons */
 .link-btn{
   padding:10px 16px;
   border-radius:10px;
@@ -127,7 +113,7 @@ body{
 
 .whatsapp{ background:#25D366; }
 .calendly{ background:#006bff; }
-.dashboard{ background:#ff4d4d; }
+.email{ background:#444; }
 </style>
 </head>
 
@@ -135,11 +121,7 @@ body{
 
 <div class="nav">
   <span>SancheSolutions</span>
-
-  <div class="nav-right">
-    <a href="#projects">Projects</a>
-    <a href="/dashboard.html" class="dashboard">Dashboard</a>
-  </div>
+  <span>AI Automation Systems</span>
 </div>
 
 <div class="hero">
@@ -148,32 +130,36 @@ body{
   <p>
     I build full-stack AI business systems: chatbots, SaaS dashboards,
     Stripe billing engines, lead automation systems, and CRM integrations
-    that turn traffic into revenue.
+    that turn traffic into revenue automatically.
   </p>
 
   <div class="contact-bar">
 
-    <a class="link-btn calendly" href="https://calendly.com/" target="_blank">
+    <!-- Calendly -->
+    <a class="link-btn calendly"
+       href="https://calendly.com/"
+       target="_blank">
       Book a Call
     </a>
 
-    <a class="link-btn whatsapp" href="https://wa.me/17802679673" target="_blank">
+    <!-- WhatsApp (hidden number link) -->
+    <a class="link-btn whatsapp"
+       href="https://wa.me/17802679673"
+       target="_blank">
       WhatsApp Me
     </a>
 
-    <a class="link-btn" href="mailto:byronsanche@zohomailcloud.ca">
+    <!-- Email (Zoho hidden) -->
+    <a class="link-btn email"
+       href="mailto:byronsanche@zohomailcloud.ca">
       Email Me
-    </a>
-
-    <a class="link-btn dashboard" href="/dashboard.html">
-      Open Dashboard
     </a>
 
   </div>
 </div>
 
 <!-- PROJECTS -->
-<div class="section" id="projects">
+<div class="section">
 <h2>🚀 My AI Systems & Bots</h2>
 
 <div class="grid">
@@ -186,31 +172,31 @@ body{
 
   <div class="card">
     <h3>AI Sales Bot</h3>
-    <p>Conversational funnel bot that converts visitors into leads.</p>
+    <p>Conversational funnel system that converts visitors into customers.</p>
     <div class="tag">Lead Gen · Automation</div>
   </div>
 
   <div class="card">
     <h3>Stripe Billing Engine</h3>
-    <p>Subscription system with checkout sessions and webhook upgrades.</p>
-    <div class="tag">Payments · SaaS</div>
+    <p>Subscription checkout + webhook upgrade system for SaaS apps.</p>
+    <div class="tag">Payments · SaaS Backend</div>
   </div>
 
   <div class="card">
     <h3>Groq AI Backend</h3>
-    <p>Ultra-fast LLM backend powering real-time chat systems.</p>
+    <p>Ultra-fast LLM backend powering real-time AI chat systems.</p>
     <div class="tag">AI · API</div>
   </div>
 
   <div class="card">
     <h3>Lead CRM System</h3>
-    <p>Supabase-powered CRM storing leads from chatbot funnels.</p>
-    <div class="tag">Database · CRM</div>
+    <p>Supabase-based CRM storing and managing chatbot leads.</p>
+    <div class="tag">CRM · Database</div>
   </div>
 
   <div class="card">
-    <h3>SaaS Dashboard UI</h3>
-    <p>Locked subscription dashboard for premium AI features.</p>
+    <h3>SaaS UI Systems</h3>
+    <p>Frontend dashboards and locked AI tools behind subscription paywalls.</p>
     <div class="tag">Frontend · SaaS UI</div>
   </div>
 
@@ -222,21 +208,18 @@ body{
 <h2>What I Do</h2>
 
 <p style="text-align:center; max-width:750px; margin:auto; color:#555; line-height:1.6;">
-I design and build complete AI automation systems for businesses.
-From frontend UI → backend APIs → Stripe billing → CRM integration.
+I design and build complete AI automation systems for businesses — from UI to backend APIs,
+Stripe billing, CRM pipelines, and lead conversion funnels.
 </p>
 
 <div style="text-align:center; margin-top:25px;">
   <a class="btn" href="https://calendly.com/" target="_blank">
     Book Strategy Call
   </a>
-
-  <a class="btn" href="/dashboard.html" style="background:#ff4d4d;">
-    View Dashboard
-  </a>
 </div>
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
 © 2026 SancheSolutions · AI Systems Portfolio
 </div>
