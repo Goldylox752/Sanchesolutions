@@ -1,16 +1,23 @@
 import axios from "axios";
 import cheerio from "cheerio";
-import fs from "fs";
 
-const query = "cleaning services Edmonton Alberta";
+/* ─────────────────────────────
+   CONFIG
+───────────────────────────── */
+
+const CONFIG = {
+  query: "cleaning services Edmonton Alberta",
+  timeout: 8000,
+  delay: 1200,
+  userAgent:
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+};
 
 /* ─────────────────────────────
    HELPERS
 ───────────────────────────── */
 
-function clean(text = "") {
-  return text.replace(/\s+/g, " ").trim();
-}
+const clean = (t = "") => t.replace(/\s+/g, " ").trim();
 
 function getDomain(url) {
   try {
@@ -21,44 +28,39 @@ function getDomain(url) {
 }
 
 function normalizeUrl(url) {
-  if (!url) return null;
-  if (!url.startsWith("http")) return null;
+  if (!url || !url.startsWith("http")) return null;
   return url.split("#")[0].split("?")[0];
 }
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ─────────────────────────────
    STEP 1: GOOGLE SCRAPER
 ───────────────────────────── */
 
-async function scrapeGoogle() {
-  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=20`;
+async function scrapeGoogle(query = CONFIG.query) {
+  const url = `https://www.google.com/search?q=${encodeURIComponent(
+    query
+  )}&num=20`;
 
   const { data } = await axios.get(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-    },
+    headers: { "User-Agent": CONFIG.userAgent },
   });
 
   const $ = cheerio.load(data);
 
   const leads = [];
-  const seenDomains = new Set();
+  const seen = new Set();
 
   $("div.g").each((_, el) => {
-    const title = clean($(el).find("h3").text());
-    let link = normalizeUrl($(el).find("a").attr("href"));
+    const name = clean($(el).find("h3").text());
+    const link = normalizeUrl($(el).find("a").attr("href"));
 
-    if (!title || !link) return;
+    if (!name || !link) return;
 
     const domain = getDomain(link);
     if (!domain) return;
 
-    // block junk platforms
     const blocked = [
       "google",
       "facebook",
@@ -69,12 +71,12 @@ async function scrapeGoogle() {
     ];
 
     if (blocked.some((b) => domain.includes(b))) return;
-    if (seenDomains.has(domain)) return;
+    if (seen.has(domain)) return;
 
-    seenDomains.add(domain);
+    seen.add(domain);
 
     leads.push({
-      name: title,
+      name,
       website: link,
       domain,
     });
@@ -84,7 +86,7 @@ async function scrapeGoogle() {
 }
 
 /* ─────────────────────────────
-   STEP 2: FIND CONTACT PAGES
+   STEP 2: CONTACT DISCOVERY
 ───────────────────────────── */
 
 async function findContactPages(baseUrl) {
@@ -98,33 +100,29 @@ async function findContactPages(baseUrl) {
     "/book",
   ];
 
-  const found = [];
+  const results = [];
 
   for (const path of paths) {
     try {
       const url = baseUrl + path;
 
       const res = await axios.get(url, {
-        timeout: 5000,
-        headers: { "User-Agent": "Mozilla/5.0" },
+        timeout: CONFIG.timeout,
+        headers: { "User-Agent": CONFIG.userAgent },
       });
 
-      if (res?.data && res.data.length > 200) {
-        found.push(url);
-      }
-    } catch {
-      // ignore broken pages
-    }
+      if (res?.data?.length > 200) results.push(url);
+    } catch {}
   }
 
-  return found;
+  return results;
 }
 
 /* ─────────────────────────────
-   STEP 3: EXTRACT CONTACTS
+   STEP 3: CONTACT EXTRACTION
 ───────────────────────────── */
 
-function extractContacts(html) {
+function extractContacts(html = "") {
   const emails =
     html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
 
@@ -151,14 +149,14 @@ function extractContacts(html) {
 }
 
 /* ─────────────────────────────
-   STEP 4: ENRICH LEADS
+   STEP 4: ENRICH LEADS (SAAS LOGIC)
 ───────────────────────────── */
 
-async function enrich(leads) {
-  const enriched = [];
+async function enrichLeads(leads) {
+  const output = [];
 
   for (const lead of leads) {
-    console.log(`🔍 Scanning: ${lead.name}`);
+    console.log(`🔍 Processing: ${lead.name}`);
 
     let emails = [];
     let phones = [];
@@ -166,12 +164,11 @@ async function enrich(leads) {
 
     try {
       const res = await axios.get(lead.website, {
-        timeout: 8000,
-        headers: { "User-Agent": "Mozilla/5.0" },
+        timeout: CONFIG.timeout,
+        headers: { "User-Agent": CONFIG.userAgent },
       });
 
       const main = extractContacts(res.data);
-
       emails.push(...main.emails);
       phones.push(...main.phones);
       socials.push(...main.socials);
@@ -180,9 +177,12 @@ async function enrich(leads) {
 
       for (const page of contactPages) {
         try {
-          const r = await axios.get(page, { timeout: 5000 });
-          const extra = extractContacts(r.data);
+          const r = await axios.get(page, {
+            timeout: CONFIG.timeout,
+            headers: { "User-Agent": CONFIG.userAgent },
+          });
 
+          const extra = extractContacts(r.data);
           emails.push(...extra.emails);
           phones.push(...extra.phones);
           socials.push(...extra.socials);
@@ -194,30 +194,30 @@ async function enrich(leads) {
     const uniquePhones = [...new Set(phones)];
     const uniqueSocials = [...new Set(socials)];
 
-    /* ─────────────────────────────
-       SCORING SYSTEM (SaaS STYLE)
-    ───────────────────────────── */
-
+    // ───────────── SCORE ENGINE ─────────────
     const score =
       uniqueEmails.length * 12 +
       uniquePhones.length * 6 +
       uniqueSocials.length * 3;
 
-    enriched.push({
+    const tier =
+      score > 20 ? "hot" : score > 10 ? "warm" : "cold";
+
+    output.push({
       ...lead,
       emails: uniqueEmails,
       phones: uniquePhones,
       socials: uniqueSocials,
       hasContact: uniqueEmails.length > 0 || uniquePhones.length > 0,
       score,
-      tier:
-        score > 20 ? "hot" : score > 10 ? "warm" : "cold",
+      tier,
+      createdAt: new Date().toISOString(),
     });
 
-    await sleep(1200);
+    await sleep(CONFIG.delay);
   }
 
-  return enriched;
+  return output;
 }
 
 /* ─────────────────────────────
@@ -225,23 +225,20 @@ async function enrich(leads) {
 ───────────────────────────── */
 
 async function run() {
-  console.log("🚀 CleanFlow Lead Engine Starting...");
+  console.log("🚀 CleanFlow SaaS Engine Starting...");
 
   const leads = await scrapeGoogle();
   console.log(`📦 Leads found: ${leads.length}`);
 
-  const enriched = await enrich(leads);
+  const enriched = await enrichLeads(leads);
 
   const sorted = enriched.sort((a, b) => b.score - a.score);
 
-  fs.writeFileSync(
-    "leads.json",
-    JSON.stringify(sorted, null, 2)
-  );
-
-  console.log("✅ DONE");
   console.log("🔥 Top Lead:");
   console.log(sorted[0]);
+
+  // Ready for SaaS (replace file save later with Supabase insert)
+  return sorted;
 }
 
 run();
