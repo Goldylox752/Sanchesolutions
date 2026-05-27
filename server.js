@@ -10,12 +10,12 @@ dotenv.config();
 const app = express();
 
 /* ─────────────────────────────
-   ENV VALIDATION
+   ENV VALIDATION (FAIL FAST)
 ───────────────────────────── */
 
 function requireEnv(key) {
   const value = process.env[key];
-  if (!value) throw new Error(`Missing env: ${key}`);
+  if (!value) throw new Error(`❌ Missing env: ${key}`);
   return value;
 }
 
@@ -23,9 +23,7 @@ function requireEnv(key) {
    CLIENTS
 ───────────────────────────── */
 
-const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
-  apiVersion: "2024-06-20",
-});
+const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"));
 
 const groq = new Groq({
   apiKey: requireEnv("GROQ_API_KEY"),
@@ -34,25 +32,13 @@ const groq = new Groq({
 const supabase = createClient(
   requireEnv("SUPABASE_URL"),
   requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-  {
-    auth: { persistSession: false },
-  }
+  { auth: { persistSession: false } }
 );
 
 /* ─────────────────────────────
-   MIDDLEWARE
+   WEBHOOK (MUST BE FIRST)
 ───────────────────────────── */
 
-app.use(
-  cors({
-    origin: [
-      "https://sanchesolutions.vercel.app",
-      "http://localhost:5500",
-    ],
-  })
-);
-
-/* IMPORTANT: Stripe webhook MUST come BEFORE express.json */
 app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
@@ -66,7 +52,7 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("Webhook signature error:", err.message);
+      console.error("❌ Webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -79,7 +65,7 @@ app.post(
           await supabase.from("users").upsert({
             id: userId,
             plan: "pro",
-            stripe_customer_id: session.customer,
+            stripe_customer_id: session.customer || null,
             updated_at: new Date().toISOString(),
           });
         }
@@ -87,13 +73,26 @@ app.post(
 
       return res.json({ received: true });
     } catch (err) {
-      console.error("Webhook processing error:", err);
+      console.error("❌ Webhook processing error:", err);
       return res.status(500).json({ error: "Webhook failed" });
     }
   }
 );
 
-/* JSON middleware AFTER webhook */
+/* ─────────────────────────────
+   MIDDLEWARE (AFTER WEBHOOK)
+───────────────────────────── */
+
+app.use(
+  cors({
+    origin: [
+      "https://sanchesolutions.vercel.app",
+      "http://localhost:5500",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 /* ─────────────────────────────
@@ -102,14 +101,14 @@ app.use(express.json());
 
 app.get("/api/health", (_, res) => {
   res.json({
-    status: "ok",
+    ok: true,
     service: "SancheSolutions AI Backend",
     time: new Date().toISOString(),
   });
 });
 
 /* ─────────────────────────────
-   AUTH MIDDLEWARE
+   AUTH MIDDLEWARE (HARDENED)
 ───────────────────────────── */
 
 async function requireUser(req, res, next) {
@@ -123,7 +122,7 @@ async function requireUser(req, res, next) {
     const { data, error } = await supabase.auth.getUser(token);
 
     if (error || !data?.user) {
-      return res.status(401).json({ error: "Invalid user" });
+      return res.status(401).json({ error: "Invalid auth session" });
     }
 
     req.user = data.user;
@@ -134,28 +133,30 @@ async function requireUser(req, res, next) {
 }
 
 /* ─────────────────────────────
-   USER PLAN CHECK (IMPORTANT FOR DASHBOARD)
+   USER PROFILE
 ───────────────────────────── */
 
 app.get("/api/me", requireUser, async (req, res) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("id", req.user.id)
-      .single();
+      .maybeSingle();
 
-    return res.json({
+    if (error) throw error;
+
+    res.json({
       user: req.user,
       profile: data || { plan: "free" },
     });
-  } catch {
-    return res.status(500).json({ error: "Failed to load user" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load user" });
   }
 });
 
 /* ─────────────────────────────
-   AI CHAT
+   AI CHAT (GROQ)
 ───────────────────────────── */
 
 app.post("/api/chat", requireUser, async (req, res) => {
@@ -172,22 +173,22 @@ app.post("/api/chat", requireUser, async (req, res) => {
         {
           role: "system",
           content:
-            "You are an AI assistant for SancheSolutions SaaS automation systems.",
+            "You are an AI assistant for a SaaS automation platform called SancheSolutions.",
         },
         { role: "user", content: message },
       ],
     });
 
     const reply =
-      completion?.choices?.[0]?.message?.content || "No response";
+      completion?.choices?.[0]?.message?.content ?? "No response";
 
-    return res.json({
+    res.json({
       success: true,
       reply,
     });
   } catch (err) {
-    console.error("AI error:", err);
-    return res.status(500).json({ error: "AI request failed" });
+    console.error("❌ AI error:", err);
+    res.status(500).json({ error: "AI request failed" });
   }
 });
 
@@ -214,8 +215,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             currency: "usd",
             product_data: {
               name: "SancheSolutions Pro",
-              description:
-                "Full AI automation dashboard + bots + CRM system",
+              description: "AI automation dashboard + lead systems",
             },
             unit_amount: 4900,
             recurring: {
@@ -237,19 +237,16 @@ app.post("/api/create-checkout-session", async (req, res) => {
       },
     });
 
-    if (!session?.url) {
-      console.error("Stripe session missing URL:", session);
+    if (!session.url) {
       return res.status(500).json({
-        error: "Stripe did not return checkout URL",
+        error: "Stripe session failed",
       });
     }
 
-    return res.json({ url: session.url });
+    res.json({ url: session.url });
   } catch (err) {
-    console.error("Checkout error:", err);
-    return res.status(500).json({
-      error: err.message || "Checkout failed",
-    });
+    console.error("❌ Stripe error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -260,5 +257,5 @@ app.post("/api/create-checkout-session", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`SancheSolutions backend running on port ${PORT}`);
+  console.log(`🚀 SancheSolutions backend running on port ${PORT}`);
 });
