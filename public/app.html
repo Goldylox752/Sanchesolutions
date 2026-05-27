@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CleanFlow AI · Booking Assistant</title>
+<title>CleanFlow AI · Dashboard</title>
 
 <style>
 :root{
@@ -12,6 +12,7 @@
   --border:rgba(255,255,255,0.08);
   --accent:#38f2a5;
   --text:#eaf2ff;
+  --danger:#ff4d4d;
 }
 
 *{
@@ -29,7 +30,7 @@ body{
   color:var(--text);
 }
 
-/* HEADER */
+/* TOP BAR */
 header{
   padding:14px 16px;
   background:var(--panel);
@@ -39,16 +40,17 @@ header{
   align-items:center;
 }
 
-header h1{
-  font-size:15px;
-}
-
 .badge{
   font-size:12px;
   padding:6px 10px;
   border-radius:20px;
   background:rgba(56,242,165,0.12);
   color:var(--accent);
+}
+
+.locked{
+  background:rgba(255,77,77,0.12);
+  color:var(--danger);
 }
 
 /* CHAT */
@@ -66,7 +68,6 @@ header h1{
   padding:12px 14px;
   border-radius:12px;
   font-size:14px;
-  line-height:1.4;
   white-space:pre-wrap;
 }
 
@@ -114,11 +115,9 @@ button{
   color:#000;
 }
 
-.small{
-  text-align:center;
-  font-size:12px;
-  opacity:0.6;
-  padding:6px;
+.upgrade{
+  background:var(--danger);
+  color:white;
 }
 </style>
 </head>
@@ -126,41 +125,47 @@ button{
 <body>
 
 <header>
-  <h1>CleanFlow AI · Booking Bot</h1>
-  <div class="badge">AI Lead Closer</div>
+  <h1>CleanFlow AI Dashboard</h1>
+  <div id="status" class="badge locked">Checking plan...</div>
 </header>
 
 <div class="chat" id="chat"></div>
 
-<div class="small">
-  AI Sales Assistant · Turns Visitors Into Cleaning Bookings
-</div>
-
 <div class="input-bar">
-  <input id="input" placeholder="Tell me what you need cleaned..." />
+  <input id="input" placeholder="Ask your AI assistant..." />
   <button class="send" onclick="send()">Send</button>
+  <button class="upgrade" onclick="goStripe()">Upgrade</button>
 </div>
 
 <script>
 
+/* ───────── CONFIG ───────── */
+
 const API_URL =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000"
+    ? "http://localhost:3000"
     : "https://sanchesolutions.onrender.com";
 
-const CHAT_ENDPOINT = `${API_URL}/api/chat`;
-const HEALTH_ENDPOINT = `${API_URL}/api/health`;
+const CHAT = `${API_URL}/api/chat`;
+const STRIPE = `${API_URL}/api/create-checkout-session`;
+const SESSION = localStorage.getItem("sessionId") || crypto.randomUUID();
 
-const sessionId =
-  localStorage.getItem("sessionId") ||
-  crypto.randomUUID();
+localStorage.setItem("sessionId", SESSION);
 
-localStorage.setItem("sessionId", sessionId);
+/* ───────── STATE ───────── */
+
+let plan = "free";
+
+/* ───────── UI ───────── */
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
+const status = document.getElementById("status");
 
-/* ───────── UI ───────── */
+function setStatus(text, locked=false){
+  status.textContent = text;
+  status.className = locked ? "badge locked" : "badge";
+}
 
 function addMsg(text, type){
   const div = document.createElement("div");
@@ -170,16 +175,28 @@ function addMsg(text, type){
   chat.scrollTop = chat.scrollHeight;
 }
 
-function typing(){
-  const div = document.createElement("div");
-  div.className = "msg ai";
-  div.textContent = "Finding best cleaning option...";
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-  return div;
+/* ───────── PLAN CHECK ───────── */
+
+async function checkPlan(){
+  try {
+    const res = await fetch(`${API_URL}/api/health`);
+    await res.json();
+
+    // TEMP: replace with real Stripe DB check later
+    plan = "free";
+
+    setStatus(plan === "pro" ? "Pro Active" : "Free Plan", plan !== "pro");
+
+    if(plan !== "pro"){
+      addMsg("You are on Free Plan. Upgrade to unlock full AI automation.", "ai");
+    }
+
+  } catch {
+    setStatus("Offline", true);
+  }
 }
 
-/* ───────── SEND ───────── */
+/* ───────── CHAT ───────── */
 
 async function send(){
 
@@ -189,45 +206,64 @@ async function send(){
   addMsg(text, "user");
   input.value = "";
 
-  const loader = typing();
+  if(plan !== "pro"){
+    addMsg("Upgrade required to continue using AI.", "ai");
+    return;
+  }
 
   try {
 
-    const res = await fetch(CHAT_ENDPOINT, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
+    const res = await fetch(CHAT, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
         message: text,
-        sessionId
+        sessionId: SESSION
       })
     });
 
     const data = await res.json();
 
-    loader.textContent =
-      data.reply ||
-      "I can help you book a cleaner today.";
+    addMsg(data.reply || "No response", "ai");
 
-  } catch (err) {
-    console.error(err);
-    loader.textContent = "⚠️ Unable to connect to booking system";
+  } catch {
+    addMsg("Error connecting to AI", "ai");
   }
 }
 
-/* ───────── EVENTS ───────── */
+/* ───────── STRIPE ───────── */
 
-input.addEventListener("keydown", (e)=>{
-  if(e.key === "Enter") send();
-});
+async function goStripe(){
+
+  try {
+
+    const res = await fetch(STRIPE, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        email: "test@test.com",
+        user_id: SESSION
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      addMsg("Stripe error: no checkout link", "ai");
+    }
+
+  } catch {
+    addMsg("Checkout failed", "ai");
+  }
+}
 
 /* ───────── INIT ───────── */
 
 window.onload = () => {
-  addMsg(
-    "👋 Hi! I’m your CleanFlow AI assistant. I help you book trusted cleaning services instantly. What do you need cleaned today?",
-    "ai"
-  );
-  input.focus();
+  addMsg("CleanFlow AI Dashboard loaded.", "ai");
+  checkPlan();
 };
 
 </script>
