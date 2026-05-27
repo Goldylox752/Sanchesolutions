@@ -155,10 +155,10 @@ button{
 </div>
 
 <div class="hero">
-  <h1>Turn Website Visitors Into Paying Customers</h1>
+  <h1>Turn Visitors Into Paying Customers</h1>
   <p>
-    AI receptionist that responds instantly, captures leads, stores them in Supabase,
-    and pushes bookings automatically.
+    AI receptionist that captures leads, stores them in Supabase,
+    and automatically helps you book cleaning jobs 24/7.
   </p>
 
   <div class="btn" onclick="openChat()">Try Live Demo</div>
@@ -201,12 +201,12 @@ button{
 <script>
 
 /* =========================
-   CONFIG
+   🔥 BACKEND URL (FIX THIS)
 ========================= */
 const API =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
-    : "https://YOUR-BACKEND.onrender.com";
+    : "https://sanchesolutions.onrender.com";
 
 /* =========================
    STATE
@@ -214,13 +214,13 @@ const API =
 let step = 0;
 let lead = {};
 
-/* =========================
-   UI
-========================= */
 const chat = document.getElementById("chat");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 
+/* =========================
+   CHAT UI
+========================= */
 function openChat(){
   chat.style.display = "flex";
 
@@ -274,13 +274,13 @@ async function send(){
   if(step === 2){
     lead.type = text;
     step++;
-    return addBot("⏱ How fast can you take bookings?");
+    return addBot("⏱ How soon can you take bookings?");
   }
 
   if(step === 3){
     lead.speed = text;
     step++;
-    return addBot("📞 Drop your email or phone.");
+    return addBot("📞 Drop your email or phone for bookings.");
   }
 
   if(step === 4){
@@ -294,7 +294,7 @@ async function send(){
 }
 
 /* =========================
-   SUPABASE LEAD SAVE (FIXED)
+   SUPABASE LEAD SAVE
 ========================= */
 async function saveLead(){
   try {
@@ -304,7 +304,7 @@ async function saveLead(){
       body: JSON.stringify(lead)
     });
   } catch(e){
-    console.log("Lead save failed", e);
+    console.log("Lead save failed");
   }
 }
 
@@ -327,13 +327,12 @@ async function startCheckout(){
     if(data.url){
       window.location.href = data.url;
     } else {
-      alert("Stripe error: no URL returned");
+      alert("Checkout failed: no Stripe URL returned");
     }
   } catch(e){
-    alert("Checkout failed");
+    alert("Checkout failed - backend not reachable");
   }
 }
-
 </script>
 
 </body>
