@@ -1,34 +1,34 @@
 import Stripe from "stripe";
 
 /* ─────────────────────────────
-   STRIPE INITIALIZATION
-   Secure + Production Ready
+   ENV SAFETY
 ───────────────────────────── */
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-
-function requireEnv(name, value) {
+function requireEnv(name) {
+  const value = process.env[name];
   if (!value) {
     throw new Error(`❌ Missing environment variable: ${name}`);
   }
   return value;
 }
 
-const secretKey = requireEnv("STRIPE_SECRET_KEY", STRIPE_SECRET_KEY);
-
 /* ─────────────────────────────
-   STRIPE CLIENT
+   STRIPE INIT
 ───────────────────────────── */
+
+const secretKey = requireEnv("STRIPE_SECRET_KEY");
 
 export const stripe = new Stripe(secretKey, {
   apiVersion: "2024-06-20",
 });
 
 /* ─────────────────────────────
-   OPTIONAL HELPERS (CLEAN SETUP)
+   SHARED STRIPE CONFIG (SAAS READY)
 ───────────────────────────── */
 
 export const STRIPE_CONFIG = {
   currency: "usd",
   mode: "subscription",
+  planName: "CleanFlow AI Pro",
+  interval: "month",
 };
