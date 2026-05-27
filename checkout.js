@@ -1,19 +1,32 @@
 import Stripe from "stripe";
 
 /* ─────────────────────────────
-   STRIPE CLIENT (PRODUCTION SAFE)
+   ENV SAFETY
 ───────────────────────────── */
 
-function requireEnv(name) {
-  const value = process.env[name];
+function requireEnv(key) {
+  const value = process.env[key];
   if (!value) {
-    throw new Error(`❌ Missing environment variable: ${name}`);
+    throw new Error(`❌ Missing environment variable: ${key}`);
   }
   return value;
 }
 
-const stripeSecret = requireEnv("STRIPE_SECRET_KEY");
+/* ─────────────────────────────
+   STRIPE CLIENT
+───────────────────────────── */
 
-export const stripe = new Stripe(stripeSecret, {
+const STRIPE_SECRET_KEY = requireEnv("STRIPE_SECRET_KEY");
+
+export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20",
 });
+
+/* ─────────────────────────────
+   OPTIONAL CONFIG
+───────────────────────────── */
+
+export const STRIPE_CONFIG = {
+  currency: "usd",
+  mode: "subscription",
+};
