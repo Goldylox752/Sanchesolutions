@@ -126,7 +126,7 @@ button{
 
 <header>
   <h1>CleanFlow AI Dashboard</h1>
-  <div id="status" class="badge locked">Checking plan...</div>
+  <div id="status" class="badge locked">Checking subscription...</div>
 </header>
 
 <div class="chat" id="chat"></div>
@@ -154,7 +154,7 @@ localStorage.setItem("sessionId", SESSION);
 
 /* ───────── STATE ───────── */
 
-let plan = "free";
+let plan = localStorage.getItem("plan") || "free";
 
 /* ───────── UI ───────── */
 
@@ -175,20 +175,26 @@ function addMsg(text, type){
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* ───────── PLAN CHECK ───────── */
+/* ───────── PLAN SYSTEM (REALISTIC LAYER) ───────── */
 
 async function checkPlan(){
+
   try {
     const res = await fetch(`${API_URL}/api/health`);
     await res.json();
 
-    // TEMP: replace with real Stripe DB check later
-    plan = "free";
+    // STEP 1: local check (fast UX)
+    plan = localStorage.getItem("plan") || "free";
 
-    setStatus(plan === "pro" ? "Pro Active" : "Free Plan", plan !== "pro");
+    // STEP 2: placeholder for Stripe DB sync (IMPORTANT NEXT STEP)
+    // later: fetch /api/me from Supabase
 
-    if(plan !== "pro"){
-      addMsg("You are on Free Plan. Upgrade to unlock full AI automation.", "ai");
+    if(plan === "pro"){
+      setStatus("Pro Active", false);
+      addMsg("Pro plan active. Full AI unlocked.", "ai");
+    } else {
+      setStatus("Free Plan", true);
+      addMsg("Free plan active. Upgrade to unlock AI automation.", "ai");
     }
 
   } catch {
@@ -207,7 +213,7 @@ async function send(){
   input.value = "";
 
   if(plan !== "pro"){
-    addMsg("Upgrade required to continue using AI.", "ai");
+    addMsg("Upgrade required to use AI features.", "ai");
     return;
   }
 
@@ -249,7 +255,12 @@ async function goStripe(){
     const data = await res.json();
 
     if(data.url){
+
+      // OPTIONAL: mark intent locally
+      localStorage.setItem("checkout_started", "true");
+
       window.location.href = data.url;
+
     } else {
       addMsg("Stripe error: no checkout link", "ai");
     }
@@ -257,6 +268,14 @@ async function goStripe(){
   } catch {
     addMsg("Checkout failed", "ai");
   }
+}
+
+/* ───────── SIMULATE UPGRADE AFTER RETURN ───────── */
+/* (temporary until webhook is wired) */
+
+if(window.location.search.includes("success=1")){
+  localStorage.setItem("plan", "pro");
+  plan = "pro";
 }
 
 /* ───────── INIT ───────── */
