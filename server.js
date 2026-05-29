@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import Groq from "groq-sdk";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
@@ -10,14 +9,14 @@ dotenv.config();
 const app = express();
 
 /* ─────────────────────────────
-   ENV VALIDATION (FAIL FAST)
+   ENV SAFETY
 ───────────────────────────── */
 
-function requireEnv(key) {
-  const value = process.env[key];
-  if (!value) throw new Error(`❌ Missing env: ${key}`);
-  return value;
-}
+const requireEnv = (key) => {
+  const val = process.env[key];
+  if (!val) throw new Error(`Missing ENV: ${key}`);
+  return val;
+};
 
 /* ─────────────────────────────
    CLIENTS
@@ -25,22 +24,17 @@ function requireEnv(key) {
 
 const stripe = new Stripe(requireEnv("STRIPE_SECRET_KEY"));
 
-const groq = new Groq({
-  apiKey: requireEnv("GROQ_API_KEY"),
-});
-
 const supabase = createClient(
   requireEnv("SUPABASE_URL"),
-  requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-  { auth: { persistSession: false } }
+  requireEnv("SUPABASE_SERVICE_ROLE_KEY")
 );
 
 /* ─────────────────────────────
-   WEBHOOK (MUST BE FIRST)
+   WEBHOOK (RAW MUST COME FIRST)
 ───────────────────────────── */
 
 app.post(
-  "/stripe-webhook",
+  "/api/stripe/webhook",
   express.raw({ type: "application/json" }),
   async (req, res) => {
     let event;
@@ -52,48 +46,83 @@ app.post(
         requireEnv("STRIPE_WEBHOOK_SECRET")
       );
     } catch (err) {
-      console.error("❌ Webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     try {
       if (event.type === "checkout.session.completed") {
         const session = event.data.object;
-        const userId = session?.metadata?.user_id;
 
-        if (userId) {
-          await supabase.from("users").upsert({
-            id: userId,
-            plan: "pro",
-            stripe_customer_id: session.customer || null,
-            updated_at: new Date().toISOString(),
-          });
-        }
+        const userId = session?.metadata?.user_id;
+        const customerId = session?.customer;
+
+        if (!userId) return res.json({ received: true });
+
+        await supabase.from("users").upsert({
+          id: userId,
+          plan: "pro",
+          stripe_customer_id: customerId,
+          updated_at: new Date().toISOString(),
+        });
       }
 
-      return res.json({ received: true });
+      res.json({ received: true });
     } catch (err) {
-      console.error("❌ Webhook processing error:", err);
-      return res.status(500).json({ error: "Webhook failed" });
+      console.error(err);
+      res.status(500).json({ error: "Webhook failed" });
     }
   }
 );
 
 /* ─────────────────────────────
-   MIDDLEWARE (AFTER WEBHOOK)
+   MIDDLEWARE
 ───────────────────────────── */
 
-app.use(
-  cors({
-    origin: [
-      "https://sanchesolutions.vercel.app",
-      "http://localhost:5500",
-    ],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: ["http://localhost:5500"],
+  credentials: true,
+}));
 
 app.use(express.json());
+
+/* ─────────────────────────────
+   AUTH (SUPABASE)
+───────────────────────────── */
+
+async function requireUser(req, res, next) {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({ error: "Missing token" });
+  }
+
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data?.user) {
+    return res.status(401).json({ error: "Invalid session" });
+  }
+
+  req.user = data.user;
+  next();
+}
+
+/* ─────────────────────────────
+   PRO ACCESS CHECK
+───────────────────────────── */
+
+async function requirePro(req, res, next) {
+  const { data } = await supabase
+    .from("users")
+    .select("plan")
+    .eq("id", req.user.id)
+    .maybeSingle();
+
+  if (data?.plan !== "pro") {
+    return res.status(403).json({ error: "Pro subscription required" });
+  }
+
+  next();
+}
 
 /* ─────────────────────────────
    HEALTH CHECK
@@ -102,151 +131,119 @@ app.use(express.json());
 app.get("/api/health", (_, res) => {
   res.json({
     ok: true,
-    service: "SancheSolutions AI Backend",
+    service: "MacFlip AI Backend",
     time: new Date().toISOString(),
   });
 });
-
-/* ─────────────────────────────
-   AUTH MIDDLEWARE (HARDENED)
-───────────────────────────── */
-
-async function requireUser(req, res, next) {
-  try {
-    const token = req.headers.authorization?.replace("Bearer ", "");
-
-    if (!token) {
-      return res.status(401).json({ error: "Missing token" });
-    }
-
-    const { data, error } = await supabase.auth.getUser(token);
-
-    if (error || !data?.user) {
-      return res.status(401).json({ error: "Invalid auth session" });
-    }
-
-    req.user = data.user;
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: "Auth failed" });
-  }
-}
 
 /* ─────────────────────────────
    USER PROFILE
 ───────────────────────────── */
 
 app.get("/api/me", requireUser, async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", req.user.id)
-      .maybeSingle();
+  const { data } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", req.user.id)
+    .maybeSingle();
 
-    if (error) throw error;
-
-    res.json({
-      user: req.user,
-      profile: data || { plan: "free" },
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to load user" });
-  }
+  res.json({
+    user: req.user,
+    profile: data || { plan: "free" },
+  });
 });
 
 /* ─────────────────────────────
-   AI CHAT (GROQ)
+   💰 STRIPE CHECKOUT ($9.99/mo)
 ───────────────────────────── */
 
-app.post("/api/chat", requireUser, async (req, res) => {
-  try {
-    const { message } = req.body;
+app.post("/api/checkout", async (req, res) => {
+  const { user_id, email } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Message required" });
-    }
+  if (!user_id || !email) {
+    return res.status(400).json({ error: "Missing user data" });
+  }
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an AI assistant for a SaaS automation platform called SancheSolutions.",
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    customer_email: email,
+
+    line_items: [
+      {
+        price_data: {
+          currency: "cad",
+          product_data: {
+            name: "MacFlip AI Pro",
+            description: "Real-time MacBook flip alerts",
+          },
+          unit_amount: 999,
+          recurring: { interval: "month" },
         },
-        { role: "user", content: message },
-      ],
-    });
+        quantity: 1,
+      },
+    ],
 
-    const reply =
-      completion?.choices?.[0]?.message?.content ?? "No response";
+    success_url: "http://localhost:5500/success.html",
+    cancel_url: "http://localhost:5500/cancel.html",
+
+    metadata: {
+      user_id,
+    },
+  });
+
+  res.json({ url: session.url });
+});
+
+/* ─────────────────────────────
+   🔍 EBAY DEAL SCANNER
+───────────────────────────── */
+
+async function fetchDeals() {
+  const res = await fetch(
+    "https://api.ebay.com/buy/browse/v1/item_summary/search?q=macbook%20air%20m1",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.EBAY_TOKEN}`,
+      },
+    }
+  );
+
+  const data = await res.json();
+  const items = data.itemSummaries || [];
+
+  return items.map((item) => {
+    const buy = Number(item.price.value);
+
+    const resale = buy * 1.35;
+    const profit = resale - buy;
+
+    return {
+      title: item.title,
+      buy,
+      resale: +resale.toFixed(2),
+      profit: +profit.toFixed(2),
+      url: item.itemWebUrl,
+      good: profit > 80,
+    };
+  });
+}
+
+/* ─────────────────────────────
+   🚀 PRO DEALS ENDPOINT
+───────────────────────────── */
+
+app.get("/api/deals", requireUser, requirePro, async (req, res) => {
+  try {
+    const deals = await fetchDeals();
 
     res.json({
       success: true,
-      reply,
+      deals,
+      count: deals.length,
     });
   } catch (err) {
-    console.error("❌ AI error:", err);
-    res.status(500).json({ error: "AI request failed" });
-  }
-});
-
-/* ─────────────────────────────
-   STRIPE CHECKOUT
-───────────────────────────── */
-
-app.post("/api/create-checkout-session", async (req, res) => {
-  try {
-    const { user_id, email } = req.body;
-
-    if (!user_id || !email) {
-      return res.status(400).json({ error: "Missing user_id or email" });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      customer_email: email,
-
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "SancheSolutions Pro",
-              description: "AI automation dashboard + lead systems",
-            },
-            unit_amount: 4900,
-            recurring: {
-              interval: "month",
-            },
-          },
-          quantity: 1,
-        },
-      ],
-
-      success_url:
-        "https://sanchesolutions.vercel.app/app.html?success=1",
-
-      cancel_url:
-        "https://sanchesolutions.vercel.app/app.html?canceled=1",
-
-      metadata: {
-        user_id,
-      },
-    });
-
-    if (!session.url) {
-      return res.status(500).json({
-        error: "Stripe session failed",
-      });
-    }
-
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error("❌ Stripe error:", err);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch deals" });
   }
 });
 
@@ -257,5 +254,5 @@ app.post("/api/create-checkout-session", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 SancheSolutions backend running on port ${PORT}`);
+  console.log(`🚀 MacFlip AI running on port ${PORT}`);
 });
