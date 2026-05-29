@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>MacFlip AI • Dashboard</title>
+<title>MacFlip AI • Pro Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -18,6 +18,7 @@
   --accent:#00e5a0;
   --accent2:#00b6ff;
   --danger:#ff4d6d;
+  --warn:#ffcc00;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
@@ -54,7 +55,7 @@ header{
 /* LAYOUT */
 .container{
   display:grid;
-  grid-template-columns:280px 1fr;
+  grid-template-columns:260px 1fr;
   height:calc(100vh - 60px);
 }
 
@@ -77,10 +78,6 @@ header{
   text-align:left;
 }
 
-.btn:hover{
-  border-color:rgba(0,229,160,.4);
-}
-
 .btn.active{
   background:rgba(0,229,160,.1);
   border-color:rgba(0,229,160,.4);
@@ -93,13 +90,13 @@ header{
   overflow:hidden;
 }
 
-/* TOPBAR */
+/* TOP BAR */
 .topbar{
-  padding:16px;
-  border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
   align-items:center;
+  padding:16px;
+  border-bottom:1px solid var(--border);
 }
 
 .cta{
@@ -111,10 +108,35 @@ header{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
 }
 
-/* DEAL GRID */
-.deals{
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
   padding:16px;
+}
+
+.stat{
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:12px;
+}
+
+.stat h3{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.stat b{
+  font-size:20px;
+}
+
+/* DEALS */
+.deals{
+  flex:1;
   overflow:auto;
+  padding:16px;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:12px;
@@ -130,7 +152,7 @@ header{
 }
 
 .card:hover{
-  transform:translateY(-2px);
+  transform:translateY(-3px);
   border-color:rgba(0,229,160,.25);
 }
 
@@ -147,23 +169,22 @@ header{
 
 .good{color:var(--accent)}
 .bad{color:var(--danger)}
+.med{color:var(--warn)}
 
-/* LOCK SCREEN */
-.lock{
-  padding:20px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:rgba(255,255,255,.02);
+.small{
+  font-size:11px;
+  color:var(--muted);
 }
 
-.lock button{
-  margin-top:10px;
-  padding:10px 14px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  font-weight:700;
-  cursor:pointer;
+/* ALERT BAR */
+.alerts{
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+  height:120px;
+  overflow:auto;
+  font-size:12px;
+  color:var(--muted);
 }
 </style>
 </head>
@@ -171,7 +192,7 @@ header{
 <body>
 
 <header>
-  <div class="logo">MacFlip AI • Dashboard</div>
+  <div class="logo">MacFlip AI • Pro Dashboard</div>
   <div class="badge" id="status">INIT</div>
 </header>
 
@@ -180,6 +201,7 @@ header{
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <button class="btn active" onclick="loadDeals()">🔥 Live Deals</button>
+    <button class="btn" onclick="toggleAuto()">⚡ Auto Scan</button>
     <button class="btn" onclick="checkout()">💳 Upgrade</button>
     <button class="btn" onclick="logout()">🚪 Logout</button>
   </aside>
@@ -188,11 +210,33 @@ header{
   <main class="main">
 
     <div class="topbar">
-      <div>Real-time MacBook Flip Scanner</div>
+      <div>Real-Time MacBook Arbitrage Engine</div>
       <button class="cta" onclick="loadDeals()">Scan Now</button>
     </div>
 
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat">
+        <h3>Total Deals</h3>
+        <b id="totalDeals">0</b>
+      </div>
+      <div class="stat">
+        <h3>Avg Profit</h3>
+        <b id="avgProfit">$0</b>
+      </div>
+      <div class="stat">
+        <h3>Best Flip</h3>
+        <b id="bestFlip">$0</b>
+      </div>
+    </div>
+
+    <!-- DEALS -->
     <div class="deals" id="deals"></div>
+
+    <!-- ALERT STREAM -->
+    <div class="alerts" id="alerts">
+      🔔 Alert stream initializing...
+    </div>
 
   </main>
 
@@ -201,102 +245,111 @@ header{
 <script>
 
 const API = "/api/deals";
+
 const dealsEl = document.getElementById("deals");
 const statusEl = document.getElementById("status");
 
-/* TOKEN */
-function getToken(){
-  return localStorage.getItem("sb_token");
-}
+let auto = false;
+let interval;
 
 /* LOAD DEALS */
 async function loadDeals(){
 
-  const token = getToken();
+  const token = localStorage.getItem("sb_token");
 
   if(!token){
-    showLocked();
     statusEl.textContent = "LOGIN REQUIRED";
     return;
   }
 
   statusEl.textContent = "SCANNING...";
 
-  try{
-    const res = await fetch(API,{
-      headers:{
-        Authorization:`Bearer ${token}`
-      }
-    });
+  const res = await fetch(API,{
+    headers:{ Authorization:`Bearer ${token}` }
+  });
 
-    if(res.status === 401){
-      showLocked("Invalid session. Please login again.");
-      return;
-    }
-
-    if(res.status === 403){
-      showLocked("Pro subscription required.");
-      return;
-    }
-
-    const data = await res.json();
-
-    renderDeals(data.deals || []);
-    statusEl.textContent = "LIVE";
+  if(res.status === 403){
+    statusEl.textContent = "PRO REQUIRED";
+    return;
   }
-  catch(err){
-    statusEl.textContent = "ERROR";
-    console.error(err);
-  }
+
+  const data = await res.json();
+  const deals = data.deals || [];
+
+  render(deals);
+  updateStats(deals);
+
+  statusEl.textContent = "LIVE";
+  pushAlert("Scan completed • " + deals.length + " listings found");
 }
 
 /* RENDER */
-function renderDeals(deals){
+function render(deals){
   dealsEl.innerHTML="";
 
   deals.forEach(d=>{
+
+    let level = d.profit > 120 ? "good" : d.profit > 70 ? "med" : "bad";
+
     const div=document.createElement("div");
     div.className="card";
 
     div.innerHTML=`
       <div><b>${d.title}</b></div>
       <div class="meta">Buy: $${d.buy} • Resale: $${d.resale}</div>
-      <div class="profit ${d.good ? "good":"bad"}">
+
+      <div class="profit ${level}">
         Profit: $${d.profit}
       </div>
-      <a href="${d.url}" target="_blank">View →</a>
+
+      <div class="small">${level.toUpperCase()} CONFIDENCE FLIP</div>
+
+      <a href="${d.url}" target="_blank">Open Listing →</a>
     `;
 
     dealsEl.appendChild(div);
   });
 }
 
-/* LOCK UI */
-function showLocked(msg="Access Required"){
-  dealsEl.innerHTML=`
-    <div class="lock">
-      <h3>🔒 ${msg}</h3>
-      <p class="meta">Unlock real-time MacBook flip alerts for $9.99/month</p>
-      <button onclick="checkout()">Upgrade Now</button>
-    </div>
-  `;
+/* STATS */
+function updateStats(deals){
+
+  const total = deals.length;
+  const avg = deals.reduce((a,b)=>a+(b.profit||0),0)/total || 0;
+  const best = Math.max(...deals.map(d=>d.profit||0));
+
+  document.getElementById("totalDeals").innerText = total;
+  document.getElementById("avgProfit").innerText = "$" + avg.toFixed(0);
+  document.getElementById("bestFlip").innerText = "$" + (best || 0);
+}
+
+/* ALERTS */
+function pushAlert(text){
+  const el=document.getElementById("alerts");
+  const time=new Date().toLocaleTimeString();
+
+  el.innerHTML = `🔔 [${time}] ${text}<br>` + el.innerHTML;
+}
+
+/* AUTO SCAN */
+function toggleAuto(){
+
+  auto=!auto;
+
+  if(auto){
+    pushAlert("Auto Scan ENABLED");
+    interval=setInterval(loadDeals,15000);
+  }else{
+    pushAlert("Auto Scan DISABLED");
+    clearInterval(interval);
+  }
 }
 
 /* STRIPE */
 async function checkout(){
-  const token = getToken();
-
-  const res = await fetch("/api/checkout",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      user_id:"demo",
-      email:"demo@user.com"
-    })
-  });
-
-  const data = await res.json();
-  if(data.url) window.location.href = data.url;
+  const res=await fetch("/api/checkout",{method:"POST"});
+  const data=await res.json();
+  if(data.url) window.location.href=data.url;
 }
 
 /* LOGOUT */
