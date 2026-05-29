@@ -4,300 +4,808 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SancheSolutions · AI Automation Systems</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0b0f19;
-  --panel:rgba(255,255,255,0.04);
-  --border:rgba(255,255,255,0.08);
-  --text:#eaf2ff;
-  --muted:rgba(255,255,255,0.65);
-  --accent:#38f2a5;
-  --darkAccent:#4f8cff;
+:root {
+  --bg: #060912;
+  --surface: #0d1220;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(56,242,165,0.35);
+  --text: #e8f0ff;
+  --muted: rgba(200,215,255,0.5);
+  --accent: #38f2a5;
+  --accent2: #4f8cff;
+  --danger: #ff5f7e;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-  background:radial-gradient(circle at top, #111a2e, var(--bg));
-  color:var(--text);
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
 }
 
-/* NAV */
-.nav{
-  display:flex;
-  justify-content:space-between;
-  padding:18px 28px;
-  border-bottom:1px solid var(--border);
+/* ─── GRAIN OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
 }
 
-.nav span{
-  font-weight:700;
-  font-size:13px;
-  letter-spacing:0.5px;
-  color:var(--muted);
+/* ─── GLOW BLOBS ─── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+.blob-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(56,242,165,0.07), transparent 70%);
+  top: -200px; left: -200px;
+  animation-duration: 20s;
+}
+.blob-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(79,140,255,0.08), transparent 70%);
+  bottom: -100px; right: -100px;
+  animation-duration: 25s; animation-delay: -5s;
+}
+.blob-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,95,126,0.05), transparent 70%);
+  top: 50%; left: 60%;
+  animation-duration: 30s; animation-delay: -12s;
+}
+@keyframes drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(40px, 60px) scale(1.1); }
 }
 
-/* HERO */
-.hero{
-  text-align:center;
-  padding:110px 20px 80px;
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(6,9,18,0.7);
+  border-bottom: 1px solid var(--border);
 }
 
-.hero h1{
-  font-size:56px;
-  line-height:1.1;
-  margin-bottom:16px;
+.nav-logo {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text);
 }
 
-.hero p{
-  max-width:820px;
-  margin:auto;
-  color:var(--muted);
-  font-size:18px;
-  line-height:1.7;
+.nav-logo span {
+  color: var(--accent);
 }
 
-.cta-row{
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-top:26px;
+.nav-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
 }
 
-.btn{
-  padding:12px 18px;
-  border-radius:10px;
-  text-decoration:none;
-  font-weight:700;
-  font-size:14px;
-  transition:0.2s;
+.nav-links {
+  display: flex;
+  gap: 8px;
 }
 
-.primary{
-  background:var(--accent);
-  color:#000;
+.nav-cta {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  background: var(--accent);
+  color: #000;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 140px 80px 100px;
+  overflow: hidden;
 }
 
-.primary:hover{ transform:translateY(-2px); }
-
-.secondary{
-  background:rgba(255,255,255,0.06);
-  color:white;
-  border:1px solid var(--border);
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--accent);
 }
 
-/* SECTION */
-.section{
-  max-width:1100px;
-  margin:auto;
-  padding:80px 20px;
+.hero h1 {
+  font-size: clamp(48px, 7vw, 88px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  max-width: 800px;
+  margin-bottom: 28px;
 }
 
-.section h2{
-  text-align:center;
-  margin-bottom:30px;
-  font-size:26px;
+.hero h1 .line-accent {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(56,242,165,0.5);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:16px;
+.hero-desc {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 520px;
+  margin-bottom: 44px;
 }
 
-.card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:22px;
-  border-radius:16px;
-  transition:0.2s;
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(56,242,165,0.4);
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(56,242,165,0.25); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  background: var(--card);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+.hero-stats {
+  position: absolute;
+  right: 80px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: right;
 }
 
-.card h3{
-  margin-bottom:10px;
+.stat-item {
+  animation: fadeUp 0.6s ease both;
+}
+.stat-item:nth-child(2) { animation-delay: 0.1s; }
+.stat-item:nth-child(3) { animation-delay: 0.2s; }
+
+.stat-num {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
 }
 
-.card p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.6;
+/* ─── SCROLL LINE ─── */
+.scroll-line {
+  position: absolute;
+  left: 80px;
+  bottom: 0;
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ─── SECTIONS ─── */
+.section {
+  position: relative;
+  z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 100px 40px;
 }
 
-.tag{
-  display:inline-block;
-  margin-top:14px;
-  font-size:12px;
-  padding:5px 10px;
-  border-radius:999px;
-  background:rgba(56,242,165,0.12);
-  color:var(--accent);
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-/* POWERED BY */
-.powered{
-  text-align:center;
-  font-size:12px;
-  color:rgba(255,255,255,0.5);
-  margin-top:10px;
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
 }
 
-/* CONTACT */
-.contact-bar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:center;
-  margin-top:28px;
+.section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 
-.link-btn{
-  padding:10px 14px;
-  border-radius:10px;
-  font-size:13px;
-  text-decoration:none;
-  font-weight:700;
+.section-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 320px;
+  line-height: 1.7;
+  text-align: right;
 }
 
-.whatsapp{ background:#25D366; color:#000; }
-.calendly{ background:#006bff; color:white; }
-.email{ background:#333; color:white; }
-
-/* FOOTER */
-.footer{
-  text-align:center;
-  padding:40px;
-  font-size:12px;
-  color:var(--muted);
-  border-top:1px solid var(--border);
-  margin-top:40px;
+/* ─── DIVIDER ─── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 40px;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  .hero h1{ font-size:38px; }
+/* ─── PROJECT GRID ─── */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.project-card {
+  background: var(--bg);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+  cursor: default;
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(56,242,165,0.04), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.project-card:hover {
+  background: rgba(56,242,165,0.03);
+}
+.project-card:hover::before { opacity: 1; }
+
+.project-index {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.project-card h3 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+}
+
+.project-card p {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(56,242,165,0.2);
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+.tag.blue {
+  border-color: rgba(79,140,255,0.25);
+  color: var(--accent2);
+}
+
+/* ─── SERVICES ─── */
+.services-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.service-item {
+  background: var(--bg);
+  padding: 36px 40px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  transition: background 0.3s;
+}
+
+.service-item:hover { background: rgba(79,140,255,0.03); }
+
+.service-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  background: var(--card);
+}
+
+.service-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.service-content p {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ─── CTA BANNER ─── */
+.cta-banner {
+  position: relative;
+  z-index: 1;
+  margin: 0 40px 100px;
+  padding: 64px 80px;
+  border-radius: 24px;
+  border: 1px solid rgba(56,242,165,0.15);
+  background: linear-gradient(135deg, rgba(56,242,165,0.06) 0%, rgba(79,140,255,0.06) 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,242,165,0.08), transparent 70%);
+}
+
+.cta-text h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+}
+.cta-text p {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 380px;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.btn-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  background: #25D366;
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,0.25); }
+
+.btn-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  background: var(--card);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.btn-email:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 32px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--accent); }
+
+.footer-copy {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.5px;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-eyebrow { animation: fadeUp 0.5s ease 0.1s both; }
+.hero h1      { animation: fadeUp 0.6s ease 0.2s both; }
+.hero-desc    { animation: fadeUp 0.6s ease 0.35s both; }
+.hero-actions { animation: fadeUp 0.6s ease 0.5s both; }
+.hero-stats   { animation: fadeUp 0.6s ease 0.6s both; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .hero { padding: 120px 32px 120px; }
+  .hero-stats { position: static; flex-direction: row; text-align: left; margin-top: 48px; flex-wrap: wrap; gap: 32px; }
+  .stat-num { font-size: 30px; }
+  .project-grid { grid-template-columns: 1fr 1fr; }
+  .services-list { grid-template-columns: 1fr; }
+  .section { padding: 80px 28px; }
+  nav { padding: 16px 24px; }
+  .nav-tag { display: none; }
+  .cta-banner { margin: 0 28px 80px; padding: 44px 36px; }
+  footer { padding: 28px 32px; }
+}
+
+@media (max-width: 600px) {
+  .project-grid { grid-template-columns: 1fr; }
+  .hero h1 { letter-spacing: -1.5px; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .section-sub { text-align: left; }
+  .cta-banner { padding: 36px 28px; }
+  .scroll-line { display: none; }
 }
 </style>
 </head>
-
 <body>
 
-<!-- NAV -->
-<div class="nav">
-  <span>SancheSolutions</span>
-  <span>AI Automation · SaaS · Lead Systems</span>
-</div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
 
-<!-- HERO -->
-<div class="hero">
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">Sanche<span>Solutions</span></div>
+  <div class="nav-tag">AI Automation · SaaS · Lead Systems</div>
+  <div class="nav-links">
+    <a class="nav-cta" href="https://calendly.com/" target="_blank">Book a Call →</a>
+  </div>
+</nav>
 
-  <h1>AI Systems That Turn Clicks Into Revenue</h1>
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="scroll-line"></div>
 
-  <p>
-    I design and deploy full-stack AI automation systems for service businesses and SaaS startups —
-    combining AI agents, lead generation engines, CRM pipelines, and Stripe billing into one system.
+  <div class="hero-eyebrow">AI Automation Engineer</div>
+
+  <h1>
+    Systems That<br>
+    Turn Clicks<br>
+    Into <span class="line-accent">Revenue.</span>
+  </h1>
+
+  <p class="hero-desc">
+    Full-stack AI automation systems for service businesses and SaaS startups —
+    combining AI agents, lead engines, CRM pipelines, and Stripe billing into one scalable system.
   </p>
 
-  <div class="cta-row">
-    <a class="btn primary" href="https://calendly.com/" target="_blank">
-      Book a Strategy Call
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://calendly.com/" target="_blank">
+      ⚡ Book a Strategy Call
     </a>
-
-    <a class="btn secondary" href="https://wa.me/17802679673" target="_blank">
-      WhatsApp
+    <a class="btn-ghost" href="https://wa.me/17802679673" target="_blank">
+      💬 WhatsApp
     </a>
-
-    <a class="btn secondary" href="mailto:byronsanche@zohomailcloud.ca">
-      Email
+    <a class="btn-ghost" href="mailto:byronsanche@zohomailcloud.ca">
+      ✉ Email Me
     </a>
   </div>
 
-  <div class="powered">
-    Powered by Northsky Systems
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">6+</div>
+      <div class="stat-label">Systems Built</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">AI-Powered</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Manual Work Left</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── PROJECTS ─── -->
+<section class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Portfolio</div>
+      <h2 class="section-title">AI Systems Built<br>& Deployed</h2>
+    </div>
+    <p class="section-sub">Every system designed to replace manual work with intelligent automation that scales.</p>
   </div>
 
+  <div class="project-grid">
+    <div class="project-card">
+      <div class="project-index">01 / SaaS</div>
+      <h3>CleanFlow AI</h3>
+      <p>AI receptionist SaaS that captures leads, qualifies customers, and books jobs automatically around the clock.</p>
+      <div class="project-tags">
+        <span class="tag">SaaS</span>
+        <span class="tag">AI Agent</span>
+        <span class="tag">Stripe</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-index">02 / Lead Gen</div>
+      <h3>RoofFlow AI</h3>
+      <p>AI sales system for roofing companies that converts website traffic into booked estimates on autopilot.</p>
+      <div class="project-tags">
+        <span class="tag blue">Lead Gen</span>
+        <span class="tag blue">Automation</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-index">03 / Conversion</div>
+      <h3>AI Funnel Engine</h3>
+      <p>Conversational AI system that turns cold visitors into high-intent leads — no human follow-up needed.</p>
+      <div class="project-tags">
+        <span class="tag">Conversion</span>
+        <span class="tag">AI Chat</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-index">04 / Payments</div>
+      <h3>Stripe Billing Engine</h3>
+      <p>Subscription infrastructure with checkout sessions, webhooks, metered billing, and plan upgrades.</p>
+      <div class="project-tags">
+        <span class="tag blue">Payments</span>
+        <span class="tag blue">SaaS Backend</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-index">05 / LLM</div>
+      <h3>Groq AI Backend</h3>
+      <p>High-speed LLM backend powering real-time AI chat and complex automation workflows at scale.</p>
+      <div class="project-tags">
+        <span class="tag">LLM</span>
+        <span class="tag">API</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-index">06 / CRM</div>
+      <h3>Lead CRM System</h3>
+      <p>Supabase-powered CRM that tracks, stores, and scores AI-generated leads with zero manual input.</p>
+      <div class="project-tags">
+        <span class="tag blue">CRM</span>
+        <span class="tag blue">Database</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── SERVICES ─── -->
+<section class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Services</div>
+      <h2 class="section-title">What I Build<br>For You</h2>
+    </div>
+    <p class="section-sub">End-to-end implementation. No hand-holding needed on your side.</p>
+  </div>
+
+  <div class="services-list">
+    <div class="service-item">
+      <div class="service-icon">🤖</div>
+      <div class="service-content">
+        <h3>AI Agent Systems</h3>
+        <p>Custom AI agents that handle customer intake, qualification, and booking — replacing your front desk entirely.</p>
+      </div>
+    </div>
+
+    <div class="service-item">
+      <div class="service-icon">🎯</div>
+      <div class="service-content">
+        <h3>Lead Generation Engines</h3>
+        <p>Automated pipelines that capture, score, and nurture leads from every channel you operate in.</p>
+      </div>
+    </div>
+
+    <div class="service-item">
+      <div class="service-icon">⚙️</div>
+      <div class="service-content">
+        <h3>SaaS Backend Architecture</h3>
+        <p>Full-stack SaaS infrastructure: auth, billing, database, and AI — production-ready from day one.</p>
+      </div>
+    </div>
+
+    <div class="service-item">
+      <div class="service-icon">💳</div>
+      <div class="service-content">
+        <h3>Stripe Payment Integration</h3>
+        <p>Subscription flows, one-time payments, webhooks, and metered billing wired end-to-end.</p>
+      </div>
+    </div>
+
+    <div class="service-item">
+      <div class="service-icon">🗄️</div>
+      <div class="service-content">
+        <h3>CRM & Data Systems</h3>
+        <p>Supabase-powered CRM that stores, scores, and surfaces the leads your AI captures.</p>
+      </div>
+    </div>
+
+    <div class="service-item">
+      <div class="service-icon">⚡</div>
+      <div class="service-content">
+        <h3>LLM API Integration</h3>
+        <p>Groq, OpenAI, and Anthropic integrations for real-time, low-latency AI interactions in any product.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<div class="cta-banner">
+  <div class="cta-text">
+    <h2>Ready to automate<br>your revenue system?</h2>
+    <p>Book a free 30-minute strategy call. I'll map out exactly what system would move the needle for your business.</p>
+  </div>
+  <div class="cta-actions">
+    <a class="btn-primary" href="https://calendly.com/" target="_blank">⚡ Book Strategy Call</a>
+    <a class="btn-wa" href="https://wa.me/17802679673" target="_blank">💬 WhatsApp</a>
+    <a class="btn-email" href="mailto:byronsanche@zohomailcloud.ca">✉ Email</a>
+  </div>
 </div>
 
-<!-- PROJECTS -->
-<div class="section">
-
-<h2>🚀 AI Systems Built & Deployed</h2>
-
-<div class="grid">
-
-  <div class="card">
-    <h3>CleanFlow AI</h3>
-    <p>AI receptionist SaaS that captures leads, qualifies customers, and books jobs automatically.</p>
-    <div class="tag">SaaS · AI Agent · Stripe</div>
-  </div>
-
-  <div class="card">
-    <h3>RoofFlow AI</h3>
-    <p>AI sales system for roofing companies that converts traffic into booked estimates.</p>
-    <div class="tag">Lead Gen · Automation</div>
-  </div>
-
-  <div class="card">
-    <h3>AI Funnel Engine</h3>
-    <p>Conversational AI system that turns visitors into high-intent leads automatically.</p>
-    <div class="tag">Conversion · AI Chat</div>
-  </div>
-
-  <div class="card">
-    <h3>Stripe Billing Engine</h3>
-    <p>Subscription infrastructure with checkout sessions, webhooks, and plan upgrades.</p>
-    <div class="tag">Payments · SaaS Backend</div>
-  </div>
-
-  <div class="card">
-    <h3>Groq AI Backend</h3>
-    <p>High-speed LLM backend powering real-time AI chat and automation workflows.</p>
-    <div class="tag">LLM · API</div>
-  </div>
-
-  <div class="card">
-    <h3>Lead CRM System</h3>
-    <p>Supabase-powered CRM that tracks, stores, and scores AI-generated leads.</p>
-    <div class="tag">CRM · Database</div>
-  </div>
-
-</div>
-</div>
-
-<!-- ABOUT -->
-<div class="section">
-
-<h2>What I Do</h2>
-
-<p style="max-width:750px;margin:auto;text-align:center;color:var(--muted);line-height:1.7;">
-I build AI-powered business systems that automate customer acquisition, sales, and operations.
-Every system is designed to replace manual work with intelligent automation that scales.
-</p>
-
-<div class="contact-bar">
-  <a class="link-btn calendly" href="https://calendly.com/" target="_blank">Book Call</a>
-  <a class="link-btn whatsapp" href="https://wa.me/17802679673" target="_blank">WhatsApp</a>
-  <a class="link-btn email" href="mailto:byronsanche@zohomailcloud.ca">Email</a>
-</div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-© 2026 SancheSolutions · AI Automation Systems · Powered by Northsky Systems
-</div>
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo">Sanche<span>Solutions</span></div>
+  <div class="footer-copy">© 2026 · AI Automation Systems · Powered by Northsky Systems</div>
+</footer>
 
 </body>
 </html>
