@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>SancheSolutions • AI Sales Widget</title>
+<title>MacFlip AI • Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -17,12 +17,12 @@
   --muted:#93a4b8;
   --accent:#00e5a0;
   --accent2:#00b6ff;
+  --danger:#ff4d6d;
 }
 
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
 
 body{
-  font-family:Inter,sans-serif;
   background:radial-gradient(circle at top,#0f1620,#070a0f);
   color:var(--text);
   height:100vh;
@@ -31,10 +31,10 @@ body{
 
 /* HEADER */
 header{
-  padding:18px 22px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  padding:16px 20px;
   border-bottom:1px solid var(--border);
   background:rgba(10,15,22,.7);
   backdrop-filter:blur(20px);
@@ -63,283 +63,213 @@ header{
 
 /* SIDEBAR */
 .sidebar{
-  padding:18px;
   border-right:1px solid var(--border);
-  background:rgba(18,26,36,.5);
+  padding:16px;
+  background:rgba(18,26,36,.4);
 }
 
 .sidebar h3{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
   margin-bottom:10px;
   letter-spacing:1px;
 }
 
-.agent{
-  padding:14px;
+.btn{
+  width:100%;
+  padding:12px;
   margin-bottom:10px;
-  border-radius:14px;
+  border-radius:12px;
   border:1px solid var(--border);
-  cursor:pointer;
-  transition:.2s;
   background:rgba(255,255,255,.02);
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+  transition:.2s;
 }
 
-.agent:hover{
-  transform:translateY(-2px);
-  border-color:rgba(0,229,160,.3);
-}
-
-.agent.active{
-  background:rgba(0,229,160,.08);
+.btn:hover{
+  transform:translateY(-1px);
   border-color:rgba(0,229,160,.4);
 }
 
-.agent b{
-  font-size:13px;
+.btn.active{
+  background:rgba(0,229,160,.1);
+  border-color:rgba(0,229,160,.4);
 }
 
-.agent p{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:6px;
-}
-
-/* CHAT AREA */
-.chat-wrap{
+/* MAIN */
+.main{
   display:flex;
-  flex-direction:column;
-  height:100%;
-}
-
-.chat{
-  flex:1;
-  overflow:auto;
-  padding:22px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.msg{
-  max-width:70%;
-  padding:12px 14px;
-  border-radius:14px;
-  font-size:13px;
-  line-height:1.5;
-  animation:fade .2s ease;
-}
-
-@keyframes fade{
-  from{opacity:0;transform:translateY(8px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-.user{
-  align-self:flex-end;
-  background:linear-gradient(135deg,var(--accent2),#6ee7ff);
-  color:#06202c;
-}
-
-.ai{
-  align-self:flex-start;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--border);
-}
-
-/* INPUT */
-.input-bar{
-  display:flex;
-  padding:14px;
-  border-top:1px solid var(--border);
-  background:rgba(10,15,22,.7);
-  backdrop-filter:blur(20px);
-}
-
-input{
-  flex:1;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:#0c121a;
-  color:var(--text);
-  outline:none;
-}
-
-button{
-  margin-left:10px;
-  padding:12px 16px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  font-weight:700;
-  cursor:pointer;
-}
-
-/* FLOAT BUTTON (INTERCOM STYLE) */
-.fab{
-  position:fixed;
-  bottom:22px;
-  right:22px;
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  color:#000;
-  cursor:pointer;
-  box-shadow:0 20px 40px rgba(0,229,160,.25);
-}
-
-.widget{
-  position:fixed;
-  bottom:90px;
-  right:22px;
-  width:380px;
-  height:520px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  display:none;
   flex-direction:column;
   overflow:hidden;
 }
 
-.widget.open{display:flex}
+/* TOP BAR */
+.topbar{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.cta{
+  padding:10px 14px;
+  border-radius:10px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+}
+
+/* DEALS */
+.deals{
+  padding:16px;
+  overflow:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:12px;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+}
+
+.card h4{
+  font-size:13px;
+  margin-bottom:8px;
+}
+
+.meta{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+
+.profit{
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.good{
+  color:var(--accent);
+}
+
+.bad{
+  color:var(--danger);
+}
+
+a{
+  font-size:12px;
+  color:var(--accent2);
+  text-decoration:none;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">SancheSolutions <span class="badge">AI Sales Mode</span></div>
-  <div class="badge">SYSTEM ONLINE</div>
+  <div class="logo">MacFlip AI • Dashboard</div>
+  <div class="badge" id="status">Loading...</div>
 </header>
 
 <div class="container">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h3>AI AGENTS</h3>
+    <h3>CONTROLS</h3>
 
-    <div class="agent active" onclick="switchAgent('sales')">
-      <b>Sales Agent</b>
-      <p>High conversion chat + booking</p>
-    </div>
-
-    <div class="agent" onclick="switchAgent('support')">
-      <b>Support Agent</b>
-      <p>Customer help automation</p>
-    </div>
-
-    <div class="agent" onclick="switchAgent('closer')">
-      <b>Closer AI</b>
-      <p>Handles objections + pricing</p>
-    </div>
+    <button class="btn active" onclick="loadDeals()">🔥 Live Deals</button>
+    <button class="btn" onclick="alert('Connect Stripe / Supabase profile here')">💳 Subscription</button>
+    <button class="btn" onclick="loadDeals()">🔄 Refresh Scan</button>
   </aside>
 
-  <main class="chat-wrap">
+  <!-- MAIN -->
+  <main class="main">
 
-    <div class="chat" id="chat"></div>
-
-    <div class="input-bar">
-      <input id="input" placeholder="Ask your AI sales assistant..." />
-      <button onclick="send()">Send</button>
+    <div class="topbar">
+      <div>Real-time MacBook Flip Opportunities</div>
+      <button class="cta" onclick="loadDeals()">Scan Now</button>
     </div>
+
+    <div class="deals" id="deals"></div>
 
   </main>
 
 </div>
 
-<!-- FLOATING WIDGET -->
-<div class="fab" onclick="toggleWidget()">AI</div>
-
-<div class="widget" id="widget">
-  <div class="chat" id="widgetChat"></div>
-
-  <div class="input-bar">
-    <input id="widgetInput" placeholder="Chat..." />
-    <button onclick="sendWidget()">→</button>
-  </div>
-</div>
-
 <script>
 
-const API = "/api/chat";
+const API = "/api/deals";
 
-let agent = "sales";
+const dealsEl = document.getElementById("deals");
+const statusEl = document.getElementById("status");
 
-/* MAIN CHAT */
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
+/* LOAD DEALS */
+async function loadDeals(){
+  try{
+    statusEl.textContent = "Scanning...";
 
-/* WIDGET CHAT */
-const widget = document.getElementById("widget");
-const widgetChat = document.getElementById("widgetChat");
-const widgetInput = document.getElementById("widgetInput");
+    const res = await fetch(API, {
+      headers: {
+        Authorization: "Bearer demo-token"
+      }
+    });
 
-function add(el,text,type){
-  const d=document.createElement("div");
-  d.className=`msg ${type}`;
-  d.textContent=text;
-  el.appendChild(d);
-  el.scrollTop=el.scrollHeight;
+    if(res.status === 403){
+      statusEl.textContent = "PRO REQUIRED";
+      dealsEl.innerHTML = `
+        <div class="card">
+          <h4>🔒 Pro Access Required</h4>
+          <p class="meta">Subscribe to unlock live MacBook flip alerts.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const data = await res.json();
+
+    renderDeals(data.deals || []);
+    statusEl.textContent = "LIVE";
+  }
+  catch(err){
+    statusEl.textContent = "ERROR";
+    console.error(err);
+  }
+}
+
+/* RENDER */
+function renderDeals(deals){
+  dealsEl.innerHTML = "";
+
+  deals.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    const good = d.good;
+
+    div.innerHTML = `
+      <h4>${d.title}</h4>
+      <div class="meta">Buy: $${d.buy} • Resale: $${d.resale}</div>
+
+      <div class="profit ${good ? "good" : "bad"}">
+        Profit: $${d.profit}
+      </div>
+
+      <a href="${d.url}" target="_blank">View Listing →</a>
+    `;
+
+    dealsEl.appendChild(div);
+  });
 }
 
 /* INIT */
-add(chat,"AI Sales Engine online.","ai");
-
-/* SEND */
-async function send(){
-  const text=input.value.trim();
-  if(!text) return;
-
-  add(chat,text,"user");
-  input.value="";
-
-  const res=await fetch(API,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({message:text,agent})
-  });
-
-  const data=await res.json();
-  add(chat,data.reply || "No response","ai");
-}
-
-/* WIDGET */
-function toggleWidget(){
-  widget.classList.toggle("open");
-}
-
-async function sendWidget(){
-  const text=widgetInput.value.trim();
-  if(!text) return;
-
-  add(widgetChat,text,"user");
-  widgetInput.value="";
-
-  const res=await fetch(API,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({message:text,agent:"sales"})
-  });
-
-  const data=await res.json();
-  add(widgetChat,data.reply || "No response","ai");
-}
-
-/* AGENTS */
-function switchAgent(a){
-  agent=a;
-  add(chat,`Switched to ${a.toUpperCase()} agent`,"ai");
-}
-
-/* ENTER */
-input.addEventListener("keydown",e=>{if(e.key==="Enter")send()});
-widgetInput.addEventListener("keydown",e=>{if(e.key==="Enter")sendWidget()});
+loadDeals();
 
 </script>
 
