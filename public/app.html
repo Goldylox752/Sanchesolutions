@@ -40,10 +40,7 @@ header{
   backdrop-filter:blur(20px);
 }
 
-.logo{
-  font-weight:800;
-  letter-spacing:-0.5px;
-}
+.logo{font-weight:800}
 
 .badge{
   font-size:12px;
@@ -68,13 +65,6 @@ header{
   background:rgba(18,26,36,.4);
 }
 
-.sidebar h3{
-  font-size:11px;
-  color:var(--muted);
-  margin-bottom:10px;
-  letter-spacing:1px;
-}
-
 .btn{
   width:100%;
   padding:12px;
@@ -85,11 +75,9 @@ header{
   color:var(--text);
   cursor:pointer;
   text-align:left;
-  transition:.2s;
 }
 
 .btn:hover{
-  transform:translateY(-1px);
   border-color:rgba(0,229,160,.4);
 }
 
@@ -105,7 +93,7 @@ header{
   overflow:hidden;
 }
 
-/* TOP BAR */
+/* TOPBAR */
 .topbar{
   padding:16px;
   border-bottom:1px solid var(--border);
@@ -123,7 +111,7 @@ header{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
 }
 
-/* DEALS */
+/* DEAL GRID */
 .deals{
   padding:16px;
   overflow:auto;
@@ -132,41 +120,50 @@ header{
   gap:12px;
 }
 
+/* CARD */
 .card{
   background:var(--panel);
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px;
+  transition:.2s;
 }
 
-.card h4{
-  font-size:13px;
-  margin-bottom:8px;
+.card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(0,229,160,.25);
 }
 
 .meta{
   font-size:12px;
   color:var(--muted);
-  margin-bottom:8px;
+  margin:6px 0;
 }
 
 .profit{
+  font-weight:800;
+  margin:10px 0;
+}
+
+.good{color:var(--accent)}
+.bad{color:var(--danger)}
+
+/* LOCK SCREEN */
+.lock{
+  padding:20px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(255,255,255,.02);
+}
+
+.lock button{
+  margin-top:10px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
   font-weight:700;
-  margin-bottom:10px;
-}
-
-.good{
-  color:var(--accent);
-}
-
-.bad{
-  color:var(--danger);
-}
-
-a{
-  font-size:12px;
-  color:var(--accent2);
-  text-decoration:none;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -175,25 +172,23 @@ a{
 
 <header>
   <div class="logo">MacFlip AI • Dashboard</div>
-  <div class="badge" id="status">Loading...</div>
+  <div class="badge" id="status">INIT</div>
 </header>
 
 <div class="container">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h3>CONTROLS</h3>
-
     <button class="btn active" onclick="loadDeals()">🔥 Live Deals</button>
-    <button class="btn" onclick="alert('Connect Stripe / Supabase profile here')">💳 Subscription</button>
-    <button class="btn" onclick="loadDeals()">🔄 Refresh Scan</button>
+    <button class="btn" onclick="checkout()">💳 Upgrade</button>
+    <button class="btn" onclick="logout()">🚪 Logout</button>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
     <div class="topbar">
-      <div>Real-time MacBook Flip Opportunities</div>
+      <div>Real-time MacBook Flip Scanner</div>
       <button class="cta" onclick="loadDeals()">Scan Now</button>
     </div>
 
@@ -206,29 +201,41 @@ a{
 <script>
 
 const API = "/api/deals";
-
 const dealsEl = document.getElementById("deals");
 const statusEl = document.getElementById("status");
 
+/* TOKEN */
+function getToken(){
+  return localStorage.getItem("sb_token");
+}
+
 /* LOAD DEALS */
 async function loadDeals(){
-  try{
-    statusEl.textContent = "Scanning...";
 
-    const res = await fetch(API, {
-      headers: {
-        Authorization: "Bearer demo-token"
+  const token = getToken();
+
+  if(!token){
+    showLocked();
+    statusEl.textContent = "LOGIN REQUIRED";
+    return;
+  }
+
+  statusEl.textContent = "SCANNING...";
+
+  try{
+    const res = await fetch(API,{
+      headers:{
+        Authorization:`Bearer ${token}`
       }
     });
 
+    if(res.status === 401){
+      showLocked("Invalid session. Please login again.");
+      return;
+    }
+
     if(res.status === 403){
-      statusEl.textContent = "PRO REQUIRED";
-      dealsEl.innerHTML = `
-        <div class="card">
-          <h4>🔒 Pro Access Required</h4>
-          <p class="meta">Subscribe to unlock live MacBook flip alerts.</p>
-        </div>
-      `;
+      showLocked("Pro subscription required.");
       return;
     }
 
@@ -245,27 +252,57 @@ async function loadDeals(){
 
 /* RENDER */
 function renderDeals(deals){
-  dealsEl.innerHTML = "";
+  dealsEl.innerHTML="";
 
-  deals.forEach(d => {
-    const div = document.createElement("div");
-    div.className = "card";
+  deals.forEach(d=>{
+    const div=document.createElement("div");
+    div.className="card";
 
-    const good = d.good;
-
-    div.innerHTML = `
-      <h4>${d.title}</h4>
+    div.innerHTML=`
+      <div><b>${d.title}</b></div>
       <div class="meta">Buy: $${d.buy} • Resale: $${d.resale}</div>
-
-      <div class="profit ${good ? "good" : "bad"}">
+      <div class="profit ${d.good ? "good":"bad"}">
         Profit: $${d.profit}
       </div>
-
-      <a href="${d.url}" target="_blank">View Listing →</a>
+      <a href="${d.url}" target="_blank">View →</a>
     `;
 
     dealsEl.appendChild(div);
   });
+}
+
+/* LOCK UI */
+function showLocked(msg="Access Required"){
+  dealsEl.innerHTML=`
+    <div class="lock">
+      <h3>🔒 ${msg}</h3>
+      <p class="meta">Unlock real-time MacBook flip alerts for $9.99/month</p>
+      <button onclick="checkout()">Upgrade Now</button>
+    </div>
+  `;
+}
+
+/* STRIPE */
+async function checkout(){
+  const token = getToken();
+
+  const res = await fetch("/api/checkout",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      user_id:"demo",
+      email:"demo@user.com"
+    })
+  });
+
+  const data = await res.json();
+  if(data.url) window.location.href = data.url;
+}
+
+/* LOGOUT */
+function logout(){
+  localStorage.removeItem("sb_token");
+  location.reload();
 }
 
 /* INIT */
