@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>MacFlip AI — eBay Deal Finder Bot</title>
-<meta name="description" content="MacFlip AI scans eBay for undervalued MacBooks and shows you real flipping profit opportunities in real time." />
+<title>MacFlip AI — MacBook Deal Alerts</title>
+
+<meta name="description" content="Get instant MacBook flipping deals from eBay. AI detects undervalued listings and sends profit alerts. $9.99/month." />
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
+:root{
   --bg:#070A12;
   --panel:#0E1424;
   --text:#EAF0FF;
@@ -20,98 +21,143 @@
   --border:rgba(255,255,255,0.08);
 }
 
-* {
+*{
   margin:0;
   padding:0;
   box-sizing:border-box;
   font-family:Inter, sans-serif;
 }
 
-body {
+body{
   background: radial-gradient(circle at top, #0C1226, var(--bg));
   color:var(--text);
 }
 
-.container {
+.container{
   max-width:1100px;
   margin:0 auto;
   padding:60px 20px;
 }
 
 /* HERO */
-.hero {
+.hero{
   text-align:center;
-  padding:80px 20px 40px;
+  padding:90px 20px 50px;
 }
 
-.hero h1 {
-  font-size:52px;
+.hero h1{
+  font-size:56px;
   font-weight:800;
   letter-spacing:-1px;
 }
 
-.hero p {
+.hero p{
   margin-top:18px;
   font-size:18px;
   color:var(--muted);
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
-.cta {
+.buttons{
   margin-top:30px;
-  display:inline-block;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.cta{
   padding:14px 26px;
   background:linear-gradient(135deg, var(--accent), var(--accent2));
   color:white;
-  border-radius:10px;
+  border-radius:12px;
   font-weight:600;
   text-decoration:none;
   box-shadow:0 10px 30px rgba(108,124,255,0.25);
+  cursor:pointer;
+  border:none;
+}
+
+.secondary{
+  padding:14px 26px;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+  border-radius:12px;
+  cursor:pointer;
 }
 
 /* FEATURES */
-.features {
+.features{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
   gap:20px;
   margin-top:80px;
 }
 
-.card {
+.card{
   background:var(--panel);
   border:1px solid var(--border);
   padding:24px;
   border-radius:14px;
 }
 
-.card h3 {
+.card h3{
   margin-bottom:10px;
 }
 
-.card p {
+.card p{
   color:var(--muted);
   font-size:14px;
+  line-height:1.5;
 }
 
-/* DEMO */
-.demo {
+/* LIVE SECTION */
+.live{
   margin-top:80px;
-  background:linear-gradient(135deg, rgba(108,124,255,0.08), rgba(0,212,255,0.05));
-  border:1px solid var(--border);
   padding:30px;
   border-radius:14px;
+  background:linear-gradient(135deg, rgba(108,124,255,0.08), rgba(0,212,255,0.05));
+  border:1px solid var(--border);
 }
 
-.demo pre {
+pre{
   background:#0A1020;
   padding:20px;
-  border-radius:10px;
+  border-radius:12px;
   overflow:auto;
   color:#A9B4D0;
 }
 
+/* PRICING */
+.pricing{
+  margin-top:90px;
+  text-align:center;
+}
+
+.price-box{
+  display:inline-block;
+  padding:30px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+}
+
+.price{
+  font-size:46px;
+  font-weight:800;
+}
+
+.small{
+  color:var(--muted);
+  margin-top:8px;
+}
+
 /* FOOTER */
-footer {
-  margin-top:80px;
+footer{
+  margin-top:90px;
   text-align:center;
   color:var(--muted);
   font-size:13px;
@@ -119,12 +165,12 @@ footer {
 
 /* RESPONSIVE */
 @media(max-width:900px){
-  .features {
+  .features{
     grid-template-columns:1fr;
   }
 
-  .hero h1 {
-    font-size:36px;
+  .hero h1{
+    font-size:38px;
   }
 }
 </style>
@@ -137,55 +183,103 @@ footer {
   <!-- HERO -->
   <section class="hero">
     <h1>MacFlip AI</h1>
-    <p>AI-powered eBay scanner that finds undervalued MacBooks and calculates your flipping profit in real time.</p>
-    <a class="cta" href="#demo">Start Scanning Deals</a>
+    <p>
+      AI scans eBay in real-time and finds undervalued MacBooks with guaranteed profit potential before the market reacts.
+    </p>
+
+    <div class="buttons">
+      <button class="cta" onclick="checkout()">Get Deal Alerts — $9.99/mo</button>
+      <button class="secondary" onclick="loadDemo()">View Live Demo</button>
+    </div>
   </section>
 
   <!-- FEATURES -->
   <section class="features">
 
     <div class="card">
-      <h3>🔍 Live eBay Scanning</h3>
-      <p>Continuously scans MacBook listings and detects underpriced deals before others see them.</p>
+      <h3>🔍 Real-Time Scanning</h3>
+      <p>Continuously scans eBay listings and detects underpriced MacBooks instantly.</p>
     </div>
 
     <div class="card">
-      <h3>💰 Profit Calculator AI</h3>
-      <p>Estimates resale value based on RAM, storage, condition, and market demand.</p>
+      <h3>💰 Profit AI Engine</h3>
+      <p>Estimates resale value using market trends, specs, and demand signals.</p>
     </div>
 
     <div class="card">
       <h3>⚡ Instant Alerts</h3>
-      <p>Get notified on Telegram or Discord when a high-profit flip appears.</p>
+      <p>Get notified within minutes when profitable flips appear.</p>
     </div>
 
   </section>
 
-  <!-- DEMO -->
-  <section class="demo" id="demo">
-    <h2>📦 Example Deal Output</h2>
-    <p style="color:var(--muted); margin-top:8px;">
-      This is what your AI will generate in real time:
+  <!-- LIVE DEMO -->
+  <section class="live">
+    <h2>📦 Live Deal Feed</h2>
+    <p style="color:var(--muted); margin:10px 0 20px;">
+      Example output from MacFlip AI engine:
     </p>
 
-    <pre>
-🔥 DEAL FOUND
-
-MacBook Air M1 2020 - 8GB RAM - 256GB SSD
-Buy Price: $280 CAD
-Estimated Resale: $410 CAD
-Profit: +$130 CAD
-
-https://ebay.com/example-listing
+    <pre id="demoBox">
+Click "View Live Demo" to simulate deals...
     </pre>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing">
+    <h2>Simple Pricing</h2>
+
+    <div class="price-box">
+      <div class="price">$9.99</div>
+      <div class="small">per month</div>
+      <div class="small">Cancel anytime • Instant alerts</div>
+    </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    Built for automation flippers • macbook-flip-ai-js • deployable Node.js system
+    MacFlip AI • Built for MacBook flippers • Powered by eBay data + AI
   </footer>
 
 </div>
+
+<script>
+/* ─────────────────────────────
+   STRIPE CHECKOUT
+───────────────────────────── */
+async function checkout(){
+  const res = await fetch("/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: "guest_user",
+      email: "guest@example.com"
+    })
+  });
+
+  const data = await res.json();
+  if(data.url) window.location.href = data.url;
+}
+
+/* ─────────────────────────────
+   DEMO SIMULATION
+───────────────────────────── */
+function loadDemo(){
+  document.getElementById("demoBox").innerText = `
+🔥 MACBOOK FLIP ALERT
+
+MacBook Air M1 (2020)
+8GB RAM • 256GB SSD
+
+Buy Price: $280 CAD
+Estimated Resale: $420 CAD
+Profit: +$140 CAD
+
+Detected 2 minutes ago
+Status: HIGH CONFIDENCE FLIP
+  `;
+}
+</script>
 
 </body>
 </html>
