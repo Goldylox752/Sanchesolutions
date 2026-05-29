@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>MacFlip AI — SaaS Entry</title>
+<title>MacFlip AI — Secure SaaS Entry</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -27,7 +27,6 @@ body{
   color:var(--text);
 }
 
-/* HERO */
 .container{
   max-width:1100px;
   margin:0 auto;
@@ -48,11 +47,27 @@ body{
   margin-top:16px;
   color:var(--muted);
   font-size:18px;
-  max-width:700px;
-  margin-left:auto;
-  margin-right:auto;
 }
 
+/* STATUS */
+.status{
+  margin-top:18px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.badge{
+  display:inline-block;
+  margin-top:10px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  background:rgba(0,229,160,.12);
+  border:1px solid rgba(0,229,160,.25);
+  color:#00e5a0;
+}
+
+/* BUTTONS */
 .buttons{
   margin-top:30px;
   display:flex;
@@ -80,36 +95,13 @@ body{
   cursor:pointer;
 }
 
-/* STATUS */
-.status{
-  margin-top:20px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-.badge{
-  display:inline-block;
-  margin-top:10px;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  background:rgba(0,229,160,.12);
-  border:1px solid rgba(0,229,160,.25);
-  color:#00e5a0;
-}
-
-/* LOCK */
 .lock{
+  display:none;
   margin-top:40px;
   padding:20px;
   border-radius:14px;
   background:rgba(255,255,255,.03);
   border:1px solid var(--border);
-  display:none;
-}
-
-.lock button{
-  margin-top:10px;
 }
 </style>
 </head>
@@ -122,29 +114,20 @@ body{
 
     <h1>MacFlip AI</h1>
 
-    <p>
-      AI finds undervalued MacBooks on eBay and calculates real flipping profit in seconds.
-    </p>
+    <p>AI detects undervalued MacBooks and calculates real flipping profit in seconds.</p>
 
     <div class="buttons">
-
-      <button class="cta" onclick="startCheckout()">
-        Get Access — $9.99/mo
-      </button>
-
-      <button class="secondary" onclick="checkStatus()">
-        Enter Dashboard
-      </button>
-
+      <button class="cta" onclick="startCheckout()">Get Access — $9.99/mo</button>
+      <button class="secondary" onclick="enterApp()">Enter Dashboard</button>
     </div>
 
-    <div class="status" id="status">Checking account...</div>
-    <div class="badge" id="badge">FREE USER</div>
+    <div class="status" id="status">Checking session...</div>
+    <div class="badge" id="badge">FREE</div>
 
     <div class="lock" id="lockBox">
       <h3>🔒 Pro Required</h3>
-      <p style="color:#9AA6C3;font-size:14px;margin-top:8px;">
-        Unlock live MacBook flip alerts, AI scoring, and instant deal notifications.
+      <p style="color:var(--muted);font-size:14px;margin-top:8px;">
+        Unlock live MacBook flip alerts + AI deal scoring.
       </p>
       <button class="cta" onclick="startCheckout()">Upgrade Now</button>
     </div>
@@ -155,34 +138,48 @@ body{
 
 <script>
 
+const API_BASE = "/api";
+
 /* =========================
-   MOCK USER STATE
-   (replace with Supabase later)
+   REAL AUTH CHECK (SUPABASE)
 ========================= */
 
-function getUser(){
-  return {
-    loggedIn: true,
-    plan: localStorage.getItem("plan") || "free"
-  };
+async function getSession(){
+  const res = await fetch(`${API_BASE}/me`, {
+    headers:{
+      Authorization: "Bearer " + localStorage.getItem("sb_token")
+    }
+  });
+
+  if(!res.ok) return null;
+  return await res.json();
 }
 
 /* =========================
-   CHECK STATUS
+   CHECK USER STATUS
 ========================= */
 
-function checkStatus(){
+async function checkStatus(){
 
-  const user = getUser();
+  const data = await getSession();
 
-  if(!user.loggedIn){
+  if(!data){
     document.getElementById("status").innerText = "Not logged in";
+    document.getElementById("badge").innerText = "GUEST";
+    document.getElementById("lockBox").style.display = "block";
     return;
   }
 
-  if(user.plan === "pro"){
-    document.getElementById("status").innerText = "Pro active — redirecting...";
-    window.location.href = "/dashboard.html";
+  const plan = data.profile?.plan || "free";
+
+  if(plan === "pro"){
+    document.getElementById("status").innerText = "Pro active — redirect ready";
+    document.getElementById("badge").innerText = "PRO USER";
+
+    setTimeout(() => {
+      window.location.href = "/app.html";
+    }, 800);
+
   } else {
     document.getElementById("status").innerText = "Free plan detected";
     document.getElementById("badge").innerText = "FREE USER";
@@ -191,17 +188,17 @@ function checkStatus(){
 }
 
 /* =========================
-   STRIPE CHECKOUT
+   STRIPE CHECKOUT (REAL BACKEND)
 ========================= */
 
 async function startCheckout(){
 
-  const res = await fetch("/api/checkout", {
+  const res = await fetch(`${API_BASE}/create-checkout-session`, {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
-      user_id:"demo_user",
-      email:"demo@user.com"
+      user_id: localStorage.getItem("user_id") || "guest",
+      email: localStorage.getItem("email") || "guest@email.com"
     })
   });
 
@@ -213,9 +210,14 @@ async function startCheckout(){
 }
 
 /* =========================
-   AUTO INIT
+   ENTER APP
 ========================= */
 
+function enterApp(){
+  window.location.href = "/app.html";
+}
+
+/* INIT */
 checkStatus();
 
 </script>
