@@ -1,366 +1,683 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MacFlip AI — Pro</title>
 
-<title>MacFlip AI • Pro Dashboard</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#0b0f14;
-  --panel:#121a24;
-  --border:rgba(255,255,255,.08);
-  --text:#eaf1ff;
-  --muted:#93a4b8;
-  --accent:#00e5a0;
-  --accent2:#00b6ff;
-  --danger:#ff4d6d;
-  --warn:#ffcc00;
+/* ── TOKENS ─────────────────────────────────────── */
+:root {
+  --cream:   #f5f0e8;
+  --paper:   #ede8df;
+  --ink:     #1a1409;
+  --ink2:    #3d3424;
+  --muted:   #8a7f6e;
+  --rule:    rgba(26,20,9,.1);
+  --rule2:   rgba(26,20,9,.06);
+  --green:   #1a6644;
+  --green-bg:#e8f5ee;
+  --red:     #8b1a1a;
+  --red-bg:  #faeaea;
+  --amber:   #8b5e00;
+  --amber-bg:#fdf3dd;
+  --accent:  #1a6644;
+  --shadow:  0 1px 3px rgba(26,20,9,.08), 0 4px 16px rgba(26,20,9,.04);
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
 
-body{
-  background:radial-gradient(circle at top,#0f1620,#070a0f);
-  color:var(--text);
-  height:100vh;
-  overflow:hidden;
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
 }
 
-/* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px 20px;
-  border-bottom:1px solid var(--border);
-  background:rgba(10,15,22,.7);
-  backdrop-filter:blur(20px);
+/* ── TEXTURE ─────────────────────────────────────── */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 23px, var(--rule2) 24px);
+  opacity:.5;
 }
 
-.logo{font-weight:800}
-
-.badge{
-  font-size:12px;
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(0,229,160,.12);
-  border:1px solid rgba(0,229,160,.25);
-  color:var(--accent);
-}
-
-/* LAYOUT */
-.container{
+/* ── SHELL ───────────────────────────────────────── */
+.shell {
+  position:relative; z-index:1;
   display:grid;
-  grid-template-columns:260px 1fr;
-  height:calc(100vh - 60px);
+  grid-template-rows: 52px 1fr;
+  grid-template-columns: 200px 1fr;
+  height:100vh;
 }
 
-/* SIDEBAR */
-.sidebar{
-  border-right:1px solid var(--border);
-  padding:16px;
-  background:rgba(18,26,36,.4);
+/* ── HEADER ──────────────────────────────────────── */
+header {
+  grid-column: 1/-1;
+  display:flex;
+  align-items:stretch;
+  border-bottom: 2px solid var(--ink);
+  background: var(--cream);
 }
 
-.btn{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.02);
-  color:var(--text);
-  cursor:pointer;
-  text-align:left;
+.header-brand {
+  display:flex;
+  align-items:center;
+  padding: 0 20px;
+  border-right: 1px solid var(--rule);
+  gap:10px;
 }
 
-.btn.active{
-  background:rgba(0,229,160,.1);
-  border-color:rgba(0,229,160,.4);
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-weight:900;
+  font-size:17px;
+  letter-spacing:-.3px;
+  color:var(--ink);
 }
 
-/* MAIN */
-.main{
+.brand-name em {
+  color:var(--accent);
+  font-style:normal;
+}
+
+.header-meta {
+  display:flex;
+  align-items:center;
+  gap:0;
+  flex:1;
+}
+
+.header-cell {
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  border-right:1px solid var(--rule);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  letter-spacing:.06em;
+  color:var(--muted);
+  gap:7px;
+}
+
+.ticker-val {
+  color:var(--ink);
+  font-weight:600;
+  font-size:12px;
+}
+
+.ticker-up   { color:var(--green); }
+.ticker-down { color:var(--red); }
+
+.header-right {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  gap:12px;
+}
+
+.status-lozenge {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:.15em;
+  font-weight:600;
+  padding:4px 10px;
+  border:1px solid currentColor;
+  border-radius:2px;
+  transition:.2s;
+}
+
+.status-lozenge.live   { color:var(--green); background:var(--green-bg); }
+.status-lozenge.busy   { color:var(--amber); background:var(--amber-bg); }
+.status-lozenge.error  { color:var(--red);   background:var(--red-bg); }
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar {
+  border-right:1px solid var(--rule);
+  background:var(--paper);
   display:flex;
   flex-direction:column;
   overflow:hidden;
 }
 
-/* TOP BAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px;
-  border-bottom:1px solid var(--border);
+.sidebar-section {
+  padding:16px 0;
+  border-bottom:1px solid var(--rule);
 }
 
-.cta{
-  padding:10px 14px;
-  border-radius:10px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-}
-
-/* STATS */
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  padding:16px;
-}
-
-.stat{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:12px;
-  border-radius:12px;
-}
-
-.stat h3{
-  font-size:12px;
+.sidebar-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  letter-spacing:.2em;
   color:var(--muted);
+  padding:0 16px 8px;
+  text-transform:uppercase;
 }
 
-.stat b{
-  font-size:20px;
+.nav-item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  padding:9px 16px;
+  border:none;
+  background:transparent;
+  color:var(--ink2);
+  font-family:'IBM Plex Sans', sans-serif;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  text-align:left;
+  transition:.15s;
+  border-left:2px solid transparent;
 }
 
-/* DEALS */
-.deals{
-  flex:1;
-  overflow:auto;
+.nav-item:hover { background:var(--cream); }
+
+.nav-item.active {
+  color:var(--accent);
+  border-left-color:var(--accent);
+  background:var(--green-bg);
+}
+
+.nav-item .nav-icon { font-size:13px; width:16px; text-align:center; }
+
+.sidebar-stats {
   padding:16px;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  display:flex;
+  flex-direction:column;
   gap:12px;
+  flex:1;
 }
 
-/* CARD */
-.card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
+.mini-stat { }
+.mini-stat-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  letter-spacing:.14em;
+  color:var(--muted);
+  margin-bottom:2px;
+  text-transform:uppercase;
+}
+.mini-stat-val {
+  font-family:'Playfair Display', serif;
+  font-weight:700;
+  font-size:20px;
+  color:var(--ink);
+  transition:.4s;
+}
+.mini-stat-val.green { color:var(--green); }
+
+.sidebar-foot {
+  padding:12px 0;
+  border-top:1px solid var(--rule);
+  margin-top:auto;
+}
+
+/* ── MAIN ────────────────────────────────────────── */
+.main {
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 20px;
+  border-bottom:1px solid var(--rule);
+  background:var(--cream);
+  flex-shrink:0;
+}
+
+.topbar-headline {
+  font-family:'Playfair Display', serif;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:-.2px;
+}
+
+.topbar-sub {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:1px;
+  font-family:'IBM Plex Mono', monospace;
+  letter-spacing:.04em;
+}
+
+.scan-btn {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:9px 20px;
+  background:var(--ink);
+  color:var(--cream);
+  border:none;
+  border-radius:2px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.1em;
+  cursor:pointer;
   transition:.2s;
 }
 
-.card:hover{
-  transform:translateY(-3px);
-  border-color:rgba(0,229,160,.25);
-}
+.scan-btn:hover { background:var(--ink2); }
+.scan-btn.busy  { background:var(--amber); color:var(--ink); }
 
-.meta{
-  font-size:12px;
-  color:var(--muted);
-  margin:6px 0;
-}
-
-.profit{
-  font-weight:800;
-  margin:10px 0;
-}
-
-.good{color:var(--accent)}
-.bad{color:var(--danger)}
-.med{color:var(--warn)}
-
-.small{
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* ALERT BAR */
-.alerts{
-  padding:10px 16px;
-  border-top:1px solid var(--border);
-  background:rgba(255,255,255,.02);
-  height:120px;
+/* ── DEALS SCROLL ─────────────────────────────────── */
+.deals-outer {
+  flex:1;
   overflow:auto;
-  font-size:12px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--rule) transparent;
+}
+
+/* ── TABLE HEADER ─────────────────────────────────── */
+.table-head {
+  display:grid;
+  grid-template-columns: 1fr 90px 90px 100px 90px 100px;
+  padding:7px 20px;
+  border-bottom:1px solid var(--ink);
+  background:var(--paper);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:.14em;
   color:var(--muted);
+  text-transform:uppercase;
+  position:sticky; top:0; z-index:10;
+}
+
+/* ── ROWS ─────────────────────────────────────────── */
+.deal-row {
+  display:grid;
+  grid-template-columns: 1fr 90px 90px 100px 90px 100px;
+  padding:0 20px;
+  border-bottom:1px solid var(--rule2);
+  align-items:center;
+  min-height:52px;
+  transition:.15s;
+  animation:rowIn .3s ease both;
+}
+
+@keyframes rowIn {
+  from { opacity:0; transform:translateX(-8px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.deal-row:hover { background:rgba(255,255,255,.6); }
+
+.deal-title {
+  font-family:'IBM Plex Sans', sans-serif;
+  font-weight:500;
+  font-size:12px;
+  color:var(--ink);
+  padding:14px 0;
+  line-height:1.4;
+}
+
+.deal-title span {
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+  font-weight:400;
+  font-family:'IBM Plex Mono', monospace;
+  margin-top:2px;
+}
+
+.cell {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  font-weight:500;
+  color:var(--ink2);
+}
+
+.cell-profit {
+  font-family:'Playfair Display', serif;
+  font-weight:700;
+  font-size:15px;
+}
+
+.cell-profit.high { color:var(--green); }
+.cell-profit.med  { color:var(--amber); }
+.cell-profit.low  { color:var(--red); }
+
+.conf-tag {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:.1em;
+  font-weight:600;
+  padding:3px 8px;
+  border-radius:1px;
+  border:1px solid currentColor;
+}
+
+.conf-tag.high { color:var(--green); background:var(--green-bg); }
+.conf-tag.med  { color:var(--amber); background:var(--amber-bg); }
+.conf-tag.low  { color:var(--red);   background:var(--red-bg); }
+
+.open-link {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color:var(--muted);
+  text-decoration:none;
+  letter-spacing:.06em;
+  transition:.15s;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.open-link:hover { color:var(--accent); }
+
+/* ── EMPTY STATE ─────────────────────────────────── */
+.empty {
+  padding:60px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.empty-rule {
+  width:32px;
+  height:2px;
+  background:var(--ink);
+  margin:16px auto;
+}
+
+.empty h3 {
+  font-family:'Playfair Display', serif;
+  font-size:20px;
+  color:var(--ink);
+  margin-bottom:6px;
+}
+
+/* ── ALERT FOOTER ────────────────────────────────── */
+.alerts {
+  border-top:1px solid var(--rule);
+  background:var(--paper);
+  padding:0 20px;
+  height:76px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  flex-shrink:0;
+}
+
+.alert-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color:var(--muted);
+  animation:fadeIn .2s ease;
+}
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.alert-time { color:var(--accent); font-weight:600; }
+
+.alert-bullet {
+  width:4px; height:4px;
+  border-radius:50%;
+  background:var(--accent);
+  flex-shrink:0;
 }
 </style>
 </head>
-
 <body>
 
-<header>
-  <div class="logo">MacFlip AI • Pro Dashboard</div>
-  <div class="badge" id="status">INIT</div>
-</header>
+<div class="shell">
 
-<div class="container">
+  <!-- HEADER -->
+  <header>
+    <div class="header-brand">
+      <div class="brand-name">MacFlip <em>AI</em></div>
+    </div>
+    <div class="header-meta">
+      <div class="header-cell">
+        MARKET <span class="ticker-val ticker-up">ACTIVE</span>
+      </div>
+      <div class="header-cell">
+        LISTINGS SCANNED <span class="ticker-val" id="scannedCount">—</span>
+      </div>
+      <div class="header-cell">
+        LAST SCAN <span class="ticker-val" id="lastScan">—</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-lozenge busy" id="status">INIT</div>
+    </div>
+  </header>
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <button class="btn active" onclick="loadDeals()">🔥 Live Deals</button>
-    <button class="btn" onclick="toggleAuto()">⚡ Auto Scan</button>
-    <button class="btn" onclick="checkout()">💳 Upgrade</button>
-    <button class="btn" onclick="logout()">🚪 Logout</button>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Views</div>
+      <button class="nav-item active" onclick="loadDeals()">
+        <span class="nav-icon">◈</span> Live Deals
+      </button>
+      <button class="nav-item" onclick="toggleAuto()" id="autoBtn">
+        <span class="nav-icon">↻</span> Auto Scan
+      </button>
+    </div>
+
+    <div class="sidebar-stats">
+      <div class="sidebar-label" style="padding:0 0 0 0">Summary</div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Deals Found</div>
+        <div class="mini-stat-val" id="totalDeals">—</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Avg Profit</div>
+        <div class="mini-stat-val green" id="avgProfit">—</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Best Flip</div>
+        <div class="mini-stat-val green" id="bestFlip">—</div>
+      </div>
+    </div>
+
+    <div class="sidebar-foot">
+      <button class="nav-item" onclick="checkout()">
+        <span class="nav-icon">✦</span> Upgrade Plan
+      </button>
+      <button class="nav-item" onclick="logout()">
+        <span class="nav-icon">→</span> Sign Out
+      </button>
+    </div>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
     <div class="topbar">
-      <div>Real-Time MacBook Arbitrage Engine</div>
-      <button class="cta" onclick="loadDeals()">Scan Now</button>
+      <div>
+        <div class="topbar-headline">MacBook Arbitrage Scanner</div>
+        <div class="topbar-sub">Real-time buy / resale spread analysis</div>
+      </div>
+      <button class="scan-btn" id="scanBtn" onclick="loadDeals()">
+        ◈ SCAN NOW
+      </button>
     </div>
 
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat">
-        <h3>Total Deals</h3>
-        <b id="totalDeals">0</b>
+    <div class="deals-outer">
+      <div class="table-head">
+        <div>Listing</div>
+        <div>Buy $</div>
+        <div>Resale $</div>
+        <div>Profit</div>
+        <div>Signal</div>
+        <div>Action</div>
       </div>
-      <div class="stat">
-        <h3>Avg Profit</h3>
-        <b id="avgProfit">$0</b>
-      </div>
-      <div class="stat">
-        <h3>Best Flip</h3>
-        <b id="bestFlip">$0</b>
-      </div>
+      <div id="deals"></div>
     </div>
 
-    <!-- DEALS -->
-    <div class="deals" id="deals"></div>
-
-    <!-- ALERT STREAM -->
     <div class="alerts" id="alerts">
-      🔔 Alert stream initializing...
+      <div class="alert-row">
+        <div class="alert-bullet"></div>
+        <span class="alert-time">—</span>
+        System ready. Awaiting scan.
+      </div>
     </div>
 
   </main>
-
 </div>
 
 <script>
-
 const API = "/api/deals";
+const dealsEl   = document.getElementById("deals");
+const statusEl  = document.getElementById("status");
+const scanBtn   = document.getElementById("scanBtn");
+const alertsEl  = document.getElementById("alerts");
 
-const dealsEl = document.getElementById("deals");
-const statusEl = document.getElementById("status");
+let auto = false, interval;
 
-let auto = false;
-let interval;
-
-/* LOAD DEALS */
-async function loadDeals(){
-
+/* ── LOAD ── */
+async function loadDeals() {
   const token = localStorage.getItem("sb_token");
+  if (!token) { setStatus("LOGIN REQUIRED","error"); return; }
 
-  if(!token){
-    statusEl.textContent = "LOGIN REQUIRED";
-    return;
+  setStatus("SCANNING","busy");
+  scanBtn.classList.add("busy");
+  scanBtn.textContent = "◌ SCANNING";
+
+  try {
+    const res = await fetch(API, { headers:{ Authorization:`Bearer ${token}` } });
+    if (res.status === 403) { setStatus("PRO REQUIRED","error"); return; }
+
+    const data  = await res.json();
+    const deals = data.deals || [];
+
+    render(deals);
+    updateStats(deals);
+    setStatus("LIVE","live");
+
+    const now = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    document.getElementById("lastScan").textContent = now;
+    document.getElementById("scannedCount").textContent = deals.length;
+    pushAlert(`Scan complete — ${deals.length} listing${deals.length!==1?"s":""} indexed`);
+
+  } catch(e) {
+    setStatus("ERROR","error");
+    pushAlert("Scan failed — check connection");
+  } finally {
+    scanBtn.classList.remove("busy");
+    scanBtn.innerHTML = "◈ SCAN NOW";
   }
-
-  statusEl.textContent = "SCANNING...";
-
-  const res = await fetch(API,{
-    headers:{ Authorization:`Bearer ${token}` }
-  });
-
-  if(res.status === 403){
-    statusEl.textContent = "PRO REQUIRED";
-    return;
-  }
-
-  const data = await res.json();
-  const deals = data.deals || [];
-
-  render(deals);
-  updateStats(deals);
-
-  statusEl.textContent = "LIVE";
-  pushAlert("Scan completed • " + deals.length + " listings found");
 }
 
-/* RENDER */
-function render(deals){
-  dealsEl.innerHTML="";
+/* ── RENDER ── */
+function render(deals) {
+  if (!deals.length) {
+    dealsEl.innerHTML = `
+      <div class="empty">
+        <div class="empty-rule"></div>
+        <h3>No deals found</h3>
+        <p>Market may be quiet. Try again shortly.</p>
+      </div>`;
+    return;
+  }
 
-  deals.forEach(d=>{
+  dealsEl.innerHTML = "";
+  deals.forEach((d, i) => {
+    const tier  = d.profit > 120 ? "high" : d.profit > 70 ? "med" : "low";
+    const label = {high:"HIGH",med:"MOD",low:"LOW"}[tier];
+    const pct   = d.buy ? ((d.profit/d.buy)*100).toFixed(1) : "—";
 
-    let level = d.profit > 120 ? "good" : d.profit > 70 ? "med" : "bad";
-
-    const div=document.createElement("div");
-    div.className="card";
-
-    div.innerHTML=`
-      <div><b>${d.title}</b></div>
-      <div class="meta">Buy: $${d.buy} • Resale: $${d.resale}</div>
-
-      <div class="profit ${level}">
-        Profit: $${d.profit}
+    const row = document.createElement("div");
+    row.className = "deal-row";
+    row.style.animationDelay = `${i*30}ms`;
+    row.innerHTML = `
+      <div class="deal-title">
+        ${d.title}
+        <span>+${pct}% margin</span>
       </div>
-
-      <div class="small">${level.toUpperCase()} CONFIDENCE FLIP</div>
-
-      <a href="${d.url}" target="_blank">Open Listing →</a>
-    `;
-
-    dealsEl.appendChild(div);
+      <div class="cell">$${d.buy}</div>
+      <div class="cell">$${d.resale}</div>
+      <div class="cell-profit ${tier}">+$${d.profit}</div>
+      <div><span class="conf-tag ${tier}">${label}</span></div>
+      <div>
+        <a class="open-link" href="${d.url}" target="_blank">
+          Open ↗
+        </a>
+      </div>`;
+    dealsEl.appendChild(row);
   });
 }
 
-/* STATS */
-function updateStats(deals){
-
+/* ── STATS ── */
+function updateStats(deals) {
   const total = deals.length;
-  const avg = deals.reduce((a,b)=>a+(b.profit||0),0)/total || 0;
-  const best = Math.max(...deals.map(d=>d.profit||0));
+  const avg   = total ? deals.reduce((s,d)=>s+(d.profit||0),0)/total : 0;
+  const best  = total ? Math.max(...deals.map(d=>d.profit||0)) : 0;
 
-  document.getElementById("totalDeals").innerText = total;
-  document.getElementById("avgProfit").innerText = "$" + avg.toFixed(0);
-  document.getElementById("bestFlip").innerText = "$" + (best || 0);
+  document.getElementById("totalDeals").textContent = total;
+  document.getElementById("avgProfit").textContent  = "$"+avg.toFixed(0);
+  document.getElementById("bestFlip").textContent   = "$"+best;
 }
 
-/* ALERTS */
-function pushAlert(text){
-  const el=document.getElementById("alerts");
-  const time=new Date().toLocaleTimeString();
-
-  el.innerHTML = `🔔 [${time}] ${text}<br>` + el.innerHTML;
+/* ── STATUS ── */
+function setStatus(text, type) {
+  statusEl.textContent = text;
+  statusEl.className = "status-lozenge " + type;
 }
 
-/* AUTO SCAN */
-function toggleAuto(){
+/* ── ALERTS ── */
+function pushAlert(text) {
+  const t = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const row = document.createElement("div");
+  row.className = "alert-row";
+  row.innerHTML = `<div class="alert-bullet"></div><span class="alert-time">${t}</span>${text}`;
+  alertsEl.prepend(row);
+  // keep only 3 lines
+  while(alertsEl.children.length > 3) alertsEl.removeChild(alertsEl.lastChild);
+}
 
-  auto=!auto;
-
-  if(auto){
-    pushAlert("Auto Scan ENABLED");
-    interval=setInterval(loadDeals,15000);
-  }else{
-    pushAlert("Auto Scan DISABLED");
+/* ── AUTO SCAN ── */
+function toggleAuto() {
+  auto = !auto;
+  const btn = document.getElementById("autoBtn");
+  if (auto) {
+    btn.classList.add("active");
+    btn.innerHTML = `<span class="nav-icon">⏹</span> Stop Auto`;
+    interval = setInterval(loadDeals, 15000);
+    pushAlert("Auto scan enabled — every 15 s");
+  } else {
+    btn.classList.remove("active");
+    btn.innerHTML = `<span class="nav-icon">↻</span> Auto Scan`;
     clearInterval(interval);
+    pushAlert("Auto scan disabled");
   }
 }
 
-/* STRIPE */
-async function checkout(){
-  const res=await fetch("/api/checkout",{method:"POST"});
-  const data=await res.json();
-  if(data.url) window.location.href=data.url;
+/* ── CHECKOUT ── */
+async function checkout() {
+  const res  = await fetch("/api/checkout", {method:"POST"});
+  const data = await res.json();
+  if (data.url) window.location.href = data.url;
 }
 
-/* LOGOUT */
-function logout(){
+/* ── LOGOUT ── */
+function logout() {
   localStorage.removeItem("sb_token");
   location.reload();
 }
 
-/* INIT */
 loadDeals();
-
 </script>
 
 </body>
