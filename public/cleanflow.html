@@ -1,335 +1,440 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CleanFlow AI · AI Receptionist SaaS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f5f7fb;
-  color:#111;
-}
+<title>CleanFlow AI | AI Receptionist That Never Misses a Customer</title>
 
-.nav{
-  display:flex;
-  justify-content:space-between;
-  padding:18px 30px;
-  background:white;
-  border-bottom:1px solid #eee;
-  font-weight:bold;
-}
+<meta name="description"
+content="CleanFlow AI answers calls, books appointments, qualifies leads, and captures customers 24/7 using artificial intelligence.">
 
-.hero{
-  text-align:center;
-  padding:100px 20px;
-  background:white;
-}
+<meta name="theme-color" content="#2563EB">
 
-.hero h1{
-  font-size:52px;
-  margin-bottom:10px;
-}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-.hero p{
-  max-width:750px;
-  margin:auto;
-  color:#555;
-  line-height:1.6;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-.btn{
-  display:inline-block;
-  margin-top:25px;
-  padding:14px 26px;
-  background:#111;
-  color:white;
-  border-radius:12px;
-  cursor:pointer;
-  text-decoration:none;
-}
+<link rel="stylesheet" href="css/styles.css">
 
-.features{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:18px;
-  padding:60px 30px;
-  max-width:1000px;
-  margin:auto;
-}
-
-.card{
-  background:white;
-  padding:22px;
-  border-radius:14px;
-  box-shadow:0 10px 20px rgba(0,0,0,0.05);
-  text-align:center;
-}
-
-.cta{
-  text-align:center;
-  padding:80px 20px;
-  background:white;
-}
-
-.price{
-  font-size:26px;
-  font-weight:bold;
-  margin:10px 0;
-}
-
-/* CHAT */
-#bot{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:60px;
-  height:60px;
-  background:#111;
-  color:white;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-size:26px;
-}
-
-#chat{
-  position:fixed;
-  bottom:90px;
-  right:20px;
-  width:340px;
-  height:460px;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:14px;
-  display:none;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-#header{
-  background:#111;
-  color:white;
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-}
-
-#messages{
-  flex:1;
-  padding:10px;
-  overflow-y:auto;
-  background:#f7f7f7;
-}
-
-.msg{
-  margin:8px 0;
-  padding:10px;
-  border-radius:10px;
-  max-width:80%;
-}
-
-.user{
-  background:#111;
-  color:white;
-  margin-left:auto;
-}
-
-.bot{
-  background:white;
-}
-
-#inputBox{
-  display:flex;
-  border-top:1px solid #ddd;
-}
-
-input{
-  flex:1;
-  padding:10px;
-  border:none;
-  outline:none;
-}
-
-button{
-  background:#111;
-  color:white;
-  border:none;
-  padding:0 14px;
-}
-</style>
 </head>
 
 <body>
 
-<div class="nav">
-  <span>CleanFlow AI</span>
-  <span>AI Receptionist SaaS</span>
+<!-- =========================
+NAVBAR
+========================== -->
+
+<nav>
+
+<div class="container nav">
+
+<a href="#" class="logo">
+
+<span class="logoIcon">✦</span>
+
+CleanFlow AI
+
+</a>
+
+<ul class="navLinks">
+
+<li><a href="#features">Features</a></li>
+
+<li><a href="#pricing">Pricing</a></li>
+
+<li><a href="#testimonials">Reviews</a></li>
+
+<li><a href="#faq">FAQ</a></li>
+
+</ul>
+
+<div class="navButtons">
+
+<a href="#" class="btn secondary">
+
+Book Demo
+
+</a>
+
+<a href="#" class="btn primary">
+
+Start Free Trial
+
+</a>
+
 </div>
 
-<div class="hero">
-  <h1>Turn Visitors Into Paying Customers</h1>
-  <p>AI receptionist that captures leads and automates booking 24/7.</p>
-
-  <div class="btn" onclick="openChat()">Try Live Demo</div>
 </div>
 
-<div class="features">
-  <div class="card">More Bookings</div>
-  <div class="card">Instant Replies</div>
-  <div class="card">CRM Storage</div>
-  <div class="card">24/7 AI Agent</div>
+</nav>
+
+<!-- =========================
+HERO
+========================== -->
+
+<section class="hero">
+
+<div class="container heroGrid">
+
+<div>
+
+<div class="badge">
+
+✨ Trusted by growing service businesses
+
 </div>
 
-<div class="cta">
-  <h2>Start Getting More Cleaning Jobs</h2>
-  <div class="price">$49/month</div>
+<h1>
 
-  <div class="btn" onclick="startCheckout()">Start Free Trial</div>
+Never Miss Another
+
+<span>Customer Call.</span>
+
+</h1>
+
+<p>
+
+CleanFlow AI answers calls, chats with website visitors, books appointments, captures leads, and follows up automatically — 24 hours a day.
+
+</p>
+
+<div class="heroButtons">
+
+<a href="#" class="btn primary">
+
+Start Free Trial
+
+</a>
+
+<a href="#" class="btn secondary" onclick="openChat()">
+
+Try Live Demo
+
+</a>
+
 </div>
 
-<!-- CHAT -->
-<div id="bot" onclick="openChat()">🧼</div>
+<div class="stats">
 
-<div id="chat">
-  <div id="header">
-    <span>CleanFlow AI</span>
-    <span onclick="closeChat()">✕</span>
-  </div>
+<div>
 
-  <div id="messages"></div>
+<h2>
 
-  <div id="inputBox">
-    <input id="input" placeholder="Type..." />
-    <button onclick="send()">Send</button>
-  </div>
+24/7
+
+</h2>
+
+<p>
+
+Always Available
+
+</p>
+
 </div>
 
-<script>
+<div>
 
-const API =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000"
-    : "https://sanchesolutions.onrender.com";
+<h2>
 
-let step = 0;
-let lead = {};
-let chatOpened = false;
+98%
 
-const chat = document.getElementById("chat");
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
+</h2>
 
-function openChat(){
-  chat.style.display = "flex";
+<p>
 
-  if(!chatOpened){
-    chatOpened = true;
-    addBot("What type of cleaning service do you offer?");
-  }
-}
+Lead Capture
 
-function closeChat(){
-  chat.style.display = "none";
-}
+</p>
 
-function addBot(text){
-  const div = document.createElement("div");
-  div.className = "msg bot";
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+</div>
 
-function addUser(text){
-  const div = document.createElement("div");
-  div.className = "msg user";
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+<div>
 
-async function send(){
+<h2>
 
-  const text = input.value.trim();
-  if(!text) return;
+500+
 
-  addUser(text);
-  input.value = "";
+</h2>
 
-  if(step === 0){
-    lead.service = text;
-    step++;
-    return addBot("What city do you serve?");
-  }
+<p>
 
-  if(step === 1){
-    lead.city = text;
-    step++;
-    return addBot("Homes or offices?");
-  }
+Businesses
 
-  if(step === 2){
-    lead.type = text;
-    step++;
-    return addBot("How soon can you take bookings?");
-  }
+</p>
 
-  if(step === 3){
-    lead.speed = text;
-    step++;
-    return addBot("Drop your email or phone.");
-  }
+</div>
 
-  if(step === 4){
-    lead.contact = text;
-    step++;
-    return addBot("Perfect. You can now start checkout.");
-  }
-}
+</div>
 
-async function startCheckout(){
+</div>
 
-  if(!lead.contact){
-    alert("Complete chat first (email required)");
-    return;
-  }
+<!-- HERO CHAT MOCKUP -->
 
-  try {
+<div class="heroCard">
 
-    const res = await fetch(`${API}/api/create-checkout-session`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        email: lead.contact,
-        user_id: crypto.randomUUID()
-      })
-    });
+<div class="cardHeader">
 
-    const data = await res.json();
+<div class="greenDot"></div>
 
-    if(!res.ok){
-      alert(data.error || "Checkout failed");
-      return;
-    }
+<span>CleanFlow AI Receptionist</span>
 
-    if(data.url){
-      window.location.href = data.url;
-    } else {
-      alert("Stripe did not return checkout URL");
-    }
+</div>
 
-  } catch(err){
-    console.error(err);
-    alert("Checkout failed (server issue)");
-  }
-}
+<div class="chat">
 
-</script>
+<div class="bot">
+
+👋 Hi there!
+
+Welcome to CleanFlow AI.
+
+</div>
+
+<div class="bot">
+
+How can I help you today?
+
+</div>
+
+<div class="user">
+
+I'd like more appointments.
+
+</div>
+
+<div class="bot">
+
+Absolutely.
+
+I can answer calls, qualify customers, book appointments, and send every lead directly into your CRM.
+
+</div>
+
+<div class="typing">
+
+<div></div>
+
+<div></div>
+
+<div></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =========================
+TRUST SECTION
+========================== -->
+
+<section class="logos">
+
+<div class="container">
+
+<p>
+
+Trusted by businesses across North America
+
+</p>
+
+<div class="logoGrid">
+
+<div>Cleaning</div>
+
+<div>Roofing</div>
+
+<div>HVAC</div>
+
+<div>Plumbing</div>
+
+<div>Electrical</div>
+
+<div>Landscaping</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =========================
+FEATURES
+========================== -->
+
+<section id="features">
+
+<div class="container">
+
+<div class="sectionHeader">
+
+<h2>
+
+Everything Your Business Needs
+
+</h2>
+
+<p>
+
+A complete AI receptionist platform built to increase bookings, save time, and never miss another opportunity.
+
+</p>
+
+</div>
+
+<div class="featureGrid">
+
+<div class="featureCard">
+
+<div class="icon">
+
+📞
+
+</div>
+
+<h3>
+
+AI Call Answering
+
+</h3>
+
+<p>
+
+Answer every customer call instantly with natural AI conversations.
+
+</p>
+
+</div>
+
+<div class="featureCard">
+
+<div class="icon">
+
+💬
+
+</div>
+
+<h3>
+
+Website Chat
+
+</h3>
+
+<p>
+
+Capture every visitor before they leave your website.
+
+</p>
+
+</div>
+
+<div class="featureCard">
+
+<div class="icon">
+
+📅
+
+</div>
+
+<h3>
+
+Appointment Booking
+
+</h3>
+
+<p>
+
+Automatically schedule customers into your calendar.
+
+</p>
+
+</div>
+
+<div class="featureCard">
+
+<div class="icon">
+
+📈
+
+</div>
+
+<h3>
+
+CRM Integration
+
+</h3>
+
+<p>
+
+Every lead is saved automatically for your team.
+
+</p>
+
+</div>
+
+<div class="featureCard">
+
+<div class="icon">
+
+📲
+
+</div>
+
+<h3>
+
+SMS Follow-Up
+
+</h3>
+
+<p>
+
+Automatically send confirmation and reminder texts.
+
+</p>
+
+</div>
+
+<div class="featureCard">
+
+<div class="icon">
+
+🤖
+
+</div>
+
+<h3>
+
+Lead Qualification
+
+</h3>
+
+<p>
+
+Collect names, phone numbers, emails, budgets, and project details before handing leads to your staff.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Continue with Part 2 -->
+
+<script src="js/app.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/checkout.js"></script>
 
 </body>
 </html>
