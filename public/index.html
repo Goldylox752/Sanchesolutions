@@ -1,580 +1,298 @@
 ```html
-<!-- ======================================================
-TRUSTED TECHNOLOGY
-====================================================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SancheSolutions | AI Automation</title>
 
-<section class="tech-section">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-    <div class="container">
+<style>
+:root{
+    --bg:#ffffff;
+    --surface:#f8fafc;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --primary:#10b981;
+    --primary-dark:#059669;
+}
 
-        <div class="section-heading center">
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-            <span class="section-label">
-                TECHNOLOGY STACK
-            </span>
+html{
+    scroll-behavior:smooth;
+}
 
-            <h2>
-                Built Using Industry-Leading Platforms
-            </h2>
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+}
 
-            <p>
-                Every solution is designed with reliable, scalable technology that grows alongside your business.
-            </p>
+.container{
+    width:min(1100px,90%);
+    margin:auto;
+}
 
-        </div>
+header{
+    position:sticky;
+    top:0;
+    background:rgba(255,255,255,.95);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+}
 
-        <div class="tech-grid">
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 0;
+}
 
-            <div class="tech-card">
-                <h3>OpenAI</h3>
-                <span>Conversational AI</span>
-            </div>
+.logo{
+    font-size:1.5rem;
+    font-weight:800;
+    text-decoration:none;
+    color:var(--text);
+}
 
-            <div class="tech-card">
-                <h3>Anthropic</h3>
-                <span>Advanced AI Models</span>
-            </div>
+.logo span{
+    color:var(--primary);
+}
 
-            <div class="tech-card">
-                <h3>Groq</h3>
-                <span>Ultra-Fast AI Inference</span>
-            </div>
+nav ul{
+    display:flex;
+    list-style:none;
+    gap:25px;
+}
 
-            <div class="tech-card">
-                <h3>Stripe</h3>
-                <span>Secure Payments</span>
-            </div>
+nav a{
+    text-decoration:none;
+    color:var(--muted);
+    font-weight:600;
+}
 
-            <div class="tech-card">
-                <h3>Supabase</h3>
-                <span>Database & Authentication</span>
-            </div>
+.button{
+    display:inline-block;
+    background:var(--primary);
+    color:#fff;
+    text-decoration:none;
+    padding:14px 26px;
+    border-radius:10px;
+    font-weight:700;
+    transition:.3s;
+}
 
-            <div class="tech-card">
-                <h3>n8n</h3>
-                <span>Workflow Automation</span>
-            </div>
+.button:hover{
+    background:var(--primary-dark);
+}
 
-        </div>
+.hero{
+    padding:90px 0;
+    text-align:center;
+}
 
-    </div>
+.hero h1{
+    font-size:clamp(2.5rem,6vw,4.5rem);
+    line-height:1.1;
+    margin-bottom:20px;
+}
 
-</section>
+.hero p{
+    max-width:700px;
+    margin:auto;
+    color:var(--muted);
+    font-size:1.1rem;
+}
 
+.hero-buttons{
+    margin-top:40px;
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
 
+.secondary{
+    background:white;
+    color:var(--text);
+    border:1px solid var(--border);
+}
 
-<!-- ======================================================
-WHY CHOOSE US
-====================================================== -->
+section{
+    padding:80px 0;
+}
 
-<section class="benefits" id="about">
+.section-title{
+    text-align:center;
+    margin-bottom:50px;
+}
+
+.section-title h2{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.section-title p{
+    color:var(--muted);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:25px;
+}
+
+.card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:30px;
+}
+
+.card h3{
+    margin-bottom:15px;
+}
+
+.card p{
+    color:var(--muted);
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:25px;
+    text-align:center;
+}
+
+.stat{
+    padding:30px;
+}
+
+.stat h2{
+    color:var(--primary);
+    font-size:2.4rem;
+}
+
+.cta{
+    background:var(--surface);
+    text-align:center;
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+}
+
+footer{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--muted);
+}
+
+@media(max-width:700px){
+
+nav{
+flex-direction:column;
+gap:20px;
+}
+
+nav ul{
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.hero{
+padding:70px 0;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
 
 <div class="container">
 
-<div class="section-heading">
+<nav>
 
-<span class="section-label">
+<a href="#" class="logo">
+Sanche<span>Solutions</span>
+</a>
 
-WHY SANCHESOLUTIONS
+<ul>
+<li><a href="#services">Services</a></li>
+<li><a href="#about">About</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
 
-</span>
-
-<h2>
-
-Automation Built Around Your Business
-
-</h2>
-
-<p>
-
-Every business operates differently. We build AI systems tailored to your workflows, helping reduce repetitive tasks, improve response times, and create a better experience for your customers.
-
-</p>
+</nav>
 
 </div>
 
+</header>
 
-<div class="benefit-grid">
-
-<div class="benefit-card">
-
-<div class="benefit-number">
-
-01
-
-</div>
-
-<h3>
-
-Capture Every Lead
-
-</h3>
-
-<p>
-
-Respond instantly to inquiries from your website, social media, and advertising campaigns before potential customers move on.
-
-</p>
-
-</div>
-
-
-<div class="benefit-card">
-
-<div class="benefit-number">
-
-02
-
-</div>
-
-<h3>
-
-Automate Repetitive Tasks
-
-</h3>
-
-<p>
-
-Reduce manual work by automating appointment scheduling, follow-ups, CRM updates, reminders, and customer communication.
-
-</p>
-
-</div>
-
-
-<div class="benefit-card">
-
-<div class="benefit-number">
-
-03
-
-</div>
-
-<h3>
-
-Connect Your Systems
-
-</h3>
-
-<p>
-
-Integrate AI with your CRM, calendars, payment platform, email, and internal tools so everything works together.
-
-</p>
-
-</div>
-
-
-<div class="benefit-card">
-
-<div class="benefit-number">
-
-04
-
-</div>
-
-<h3>
-
-Built to Scale
-
-</h3>
-
-<p>
-
-Whether you're a local service business or launching a SaaS platform, your automation can expand as your business grows.
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-```
-```html
-<!-- ======================================================
-AI SOLUTIONS
-====================================================== -->
-
-<section class="solutions" id="solutions">
-
-    <div class="container">
-
-        <div class="section-heading center">
-
-            <span class="section-label">
-                OUR SOLUTIONS
-            </span>
-
-            <h2>
-                AI Systems That Help Your Business Grow
-            </h2>
-
-            <p>
-                From customer conversations to payment processing, every solution is custom-built to streamline operations, improve response times, and support business growth.
-            </p>
-
-        </div>
-
-        <div class="solutions-grid">
-
-            <!-- Card 1 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">AI</div>
-
-                <h3>AI Receptionists</h3>
-
-                <p>
-                    Answer customer questions, qualify leads, schedule appointments, and provide support around the clock without missing opportunities outside business hours.
-                </p>
-
-                <ul>
-
-                    <li>24/7 customer responses</li>
-
-                    <li>Appointment booking</li>
-
-                    <li>Lead qualification</li>
-
-                    <li>CRM integration</li>
-
-                </ul>
-
-            </article>
-
-            <!-- Card 2 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">CRM</div>
-
-                <h3>CRM Automation</h3>
-
-                <p>
-                    Automatically organize leads, update customer records, trigger follow-up sequences, and keep your sales pipeline current.
-                </p>
-
-                <ul>
-
-                    <li>Lead tracking</li>
-
-                    <li>Pipeline management</li>
-
-                    <li>Email automation</li>
-
-                    <li>Sales reporting</li>
-
-                </ul>
-
-            </article>
-
-            <!-- Card 3 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">WEB</div>
-
-                <h3>Modern Business Websites</h3>
-
-                <p>
-                    Fast, responsive websites designed to convert visitors into customers with integrated forms, booking tools, and AI-powered interactions.
-                </p>
-
-                <ul>
-
-                    <li>Responsive design</li>
-
-                    <li>SEO ready</li>
-
-                    <li>Lead capture</li>
-
-                    <li>Analytics integration</li>
-
-                </ul>
-
-            </article>
-
-            <!-- Card 4 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">PAY</div>
-
-                <h3>Payment Systems</h3>
-
-                <p>
-                    Secure online payments, subscriptions, invoices, and customer billing integrated directly into your business workflows.
-                </p>
-
-                <ul>
-
-                    <li>Subscriptions</li>
-
-                    <li>One-time payments</li>
-
-                    <li>Invoices</li>
-
-                    <li>Webhook automation</li>
-
-                </ul>
-
-            </article>
-
-            <!-- Card 5 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">API</div>
-
-                <h3>Custom AI Integrations</h3>
-
-                <p>
-                    Connect AI models with your existing software to automate tasks, generate content, answer customer questions, and simplify operations.
-                </p>
-
-                <ul>
-
-                    <li>API development</li>
-
-                    <li>Workflow automation</li>
-
-                    <li>Data processing</li>
-
-                    <li>Custom integrations</li>
-
-                </ul>
-
-            </article>
-
-            <!-- Card 6 -->
-
-            <article class="solution-card">
-
-                <div class="solution-icon">DATA</div>
-
-                <h3>Business Data & Dashboards</h3>
-
-                <p>
-                    Centralize important business data into dashboards that provide clear insights into customers, sales, and operational performance.
-                </p>
-
-                <ul>
-
-                    <li>Live reporting</li>
-
-                    <li>Custom dashboards</li>
-
-                    <li>Business analytics</li>
-
-                    <li>Database management</li>
-
-                </ul>
-
-            </article>
-
-        </div>
-
-    </div>
-
-</section>
-```
-```html
-<!-- ======================================================
-HOW WE WORK
-====================================================== -->
-
-<section class="process-section" id="process">
-
-    <div class="container">
-
-        <div class="section-heading center">
-
-            <span class="section-label">
-                OUR PROCESS
-            </span>
-
-            <h2>
-                A Clear Process From Idea to Launch
-            </h2>
-
-            <p>
-                Every project follows a structured workflow designed to deliver a solution that fits your business and supports long-term growth.
-            </p>
-
-        </div>
-
-        <div class="process-grid">
-
-            <!-- STEP 1 -->
-
-            <div class="process-card">
-
-                <div class="process-number">
-                    01
-                </div>
-
-                <h3>
-                    Discovery
-                </h3>
-
-                <p>
-                    We learn how your business operates, identify repetitive tasks, and uncover opportunities where AI and automation can save time and improve customer experience.
-                </p>
-
-            </div>
-
-            <!-- STEP 2 -->
-
-            <div class="process-card">
-
-                <div class="process-number">
-                    02
-                </div>
-
-                <h3>
-                    Strategy & Design
-                </h3>
-
-                <p>
-                    We map your workflows, recommend the right technology stack, and create a solution tailored to your business goals.
-                </p>
-
-            </div>
-
-            <!-- STEP 3 -->
-
-            <div class="process-card">
-
-                <div class="process-number">
-                    03
-                </div>
-
-                <h3>
-                    Build & Integrate
-                </h3>
-
-                <p>
-                    We develop your AI solution, connect it with your existing tools, and test every workflow before launch.
-                </p>
-
-            </div>
-
-            <!-- STEP 4 -->
-
-            <div class="process-card">
-
-                <div class="process-number">
-                    04
-                </div>
-
-                <h3>
-                    Launch & Support
-                </h3>
-
-                <p>
-                    Once everything is live, we monitor performance, provide updates, and help your automation evolve as your business grows.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-<!-- ======================================================
-FEATURE HIGHLIGHTS
-====================================================== -->
-
-<section class="features-section">
+<section class="hero">
 
 <div class="container">
 
-<div class="features-grid">
-
-<div class="feature-large">
-
-<h2>
-
-Designed for Modern Businesses
-
-</h2>
+<h1>
+AI Automation That Helps Your Business Work Smarter
+</h1>
 
 <p>
-
-Our systems are built with performance, security, and scalability in mind. Whether you're automating customer support, generating leads, or launching a SaaS platform, every solution is designed to integrate with your existing workflow.
-
+We build AI-powered automation, modern websites, CRM integrations, and custom business systems that help companies save time, streamline operations, and deliver better customer experiences.
 </p>
 
-<a href="#contact" class="primary-button">
+<div class="hero-buttons">
 
-Let's Build Your System
+<a href="#contact" class="button">
+Book a Free Consultation
+</a>
 
+<a href="#services" class="button secondary">
+Our Services
 </a>
 
 </div>
 
+</div>
 
-<div class="feature-list">
+</section>
 
-<div class="feature-item">
+<section id="services">
 
-<h4>Fast Deployment</h4>
+<div class="container">
 
-<p>
+<div class="section-title">
 
-Solutions are developed efficiently using modern technologies and proven development practices.
+<h2>What We Build</h2>
 
-</p>
+<p>Practical AI and automation solutions tailored to your business.</p>
 
 </div>
 
+<div class="grid">
 
-<div class="feature-item">
-
-<h4>Custom Integrations</h4>
-
-<p>
-
-Connect with your CRM, payment provider, email platform, scheduling software, and business applications.
-
-</p>
-
+<div class="card">
+<h3>AI Assistants</h3>
+<p>Automate customer conversations, answer questions, qualify leads, and schedule appointments.</p>
 </div>
 
-
-<div class="feature-item">
-
-<h4>Secure Infrastructure</h4>
-
-<p>
-
-Built using trusted cloud services with secure authentication, encrypted communication, and reliable hosting.
-
-</p>
-
+<div class="card">
+<h3>Business Automation</h3>
+<p>Connect your CRM, forms, email, scheduling, and internal workflows to reduce manual work.</p>
 </div>
 
-
-<div class="feature-item">
-
-<h4>Future Ready</h4>
-
-<p>
-
-As your business evolves, your automation can expand with new workflows, integrations, and AI capabilities.
-
-</p>
-
-</div>
-
+<div class="card">
+<h3>Custom Websites</h3>
+<p>Modern, responsive websites built for speed, lead generation, and long-term growth.</p>
 </div>
 
 </div>
@@ -582,4 +300,75 @@ As your business evolves, your automation can expand with new workflows, integra
 </div>
 
 </section>
+
+<section id="about">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>Why SancheSolutions?</h2>
+
+<p>Focused on reliable technology and measurable business value.</p>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<h2>24/7</h2>
+<p>AI Availability</p>
+</div>
+
+<div class="stat">
+<h2>Fast</h2>
+<p>Modern Development</p>
+</div>
+
+<div class="stat">
+<h2>Custom</h2>
+<p>Solutions Built for You</p>
+</div>
+
+<div class="stat">
+<h2>Secure</h2>
+<p>Scalable Architecture</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="cta" id="contact">
+
+<div class="container">
+
+<h2 style="margin-bottom:20px;">
+Let's Build Your Next AI Solution
+</h2>
+
+<p style="max-width:650px;margin:0 auto 35px;color:#6b7280;">
+Whether you need an AI assistant, workflow automation, or a modern business website, let's discuss how technology can support your goals.
+</p>
+
+<a href="mailto:byronsanche@zohomailcloud.ca" class="button">
+Contact Me
+</a>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+© 2026 SancheSolutions. All rights reserved.
+</p>
+
+</footer>
+
+</body>
+</html>
 ```
